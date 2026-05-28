@@ -24,3 +24,6 @@ node_modules/
 *.bak_ga
 *.py
 .DS_Store
+.env.local
+.env.prod
+.env*
