@@ -1,0 +1,9 @@
+{
+  "name": "career-agent-api",
+  "version": "1.0.0",
+  "dependencies": {
+    "@sparticuz/chromium-min": "^148.0.0",
+    "node-fetch": "^2.7.0",
+    "puppeteer-core": "^21.11.0"
+  }
+}
