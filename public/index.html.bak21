@@ -1,0 +1,2836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Career Destiny — Vedic Analysis</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root{
+  --gold:#B8860B;
+  --gold-light:#D4A017;
+  --gold-bg:rgba(184,134,11,0.08);
+  --bg:#FAF8F3;
+  --bg-card:#FFFFFF;
+  --bg-form:#F5F0E8;
+  --border:#E8E0D0;
+  --text:#1A1410;
+  --text-muted:#6B5F4E;
+  --text-dim:#9C8E7A;
+  --purple:#534AB7;
+  --green:#1D9E75;
+  --accent-bg:rgba(83,74,183,0.06);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+.app{
+  width:100%;
+  max-width:480px;
+  margin:0 auto;
+  min-height:100vh;
+  background:var(--bg);
+}
+
+/* HEADER */
+.hdr{
+  padding:14px 20px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-card);
+  position:sticky;
+  top:0;
+  z-index:100;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);
+}
+
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.dot.er{background:#E24B4A;}
+.dot.ld{background:var(--gold);animation:bk 1s infinite;}
+@keyframes bk{0%,100%{opacity:1}50%{opacity:.3}}
+
+.htitle{
+  font-family:'Playfair Display',serif;
+  font-size:16px;
+  font-weight:500;
+  color:var(--text);
+  letter-spacing:0.3px;
+}
+
+.hsub{font-size:11px;color:var(--text-dim);margin-left:auto;text-align:right;}
+
+#lang-btn{
+  margin-left:8px;
+  padding:5px 12px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  background:var(--gold-bg);
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+  color:var(--gold);
+  flex-shrink:0;
+  font-family:'DM Sans',sans-serif;
+}
+
+/* HERO — compact, just text */
+.hero{
+  padding:20px 20px 16px;
+  background:linear-gradient(180deg,#FDF8EE 0%,var(--bg) 100%);
+  border-bottom:1px solid var(--border);
+  text-align:center;
+}
+
+.hero-badge{
+  display:inline-block;
+  font-size:10px;
+  letter-spacing:0.12em;
+  color:var(--gold);
+  border:1px solid rgba(184,134,11,0.3);
+  padding:3px 10px;
+  border-radius:20px;
+  margin-bottom:10px;
+  text-transform:uppercase;
+  background:var(--gold-bg);
+}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:22px;
+  font-weight:600;
+  color:var(--text);
+  line-height:1.3;
+  margin-bottom:6px;
+}
+
+.hero-title span{color:var(--gold-light);}
+
+.hero-sub{
+  font-size:12px;
+  color:var(--text-muted);
+  line-height:1.6;
+  margin-bottom:10px;
+}
+
+.hero-pills{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.hero-pill{
+  font-size:10px;
+  color:var(--text-dim);
+  border:1px solid var(--border);
+  padding:2px 8px;
+  border-radius:20px;
+  background:var(--bg-card);
+}
+
+/* FORM */
+.form-section{padding:16px 20px 20px;}
+
+.form-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+}
+
+.form-title{
+  font-family:'Playfair Display',serif;
+  font-size:15px;
+  font-weight:500;
+  color:var(--text);
+  margin-bottom:3px;
+}
+
+.form-sub{font-size:12px;color:var(--text-muted);margin-bottom:16px;}
+
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+
+label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:0.3px;}
+
+input,select{
+  padding:9px 12px;
+  font-size:14px;
+  font-family:'DM Sans',sans-serif;
+  border:1px solid var(--border);
+  border-radius:8px;
+  background:var(--bg-form);
+  color:var(--text);
+  width:100%;
+  outline:none;
+  transition:border-color 0.2s;
+}
+input:focus,select:focus{border-color:var(--gold);}
+
+.analyze-btn{
+  width:100%;
+  padding:13px;
+  background:var(--purple);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+  font-family:'DM Sans',sans-serif;
+  cursor:pointer;
+  margin-top:6px;
+  transition:background 0.2s;
+}
+.analyze-btn:hover{background:#3C3489;}
+.analyze-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+.divider{height:1px;background:var(--border);margin:0;}
+
+/* RESULT */
+.result-header{
+  padding:12px 20px;
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-card);
+}
+.name{font-size:12px;color:var(--text-muted);flex:1;}
+.reset-btn{font-size:11px;color:var(--text-muted);background:transparent;border:1px solid var(--border);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+/* dl-btn pill style removed */
+
+/* MESSAGES */
+.msgs{padding:14px 20px;display:flex;flex-direction:column;gap:12px;min-height:60px;}
+.msgs:empty{display:none;}
+.row{display:flex;gap:8px;align-items:flex-start;}
+.row.u{flex-direction:row-reverse;}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;margin-top:2px;}
+.av.a{background:#EEF;color:var(--purple);}
+.av.u{background:var(--gold-bg);color:var(--gold);}
+.bub{max-width:90%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.7;}
+.bub.a{background:#fff;color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--border);}
+.bub.u{background:#EEF;color:#26215C;border-bottom-right-radius:4px;}
+.bub.er{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+
+.ldot{display:flex;gap:5px;align-items:center;padding:4px 0;}
+.ldot span{width:6px;height:6px;border-radius:50%;background:var(--text-dim);animation:pu 1.2s infinite;}
+.ldot span:nth-child(2){animation-delay:.2s;}
+.ldot span:nth-child(3){animation-delay:.4s;}
+@keyframes pu{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+.prog{padding:10px 20px;display:flex;flex-direction:column;gap:5px;}
+.prog-item{display:flex;align-items:center;gap:8px;font-size:12px;}
+.prog-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.prog-dot.done{background:var(--green);}
+.prog-dot.act{background:var(--gold);animation:bk 1s infinite;}
+.prog-dot.wait{background:var(--border);}
+.prog-text.done{color:var(--text-dim);}
+.prog-text.act{color:var(--gold);}
+.prog-text.wait{color:var(--text-dim);}
+
+/* Report */
+.rpt{color:var(--text);}
+.rpt p{color:var(--text-muted);font-size:13px;line-height:1.8;margin-bottom:10px;}
+.rpt strong{color:var(--text);font-weight:600;}
+.rpt table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;}
+.rpt thead th{text-align:left;padding:8px 10px;background:var(--accent-bg);color:var(--purple);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border);}
+.rpt tbody tr{border-bottom:1px solid var(--border);}
+.rpt tbody tr:nth-child(even){background:#FAFAF8;}
+.rpt tbody td{padding:8px 10px;color:var(--text-muted);vertical-align:top;font-size:12px;}
+.rpt tbody td:first-child{color:var(--text);font-weight:500;}
+.rpt .rpt-hd{font-family:'Playfair Display',serif;font-size:14px;color:var(--text);margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+.rpt-verdict{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid rgba(83,74,183,0.2);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:500;color:var(--purple);margin-bottom:8px;}
+
+/* Chat */
+.chat-section{border-top:1px solid var(--border);}
+.bottom-bar{position:sticky;bottom:0;background:var(--bg-card);border-top:1px solid var(--border);z-index:50;}
+.bottom-bar .dl-btn{display:block;width:calc(100% - 32px);margin:10px 16px 6px;padding:11px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;}
+.bottom-bar .dl-btn:hover{opacity:0.9;}
+.chat-inp{padding:6px 16px 12px;display:flex;gap:8px;background:var(--bg-card);}
+.chat-inp input{flex:1;padding:9px 12px;font-size:13px;border:1px solid var(--border);border-radius:8px;background:var(--bg-form);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;}
+.chat-inp input:focus{border-color:var(--purple);}
+.chat-btn{padding:9px 16px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+.confirm-section{padding:14px 20px;border-top:1px solid var(--border);}
+.confirm-q{font-size:13px;color:var(--text-muted);margin-bottom:10px;}
+.confirm-btns{display:flex;gap:8px;}
+.confirm-yes{flex:1;padding:10px;background:var(--purple);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.confirm-no{flex:1;padding:10px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+/* Responsive */
+@media(max-width:599px){
+  .form-grid{grid-template-columns:1fr;}
+  .form-group.full{grid-column:1;}
+  .av{display:none;}
+  .bub{max-width:100%;width:100%;}
+}
+@media(min-width:600px){
+  body{padding:20px;display:flex;align-items:flex-start;justify-content:center;}
+  .app{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.08);}
+}
+</style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6EP70RFV5S"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-6EP70RFV5S');
+</script>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="dot" id="dot"></div>
+    <span class="htitle" id="app-title">Career Destiny</span>
+    <span class="hsub" id="hsub">Vedic Analysis · Sapta Sutri Siddhant</span>
+    <button id="lang-btn" onclick="toggleLang()" style="margin-left:auto;padding:5px 12px;border:1px solid #ddd;border-radius:20px;background:#f5f5f0;font-size:12px;font-weight:500;cursor:pointer;color:#555;flex-shrink:0;">हिंदी</button>
+  </div>
+
+  <!-- Birth Details Form -->
+  <div class="hero">
+    <div class="hero-badge">Vedic Jyotish · Sapta Sutri Siddhant</div>
+    <div class="hero-title">Discover Your<br><span>Career Destiny</span></div>
+    <div class="hero-sub">Your birth chart holds the answer — Job or Business, when to leap, what work fulfills you.</div>
+    <div class="hero-pills">
+      <span class="hero-pill">D1 · D9 · D10</span>
+      <span class="hero-pill">Vimshottari Dasha</span>
+      <span class="hero-pill">Gochar Transits</span>
+    </div>
+  </div>
+  
+  <div class="form-section" id="form-section">
+  <div class="form-card">
+  <div class="form-card">
+    <div class="form-title" onclick="cdTrack('form_start')">Enter Birth Details</div>
+    <div class="form-sub">All fields required for accurate analysis</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="f-name">Your Name (optional)</label>
+        <input type="text" id="f-name" placeholder="e.g. Rahul Sharma"/>
+      </div>
+      <div class="form-group">
+        <label for="f-dob">Date of Birth</label>
+        <input type="text" id="f-dob" placeholder="DD/MM/YYYY" onfocus="cdTrack('field_focus',{field:'dob'})" maxlength="10" required
+          oninput="formatDOB(this)"
+          onkeydown="handleDOBKey(event,this)"/>
+      </div>
+      <div class="form-group">
+        <label for="f-time">Time of Birth</label>
+        <input type="time" id="f-time" required onfocus="cdTrack('field_focus',{field:'time'})"/>
+      </div>
+      <div class="form-group">
+        <label for="f-place">Place of Birth</label>
+        <input type="text" id="f-place" onfocus="cdTrack('field_focus',{field:'place'})" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+      </div>
+      <div class="form-group full">
+        <label for="f-email">Email Address <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
+        <input type="email" id="f-email" placeholder="your@email.com" onfocus="cdTrack('field_focus',{field:'email'})"/>
+        <div style="font-size:11px;color:#aaa;margin-top:4px;">📧 Email required to receive your report as PDF</div>
+      </div>
+    </div>
+    <button class="analyze-btn" id="analyze-btn" onclick="analyze()">Analyze My Career Destiny</button>
+  </div></div></div>
+
+  <div class="divider"></div>
+
+  <!-- Results Section -->
+  <div id="result-section" style="display:none">
+    <div class="result-header">
+      <span class="name" id="result-name"></span>
+      <button class="reset-btn" onclick="reset()">← Analyze another</button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="bottom-bar" id="bottom-bar" style="display:none">
+      <button class="dl-btn" id="dl-report-btn" onclick="triggerDownload()">📧 Email My Report</button>
+      <div class="chat-inp" id="chat-inp">
+        <input type="text" id="chat-ui" placeholder="Ask a follow-up question..."/>
+        <button class="chat-btn" id="chat-btn" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ─── Career Destiny Analytics ───────────────────────────────────────────────
+function cdTrack(event, params){
+  try{
+    if(typeof gtag !== 'undefined'){
+      gtag('event', event, params || {});
+    }
+  } catch(e){ /* silent fail */ }
+}
+// ────────────────────────────────────────────────────────────────────────────
+var _RASHI_EN={'Mesha':'Aries','Vrishabha':'Taurus','Mithuna':'Gemini','Karka':'Cancer','Simha':'Leo','Kanya':'Virgo','Tula':'Libra','Vrischika':'Scorpio','Dhanu':'Sagittarius','Makar':'Capricorn','Kumbha':'Aquarius','Meena':'Pisces'};
+var _RASHI_HI={'Mesha':'मेष','Vrishabha':'वृषभ','Mithuna':'मिथुन','Karka':'कर्क','Simha':'सिंह','Kanya':'कन्या','Tula':'तुला','Vrischika':'वृश्चिक','Dhanu':'धनु','Makar':'मकर','Kumbha':'कुंभ','Meena':'मीन'};
+window._RASHI_EN=_RASHI_EN;
+window._RASHI_HI=_RASHI_HI;
+
+const API='';
+let hist=[];
+let chartData=null;
+
+const M=document.getElementById('msgs');
+
+function setStat(s,t){
+  document.getElementById('dot').className='dot'+(s==='er'?' er':s==='ld'?' ld':'');
+  document.getElementById('hsub').textContent=t||'Vedic Analysis · Sapta Sutri Siddhant';
+}
+
+function addRow(role,content,type){
+  const w=document.createElement('div');w.className='row '+(role==='agent'?'agent':'u');
+  const av=document.createElement('div');av.className='av '+(role==='agent'?'a':'u');
+  av.textContent=role==='agent'?'ज':'आ';
+  const b=document.createElement('div');
+  b.className='bub '+(role==='agent'?'a':'u')+(type?' '+type:'');
+  if(typeof content==='string')b.innerHTML=content.replace(/\n/g,'<br>');
+  else b.appendChild(content);
+  w.appendChild(av);w.appendChild(b);
+  M.appendChild(w);M.scrollTop=M.scrollHeight;
+  return w;
+}
+
+function addLoader(txt){
+  removeLoader();
+  const w=document.createElement('div');w.className='row agent';w.id='lrow';
+  const av=document.createElement('div');av.className='av a';av.textContent='ज';
+  const b=document.createElement('div');b.className='bub a';
+  b.innerHTML='<div class="ldot"><span></span><span></span><span></span></div>'+(txt?'<div style="font-size:12px;color:#888;margin-top:4px">'+txt+'</div>':'');
+  w.appendChild(av);w.appendChild(b);M.appendChild(w);M.scrollTop=M.scrollHeight;
+}
+function removeLoader(){const l=document.getElementById('lrow');if(l)l.remove();}
+
+function addProg(steps){
+  removeProg();
+  const w=document.createElement('div');w.className='row agent';w.id='prow';
+  const av=document.createElement('div');av.className='av a';av.textContent='ज';
+  const b=document.createElement('div');b.className='bub a';
+  const p=document.createElement('div');p.className='prog';
+  steps.forEach(function(s){
+    const r=document.createElement('div');r.className='prow';
+    const ic=document.createElement('div');ic.className='pic '+s[1];
+    ic.textContent=s[1]==='done'?'✓':s[1]==='act'?'…':'○';
+    r.appendChild(ic);
+    const t=document.createElement('span');t.textContent=s[0];
+    r.appendChild(t);p.appendChild(r);
+  });
+  b.appendChild(p);w.appendChild(av);w.appendChild(b);M.appendChild(w);M.scrollTop=M.scrollHeight;
+}
+function removeProg(){const p=document.getElementById('prow');if(p)p.remove();}
+
+function addQuick(opts){
+  const w=document.createElement('div');w.className='row agent';
+  const av=document.createElement('div');av.className='av a';av.textContent='ज';
+  const b=document.createElement('div');b.className='bub a';
+  const q=document.createElement('div');q.className='qbtns';
+  opts.forEach(function(o){
+    const btn=document.createElement('button');btn.className='qbtn';btn.textContent=o;
+    btn.onclick=function(){
+      cdTrack('question_clicked', {question: o});
+      document.getElementById('chat-ui').value=o;
+      sendChat();
+    };
+    q.appendChild(btn);
+  });
+  b.appendChild(q);w.appendChild(av);w.appendChild(b);M.appendChild(w);M.scrollTop=M.scrollHeight;
+}
+
+async function geocode(place){
+  const r=await fetch(API+"/api/geocode?place="+encodeURIComponent(place));
+  if(!r.ok)throw new Error("Geocode HTTP "+r.status);
+  const data=await r.json();
+  if(data.error)throw new Error(data.error);
+  if(!data||!data.length)throw new Error("Place not found: "+place+". Please be more specific.");
+  var glat=parseFloat(data[0].lat);
+  var glon=parseFloat(data[0].lon);
+  if(isNaN(glat)||isNaN(glon))throw new Error("Could not get coordinates for: "+place);
+  return {lat:glat, lon:glon, name:data[0].display_name, coordinates:glat+","+glon};
+}
+
+async function chartAPI(endpoint,params){
+  const qs=new URLSearchParams(Object.assign({endpoint:endpoint},params)).toString();
+  const r=await fetch(API+'/api/chart?'+qs);
+  if(!r.ok)throw new Error(endpoint+' HTTP '+r.status);
+  const data=await r.json();
+  if(data.errors)throw new Error(data.errors[0].detail||JSON.stringify(data.errors));
+  if(data.error)throw new Error(data.error);
+  return data;
+}
+
+function parseDT(dob,time){
+  return dob+'T'+time+':00+05:30';
+}
+
+async function fetchChart(datetime,coords){
+  console.log('coords object:',JSON.stringify(coords)); var coordStr=coords.coordinates||(coords.lat+','+(coords.lon||coords.lon)); console.log('coordStr:',coordStr); const p={coordinates:coordStr,datetime:datetime};
+  // Batch 1: D1 planets and dasha
+  const batch1=await Promise.all([
+    chartAPI('planet-position',p),
+    chartAPI('dasha-periods',p)
+  ]);
+  await new Promise(function(r){setTimeout(r,1200);});
+  // Batch 2: D9, D10, Gochar, Yoga
+  const batch2=await Promise.all([
+    chartAPI('navamsha',p),
+    chartAPI('dashamsha',p),
+    chartAPI('gochar',{coordinates:coords.lat+','+coords.lon}),
+    chartAPI('yoga',p).catch(function(){return null;})
+  ]);
+  return{planets:batch1[0],dasha:batch1[1],navamsha:batch2[0],dashamsha:batch2[1],gochar:batch2[2],yoga:batch2[3]};
+}
+
+async function fetchChartSVGs(datetime,coords){
+  var base=API+'/api/chart?endpoint=chart-svg&coordinates='+coords.lat+','+coords.lon+'&datetime='+encodeURIComponent(datetime)+'&chart_style=north-indian';
+  var today=new Date();
+  var ist=new Date(today.getTime()+(5.5*60*60*1000));
+  var pad=function(n){return String(n).padStart(2,'0');};
+  var todayDT=ist.getUTCFullYear()+'-'+pad(ist.getUTCMonth()+1)+'-'+pad(ist.getUTCDate())+'T12:00:00+05:30';
+  var gbase=API+'/api/chart?endpoint=chart-svg&coordinates='+coords.lat+','+coords.lon+'&datetime='+encodeURIComponent(todayDT)+'&chart_style=north-indian';
+  // Batch SVG fetches to avoid rate limit
+  var r1=await Promise.all([
+    fetch(base+'&chart_type=rasi').then(function(x){return x.text();}),
+    fetch(base+'&chart_type=navamsa').then(function(x){return x.text();})
+  ]);
+  await new Promise(function(r){setTimeout(r,1200);});
+  var r2=await Promise.all([
+    fetch(base+'&chart_type=dasamsa').then(function(x){return x.text();}),
+    fetch(gbase+'&chart_type=rasi').then(function(x){return x.text();})
+  ]);
+  return{d1:r1[0],d9:r1[1],d10:r2[0],gochar:r2[1]};
+}
+
+function mdToHtml(text){
+    if(!text) return '';
+    // Clean meta-commentary
+    text = text.replace(/I notice[^\n]*/gi,'').replace(/I will derive[^\n]*/gi,'').replace(/I cannot[^\n]*/gi,'').replace(/Looking at[^\n]*/gi,'');
+    // Headers (##)
+    text = text.replace(/^##\s+(.+)$/gm,'<h3 style="font-size:13px;font-weight:600;color:#1a1a1a;margin:14px 0 6px;text-transform:uppercase;letter-spacing:0.05em;">$1</h3>');
+    text = text.replace(/^###\s+(.+)$/gm,'<h4 style="font-size:12px;font-weight:600;color:#444;margin:10px 0 4px;">$1</h4>');
+    // Tables
+    text = text.replace(/\|(.+)\|\s*\n\|[-| :]+\|\s*\n((?:\|.+\|\s*\n?)+)/g, function(m, header, rows){
+      var ths = header.split('|').filter(function(s){return s.trim();}).map(function(s){
+        return '<th>'+s.trim()+'</th>';
+      }).join('');
+      var trs = rows.trim().split('\n').map(function(row){
+        var cells = row.split('|').filter(function(s){return s.trim();});
+        return '<tr>'+cells.map(function(s,i){
+          var txt = s.trim();
+          // Badge for last column
+          if(i===cells.length-1){
+            var low=txt.toLowerCase();
+            if(low.includes('business')) return '<td><span class="badge-biz">'+txt+'</span></td>';
+            if(low.includes('job')) return '<td><span class="badge-job">'+txt+'</span></td>';
+            if(low.includes('neutral')) return '<td><span class="badge-neu">'+txt+'</span></td>';
+            if(low.includes('active')) return '<td><span class="badge-active">'+txt+'</span></td>';
+            if(low.includes('upcoming')||low.includes('activates')) return '<td><span class="badge-upcoming">'+txt+'</span></td>';
+            if(low.includes('peak')) return '<td><span class="badge-peak">'+txt+'</span></td>';
+          }
+          return '<td>'+txt+'</td>';
+        }).join('')+'</tr>';
+      }).join('');
+      return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+    });
+    // Bold
+    text = text.replace(/\*\*([^*]+)\*\*/g,'<strong style="">$1</strong>');
+    // Italic
+    text = text.replace(/\*([^*\n]+)\*/g,'<em style="color:#666;">$1</em>');
+    // Section labels e.g. "As an Employee:" on its own line
+    text = text.replace(/^([A-Z][^:\n]{2,30}):\s*$/gm,'<div style="font-size:11px;font-weight:600;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin:14px 0 6px;padding-bottom:4px;border-bottom:0.5px solid #eee;">$1</div>');
+    // Bullet points
+    text = text.replace(/^[-•]\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin-bottom:6px;font-size:13px;color:#555;line-height:1.6;"><span style="color:#c9a96e;font-weight:700;flex-shrink:0;margin-top:1px;">•</span><div>$1</div></div>');
+    // Numbered lists
+    text = text.replace(/^(\d+)\.\s+(.+)$/gm,'<div style="display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;"><span style="font-size:15px;font-weight:700;color:#c9a96e;min-width:22px;flex-shrink:0;line-height:1.4;">$1</span><div style="font-size:13px;color:#555;line-height:1.6;">$2</div></div>');
+    // Numbered list items  
+    text = text.replace(/^(\d+)\.\s+(.+)$/gm, '<div class="list-item"><span class="list-num">$1</span><div>$2</div></div>');
+    // Paragraphs
+    var paras = text.split(/\n\n+/).filter(function(p){return p.trim();});
+    return paras.map(function(p){
+      p = p.trim();
+      if(p.startsWith('<')) return p;
+      return '<p>'+p.replace(/\n/g,'<br>')+'</p>';
+    }).join('');
+  }
+
+function downloadReport(meta, analysis, svgs){
+
+  function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function extractVerdict(text){
+    var m = text.match(/VERDICT:\s*([A-Z]+)/i);
+    return m ? m[1].toUpperCase() : 'MIXED';
+  }
+
+  function extractSection(text, num){
+    // Primary: --- SECTION N --- format
+    var re1 = new RegExp('---\\s*\\nSECTION\\s+'+num+'[^\\n]*\\n---\\n?([\\s\\S]*?)(?=\\n---\\s*\\nSECTION |\\n---\\s*$|$)');
+    var m1 = text.match(re1);
+    if(m1 && m1[1].trim()) return m1[1].trim();
+    // Fallback: ## SECTION N format
+    var re2 = new RegExp('##\\s+SECTION\\s+'+num+'[^\\n]*\\n([\\s\\S]*?)(?=\\n##\\s+SECTION\\s+|\\n---\\s*\\nSECTION |$)');
+    var m2 = text.match(re2);
+    return m2 ? m2[1].trim() : '';
+  }
+
+
+
+  function parseVerdictDrivers(s3){
+    // Extract checkmark lines from confirmation paragraph or scorecard
+    var drivers = [];
+    var bizCount = 0, jobCount = 0, neuCount = 0;
+    var lines = s3.split('\n');
+    lines.forEach(function(l){
+      var low = l.toLowerCase();
+      if(low.includes('→ business') || low.includes('points to | business') || (low.includes('business') && low.includes('|'))) bizCount++;
+      if(low.includes('→ job') || low.includes('points to | job') || (low.includes('job') && low.includes('|'))) jobCount++;
+      if(low.includes('neutral')) neuCount++;
+    });
+    return {biz:bizCount, job:jobCount, neu:neuCount};
+  }
+
+  function parseWhoYouAre(s1){
+    var lagna='', moon='', style='', env='';
+    var lagnaM = s1.match(/(\w+)\s+(?:Ascendant|Lagna|Rising)/i) || s1.match(/([A-Z][a-z]+)\s+Lagna/);
+    var moonM = s1.match(/(\w+)\s+Moon/i);
+    var styleM = s1.match(/working style[^:]*:?\s*([^.\n]+)/i);
+    var envM = s1.match(/(?:best|perform|environment)[^:]*:?\s*([^.\n]+)/i);
+    if(lagnaM) lagna = lagnaM[1];
+    if(moonM) moon = moonM[1];
+    if(styleM) style = styleM[1].trim();
+    if(envM) env = envM[1].trim();
+    return {lagna:lagna, moon:moon, style:style, env:env};
+  }
+
+  function parseGochar(s10){
+    // Extract 3 planet observations from Section 10
+    var planets = [];
+    var icons = ['★','◆','▲'];
+    var paras = s10.split(/\n\n+/).filter(function(p){return p.trim();});
+    paras.slice(0,3).forEach(function(p, i){
+      // Extract planet name and house
+      var planetM = p.match(/(?:Right now,\s+)?(Jupiter|Saturn|Mars|Mercury|Venus|Sun|Moon|Rahu|Ketu)/i);
+      var houseM = p.match(/(?:through your|in your|moving through your)\s+(\w+)\s+house/i) || p.match(/H(\d+)/);
+      var planet = planetM ? planetM[1] : 'Planet';
+      var house = houseM ? houseM[1]+' House' : '';
+      // Get the key insight — 2 sentences max
+      var sentences = p.match(/[^.!?]+[.!?]+/g) || [p];
+      var insight = sentences.slice(0,2).join(' ').replace(/^Right now,?\s*/i,'').trim();
+      planets.push({icon:icons[i]||'●', planet:planet, house:house, insight:insight});
+    });
+    return planets;
+  }
+
+  function parseDashas(s8){
+    var rows = [];
+    var tableMatch = s8.match(/\|([^\n]+)\n\|[-| ]+\n((?:\|[^\n]+\n?)+)/);
+    if(tableMatch){
+      tableMatch[2].trim().split('\n').forEach(function(row){
+        var cells = row.split('|').filter(function(s){return s.trim();});
+        if(cells.length >= 4){
+          var type = cells[0].trim();
+          var isCurrent = type.toLowerCase().includes('current');
+          var isNext = type.toLowerCase().includes('next') || type.toLowerCase().includes('after');
+          var isCaution = cells[4] && cells[4].toLowerCase().includes('avoid');
+          rows.push({
+            type: type,
+            planet: cells[1].trim(),
+            from: cells[2].trim(),
+            to: cells[3].trim(),
+            meaning: cells[4] ? cells[4].trim() : '',
+            isCurrent: isCurrent,
+            isNext: isNext,
+            isCaution: isCaution
+          });
+        }
+      });
+    }
+    return rows.slice(0,5);
+  }
+
+  function parseWindows(s9){
+    var windows = [];
+    // Match Window 1 — capture everything until Window 2 or Caution
+    var w1m = s9.match(/Window\s+1[^:\n]*[:\s\u2014\u2013-]*\*{0,2}([\s\S]*?)(?=Window\s+2|Caution|$)/i);
+    var w2m = s9.match(/Window\s+2[^:\n]*[:\s\u2014\u2013-]*\*{0,2}([\s\S]*?)(?=Caution|Timing window|$)/i);
+    var wcm = s9.match(/\*?\*?Caution[^:\n]*[:\s—–]*\*?\*?([\s\S]*?)(?=Timing window|$)/i);
+
+    if(w1m && w1m[1].trim().length > 3) windows.push({label:'Window 1', type:'positive', text:w1m[1].trim()});
+    if(w2m && w2m[1].trim().length > 3) windows.push({label:'Window 2', type:'positive', text:w2m[1].trim()});
+    if(wcm && wcm[1].trim().length > 3) windows.push({label:'Caution Period', type:'caution', text:wcm[1].trim()});
+    // If caution is missing or empty, add a placeholder from s9
+    if(!wcm || wcm[1].trim().length <= 3){
+      var lastSentM = s9.match(/avoid[^.]+\./i);
+      if(lastSentM) windows.push({label:'Caution Period', type:'caution', text:lastSentM[0].trim()});
+    }
+    return windows;
+  }
+
+  function parseWorkTypes(s6){
+    var items = [];
+    var lines = s6.split('\n');
+    var current = null;
+    var sectionLabel = '';
+    lines.forEach(function(l){
+      var lt = l.trim();
+      // Detect section labels like "As an Employee:" or "As an Entrepreneur:"
+      var labelM = lt.match(/^\*\*([^*]+):\*\*$/) || lt.match(/^([A-Z][^:]{2,30}):$/);
+      if(labelM){
+        if(current) items.push(current);
+        current = null;
+        sectionLabel = labelM[1].trim();
+        items.push({isLabel:true, label:sectionLabel});
+        return;
+      }
+      // Numbered item: "1. **Title** — description" or "1. Title — description"
+      var numM = lt.match(/^(\d+)\.\s+(.+)/);
+      if(numM){
+        if(current) items.push(current);
+        var rest = numM[2];
+        // Remove bold markers from title area
+        rest = rest.replace(/\*\*/g,'');
+        // Split on em dash or regular dash
+        var dashM = rest.match(/^([^—–]+)[—–](.+)/);
+        if(dashM){
+          current = {num:numM[1], title:dashM[1].trim(), desc:dashM[2].trim(), section:sectionLabel};
+        } else {
+          current = {num:numM[1], title:rest.trim(), desc:'', section:sectionLabel};
+        }
+      } else if(current && lt && !lt.match(/^\d+\./)){
+        current.desc += (current.desc?' ':'')+lt;
+      }
+    });
+    if(current) items.push(current);
+    return items;
+  }
+
+  var verdict = extractVerdict(analysis);
+  var s1 = extractSection(analysis,1);
+  var s3 = extractSection(analysis,3);
+  var s4 = extractSection(analysis,4);
+  var s5 = extractSection(analysis,5);
+  var s6 = extractSection(analysis,6);
+  var s7 = extractSection(analysis,7);
+  var s8 = extractSection(analysis,8);
+  var s9 = extractSection(analysis,9);
+  var s10 = extractSection(analysis,10);
+  var s11 = extractSection(analysis,11);
+
+  var who = parseWhoYouAre(s1);
+  var drivers = parseVerdictDrivers(s3);
+  var dashas = parseDashas(s8);
+  var windows = parseWindows(s9);
+  var gochar = parseGochar(s10);
+  var workTypes = parseWorkTypes(s6);
+
+  var verdictColor = verdict==='BUSINESS'?'#1D9E75':verdict==='JOB'?'#534AB7':'#c9a96e';
+  var today = new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});
+
+  // Charts
+  var chartsHtml = '';
+  if(svgs){
+    var chartList = [['d1','D1 — Birth Chart'],['d9','D9 — Soul Strength'],['d10','D10 — Career Chart'],['gochar','Gochar — Current Sky']];
+    chartsHtml = '<div class="charts-grid">';
+    chartList.forEach(function(pair){
+      chartsHtml += '<div class="chart-card"><div class="chart-label">'+pair[1]+'</div>'+(svgs[pair[0]]||'<div class="chart-empty">Unavailable</div>')+'</div>';
+    });
+    chartsHtml += '</div>';
+  }
+
+  // Work type cards
+  var workHtml = '';
+  if(workTypes.length > 0){
+    workTypes.forEach(function(w){
+      if(w.isLabel){
+        workHtml += '<div style="font-size:11px;font-weight:600;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin:16px 0 8px;padding-bottom:4px;border-bottom:0.5px solid #eee;">'+w.label+'</div>';
+      } else {
+        var cleanDesc = (w.desc||'').replace(/\*\*/g,'').replace(/^\*\*|\*\*$/g,''); workHtml += '<div class="work-card"><div class="work-num">'+w.num+'</div><div><div class="work-title">'+w.title.replace(/\*\*/g,'')+'</div>'+(cleanDesc?'<div class="work-desc">'+cleanDesc+'</div>':'')+'</div></div>';
+      }
+    });
+  } else {
+    workHtml = mdToHtml(s6);
+  }
+
+  // Dasha timeline
+  var dashaHtml = '';
+  if(dashas.length > 0){
+    dashas.forEach(function(d){
+      var badge = '';
+      if(d.isCurrent) badge = '<span class="dasha-badge badge-active">CURRENT</span>';
+      else if(d.isCaution) badge = '<span class="dasha-badge badge-caution">CAUTION</span>';
+      else if(d.type.toLowerCase().includes('next mahadasha')) badge = '<span class="dasha-badge badge-peak">PEAK</span>';
+      else badge = '<span class="dasha-badge badge-upcoming">UPCOMING</span>';
+      
+      dashaHtml += '<div class="dasha-row'+(d.isCurrent?' dasha-current':'')+'">';
+      dashaHtml += '<div class="dasha-left"><div class="dasha-type">'+d.type+'</div>';
+      dashaHtml += '<div class="dasha-planet">'+d.planet+' '+badge+'</div>';
+      dashaHtml += '<div class="dasha-dates">'+d.from+' – '+d.to+'</div></div>';
+      dashaHtml += '<div class="dasha-meaning">'+d.meaning+'</div>';
+      dashaHtml += '</div>';
+    });
+  } else {
+    dashaHtml = mdToHtml(s8);
+  }
+
+  // Gochar cards
+  var gocharHtml = '';
+  if(gochar.length > 0){
+    gochar.forEach(function(g){
+      gocharHtml += '<div class="gochar-card">';
+      gocharHtml += '<div class="gochar-icon">'+g.icon+'</div>';
+      gocharHtml += '<div class="gochar-planet">'+g.planet+'</div>';
+      gocharHtml += '<div class="gochar-house">'+g.house+'</div>';
+      gocharHtml += '<div class="gochar-insight">'+g.insight+'</div>';
+      gocharHtml += '</div>';
+    });
+  } else {
+    gocharHtml = mdToHtml(s10);
+  }
+
+  // Window cards
+  var windowHtml = '';
+  windows.forEach(function(w){
+    var cls = w.type==='caution' ? 'window-card window-caution' : 'window-card';
+    windowHtml += '<div class="'+cls+'">';
+    // Extract dates and action from text
+    // Extract dates: handles "May 9 to June 22, 2026" and "2026-05-27 to 2026-07-18"
+    var dateM = w.text.match(/([A-Z][a-z]+ \d{1,2}[^—–\n]*(?:to)[^—–\n]*\d{4})/i)
+             || w.text.match(/(\d{4}-\d{2}-\d{2}[^—–\n]*(?:to)[^—–\n]*\d{4}-\d{2}-\d{2})/i)
+             || w.text.match(/([A-Z][a-z]+ \d{4}[^—–\n]*(?:—|–)[^—–\n]*)/);
+    var actionM = w.text.match(/Action:\s*([^\n]+)/i);
+    windowHtml += '<div class="window-label">'+w.label+'</div>';
+    if(dateM) windowHtml += '<div class="window-date '+(w.type==='caution'?'window-date-caution':'')+'">'+dateM[1].trim()+'</div>';
+    var desc = w.text.replace(dateM?dateM[0]:'','').replace(actionM?'Action: '+actionM[1]:'','').replace(/\*\*/g,'').trim();
+    windowHtml += '<div class="window-desc">'+desc+'</div>';
+    if(actionM) windowHtml += '<div class="window-action">→ '+actionM[1]+'</div>';
+    windowHtml += '</div>';
+  });
+
+  var verdictCardHtml = '<div class="verdict-card">'
+    + '<div class="verdict-main"><div class="verdict-main-label">Career Destiny</div>'
+    + '<div class="verdict-main-value" style="color:'+verdictColor+'">'+verdict+'</div>'
+    + '<div class="verdict-main-sub">'+(verdict==='MIXED'?'Balanced with directional signals':verdict==='BUSINESS'?'Independent path indicated':'Structured employment indicated')+'</div></div>'
+    + '<div class="verdict-drivers"><div class="verdict-drivers-label">Key Verdict Drivers</div>'
+    + (function(){
+        var rows = s3.split('\n').filter(function(l){
+          return l.includes('|') && (l.toLowerCase().includes('business')||l.toLowerCase().includes('job')||l.toLowerCase().includes('neutral'));
+        }).slice(0,7);
+        return rows.map(function(l){
+          var cells = l.split('|').map(function(c){return c.trim();}).filter(function(c){return c;});
+          if(cells.length < 2) return '';
+          // cells[0] = factor name, last cell = verdict
+          var factorRaw = cells[0];
+          var verdictCell = cells[cells.length-1].replace(/\*\*/g,'').trim();
+          // Clean factor name — remove sutra number and keep just the label
+          var factor = factorRaw
+            .replace(/\(Sutra \d+\)/gi,'')
+            .replace(/\*\*/g,'')
+            .trim();
+          // Add back 'most decisive' label for Saturn
+          if(factor.toLowerCase().includes('saturn')) factor = 'Saturn (most decisive)';
+          // Keep it short — first 3 words max
+          var words = factor.split(/\s+/).slice(0,4).join(' ');
+          var isB = verdictCell.toLowerCase().includes('business');
+          var isJ = verdictCell.toLowerCase().includes('job');
+          var badge = isB
+            ? '<span style="font-size:10px;background:rgba(29,158,117,0.12);color:#1D9E75;padding:2px 8px;border-radius:10px;font-weight:600;">Business</span>'
+            : isJ
+            ? '<span style="font-size:10px;background:rgba(83,74,183,0.1);color:#534AB7;padding:2px 8px;border-radius:10px;font-weight:600;">Job</span>'
+            : '<span style="font-size:10px;background:#f0f0f0;color:#888;padding:2px 8px;border-radius:10px;">Neutral</span>';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:12px;color:#444;">'+words+' '+badge+'</div>';
+        }).join('');
+      })()
+    + '</div></div>';
+
+  var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Career Destiny</title>'
+  + '<style>'
+  + '*{box-sizing:border-box;margin:0;padding:0;}'
+  + 'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fff;color:#1a1a1a;line-height:1.7;font-size:13px;}'
+  + '.print-bar{background:#1a1a1a;padding:10px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}'
+  + '.print-bar span{color:#666;font-size:12px;letter-spacing:0.5px;}'
+  + '.print-btn{background:#c9a96e;color:#0f0f0f;border:none;padding:7px 20px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;}'
+  + '.wrap{max-width:740px;margin:0 auto;padding:28px 32px 56px;border:1px solid #e0ddd8;border-radius:12px;background:#fff;}'
+  + '.cover{background:#1a1025;border-radius:12px;padding:2.5rem 2rem 2rem;margin-bottom:2rem;position:relative;overflow:hidden;}'
+  + '.cover-stars{position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle,rgba(255,255,255,0.55) 1px,transparent 1px),radial-gradient(circle,rgba(255,255,255,0.35) 1px,transparent 1px);background-size:120px 120px,80px 80px;background-position:10px 10px,40px 30px;}'
+  + '.cover-inner{position:relative;z-index:1;}'
+  + '.cover-tag{display:inline-block;font-size:10px;letter-spacing:0.15em;color:#c9a96e;border:0.5px solid #c9a96e;padding:3px 10px;border-radius:2px;margin-bottom:1.5rem;text-transform:uppercase;}'
+  + '.cover-name{font-size:36px;font-weight:500;color:#fff;line-height:1.1;margin-bottom:0.4rem;}'
+  + '.cover-meta{font-size:12px;color:rgba(255,255,255,0.45);letter-spacing:0.05em;margin-bottom:1rem;}'
+  + '.cover-lagna{display:flex;gap:20px;margin-bottom:1.5rem;}'
+  + '.cover-lagna-item{font-size:11px;color:rgba(255,255,255,0.5);}'
+  + '.cover-lagna-item span{display:block;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;}'
+  + '.cover-verdict{display:inline-flex;align-items:center;gap:10px;background:rgba(201,169,110,0.12);border:0.5px solid rgba(201,169,110,0.4);border-radius:8px;padding:0.6rem 1rem;margin-bottom:1.5rem;}'
+  + '.verdict-label{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:0.12em;text-transform:uppercase;}'
+  + '.verdict-value{font-size:18px;font-weight:500;color:#c9a96e;letter-spacing:0.08em;}'
+  + '.cover-footer{display:flex;justify-content:space-between;align-items:center;padding-top:1.2rem;border-top:0.5px solid rgba(255,255,255,0.1);}'
+  + '.cover-pills{display:flex;gap:6px;}'
+  + '.cover-pill{font-size:9px;color:rgba(255,255,255,0.4);border:0.5px solid rgba(255,255,255,0.15);padding:3px 8px;border-radius:2px;}'
+  + '.cover-date{font-size:11px;color:rgba(255,255,255,0.3);}'
+  + '.verdict-card{background:#fff;border:1px solid #e8e8e4;border-radius:10px;padding:1.5rem;margin-bottom:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}'
+  + '.verdict-main-label{font-size:10px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;}'
+  + '.verdict-main-value{font-size:28px;font-weight:600;letter-spacing:1px;margin-bottom:4px;}'
+  + '.verdict-main-sub{font-size:12px;color:#666;font-style:italic;}'
+  + '.verdict-drivers-label{font-size:10px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}'
+  + '.driver-item{font-size:12px;color:#444;margin-bottom:4px;display:flex;align-items:flex-start;gap:6px;}'
+  + '.driver-check{color:#1D9E75;font-weight:600;}'
+  + '.driver-cross{color:#e05050;font-weight:600;}'
+  + '.driver-neu{color:#888;}'
+  + '.section{margin-bottom:2.5rem;border:1px solid #e8e8e4;border-radius:10px;padding:20px 24px;background:#fff;}'
+  + '.section-header{display:flex;align-items:baseline;gap:12px;margin-bottom:1.2rem;padding-bottom:0.8rem;border-bottom:1px solid #e8e8e4;}'
+  + '.section-num{font-size:10px;font-weight:500;color:#c9a96e;letter-spacing:0.15em;text-transform:uppercase;}'
+  + '.section-title{font-size:13px;font-weight:500;color:#666;letter-spacing:0.1em;text-transform:uppercase;}'
+  + '.who-table{width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:13px;}'
+  + '.who-table td{padding:8px 12px;border-bottom:0.5px solid #eee;vertical-align:top;}'
+  + '.who-table td:first-child{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.08em;width:28%;font-weight:500;}'
+  + '.who-table td:nth-child(2){font-weight:600;color:#1a1a1a;width:36%;}'
+  + '.who-table td:nth-child(3){color:#666;font-size:12px;}'
+  + 'p{font-size:13px;color:#444;line-height:1.8;margin-bottom:12px;}'
+  + 'p:last-child{margin-bottom:0;}'
+  + 'strong{color:#1a1a1a;font-weight:600;}'
+  + 'h3{font-size:13px;font-weight:600;color:#1a1a1a;margin:14px 0 6px;text-transform:uppercase;letter-spacing:0.05em;}'
+  + 'table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;border:1px solid #e8e8e4;border-radius:8px;overflow:hidden;}'
+  + 'thead th{text-align:left;padding:10px 14px;background:#1a1025;color:#c9a96e;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:500;}'
+  + 'tbody tr{border-bottom:0.5px solid #eee;}'
+  + 'tbody tr:nth-child(even){background:#fafaf8;}'
+  + 'tbody td{padding:11px 14px;color:#444;vertical-align:top;line-height:1.6;}'
+  + 'tbody td:first-child{color:#1a1a1a;font-weight:500;}'
+  + '.badge-biz,.badge-job,.badge-neu,.badge-active,.badge-upcoming,.badge-peak,.badge-caution{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;white-space:nowrap;}'
+  + '.badge-biz{background:rgba(201,169,110,0.15);color:#c9a96e;}'
+  + '.badge-job{background:rgba(83,74,183,0.1);color:#534AB7;}'
+  + '.badge-neu{background:#f0f0f0;color:#888;}'
+  + '.badge-active{background:rgba(26,158,96,0.1);color:#1a9e60;}'
+  + '.badge-upcoming{background:rgba(201,169,110,0.1);color:#c9a96e;}'
+  + '.badge-peak{background:rgba(26,158,96,0.15);color:#1a9e60;}'
+  + '.badge-caution{background:rgba(224,80,80,0.1);color:#e05050;}'
+  + '.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}'
+  + '.chart-card{background:#fff;border:0.5px solid #eee;border-radius:8px;padding:12px;}'
+  + '.chart-label{font-size:9px;color:#888;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:8px;}'
+  + '.chart-card svg,.chart-card img{width:100%;height:auto;}'
+  + '.work-card{border:1px solid #e8e8e4;border-radius:8px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;background:#fafaf8;}'
+  + '.work-num{font-size:18px;font-weight:700;color:#c9a96e;line-height:1;min-width:24px;}'
+  + '.work-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}'
+  + '.work-desc{font-size:12px;color:#666;line-height:1.6;}'
+  + '.dasha-timeline{border:1px solid #e8e8e4;border-radius:8px;overflow:hidden;}'
+  + '.dasha-row{display:grid;grid-template-columns:200px 1fr;gap:16px;padding:12px 16px;border-bottom:0.5px solid #eee;font-size:12px;}'
+  + '.dasha-row:last-child{border-bottom:none;}'
+  + '.dasha-current{background:#fffdf7;border-left:3px solid #c9a96e;}'
+  + '.dasha-type{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:2px;}'
+  + '.dasha-planet{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:2px;display:flex;align-items:center;gap:8px;}'
+  + '.dasha-dates{font-size:11px;color:#aaa;}'
+  + '.dasha-meaning{color:#555;font-size:12px;line-height:1.6;}'
+  + '.dasha-badge{font-size:9px;padding:1px 7px;border-radius:10px;}'
+  + '.gochar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0;}'
+  + '.gochar-card{background:#fff;border:1px solid #e8e8e4;border-radius:8px;padding:16px;}'
+  + '.gochar-icon{font-size:18px;color:#c9a96e;margin-bottom:6px;}'
+  + '.gochar-planet{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}'
+  + '.gochar-house{font-size:11px;color:#888;margin-bottom:8px;}'
+  + '.gochar-insight{font-size:12px;color:#555;line-height:1.6;}'
+  + '.windows-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0;}'
+  + '.window-card{background:#fff;border:1px solid #e8e8e4;border-radius:8px;padding:16px;}'
+  + '.window-caution{border-color:rgba(224,80,80,0.25);background:#fff8f8;}'
+  + '.window-label{font-size:9px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px;}'
+  + '.window-date{font-size:13px;font-weight:600;color:#c9a96e;margin-bottom:4px;}'
+  + '.window-date-caution{color:#e05050;}'
+  + '.window-desc{font-size:12px;color:#555;line-height:1.6;margin-bottom:6px;}'
+  + '.window-action{font-size:11px;color:#1a1a1a;font-weight:500;}'
+  + '.nextstep{background:#1a1025;border-radius:12px;padding:1.5rem;position:relative;overflow:hidden;}'
+  + '.nextstep-stars{position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle,rgba(255,255,255,0.4) 1px,transparent 1px);background-size:60px 60px;background-position:15px 15px;opacity:0.4;}'
+  + '.nextstep-inner{position:relative;z-index:1;}'
+  + '.nextstep p{color:rgba(255,255,255,0.6);font-size:13px;}'
+  + '.nextstep strong{color:#c9a96e;}'
+  + '.report-footer{padding:20px 0;border-top:0.5px solid #ddd;display:flex;justify-content:space-between;align-items:center;margin-top:2rem;}'
+  + '.footer-brand{font-size:13px;color:#c9a96e;font-weight:500;}'
+  + '.footer-note{font-size:10px;color:#aaa;line-height:1.6;max-width:400px;}'
+  + '@media print{.print-bar{display:none;}-webkit-print-color-adjust:exact;print-color-adjust:exact;}'
+  + '.section{page-break-inside:avoid;break-inside:avoid;}'
+  + '.verdict-card{page-break-inside:avoid;break-inside:avoid;}'
+  + '.work-card{page-break-inside:avoid;break-inside:avoid;}'
+  + '.dasha-row{page-break-inside:avoid;break-inside:avoid;}'
+  + '.gochar-card{page-break-inside:avoid;break-inside:avoid;}'
+  + '.window-card{page-break-inside:avoid;break-inside:avoid;}'
+  + '.charts-grid{page-break-inside:avoid;break-inside:avoid;}'
+  + 'h3,h4{page-break-after:avoid;break-after:avoid;}'
+  + 'table{page-break-inside:avoid;break-inside:avoid;}'
+  + '.section-header{page-break-after:avoid;break-after:avoid;}'
+  + '.calc-block{display:none;}'
+  + '.indu-calc{display:none;}'
+  + '@media(max-width:599px){.wrap{padding:12px;}.verdict-card{grid-template-columns:1fr;}.charts-grid{grid-template-columns:1fr;}.gochar-grid{grid-template-columns:1fr;}.windows-grid{grid-template-columns:1fr;}.dasha-row{grid-template-columns:1fr;}}'
+  + '</style></head><body>'
+  + '<div class="print-bar"><span>CAREER DESTINY REPORT</span><button class="print-btn" id="pdf-btn" onclick="savePDF()">Download PDF</button></div>'
+  + '<div class="wrap">'
+  + '<div class="cover"><div class="cover-stars"></div><div class="cover-inner">'
+  + '<div class="cover-tag">Vedic Jyotish · Career Analysis</div>'
+  + '<div class="cover-name">'+(meta.name||'Your Report')+'</div>'
+  + '<div class="cover-meta">'+(meta.dob||'')+' &nbsp;·&nbsp; '+(meta.time||'')+' &nbsp;·&nbsp; '+(meta.place||'')+'</div>'
+  + '<div class="cover-lagna">'
+  + '<div class="cover-lagna-item"><span>D1 Lagna</span>'+(window._d1LagnaSign||'–')+(window._RASHI_EN&&window._RASHI_EN[window._d1LagnaSign]?' ('+window._RASHI_EN[window._d1LagnaSign]+')':'')+'</div>'
+  + '<div class="cover-lagna-item"><span>Rashi</span>'+(window._moonRashi||'–')+(window._RASHI_EN&&window._RASHI_EN[window._moonRashi]?' ('+window._RASHI_EN[window._moonRashi]+')':'')+'</div>'
+  + '<div class="cover-lagna-item"><span>D9 Lagna</span>'+(window._d9LagnaSign||'–')+(window._RASHI_EN&&window._RASHI_EN[window._d9LagnaSign]?' ('+window._RASHI_EN[window._d9LagnaSign]+')':'')+'</div>'
+  + '</div>'
+  + '<div class="cover-verdict"><div><div class="verdict-label">Career Destiny</div><div class="verdict-value">'+verdict+'</div></div></div>'
+  + '<div class="cover-footer"><div class="cover-pills"><div class="cover-pill">D1</div><div class="cover-pill">D9</div><div class="cover-pill">D10</div><div class="cover-pill">Gochar</div></div><div class="cover-date">'+today+'</div></div>'
+  + '</div></div>'
+  + sectionHtml('01','Career Destiny Verdict', verdictCardHtml)
+  + sectionHtml('02','Who You Are', (function(){
+      // Use pre-computed lagna values stored on window
+      var d1Lagna = (window._d1LagnaSign||who.lagna||'');
+      var moonRashi = (window._moonRashi||who.moon||'');
+      var d9Lagna = (window._d9LagnaSign||'');
+      var RASHI_EN = window._RASHI_EN||{};
+      var d1En = RASHI_EN[d1Lagna]||d1Lagna;
+      var moonEn = RASHI_EN[moonRashi]||moonRashi;
+      var whoTable = '<table class="who-table"><tbody>'
+        + (d1Lagna?'<tr><td>Ascendant</td><td>'+(d1Lagna+(d1En&&d1En!==d1Lagna?' ('+d1En+')':""))+'</td><td>Natural authority, core identity</td></tr>':'')
+        + (moonRashi?'<tr><td>Moon Sign</td><td>'+(moonRashi+(moonEn&&moonEn!==moonRashi?' ('+moonEn+')':""))+'</td><td>Emotional drive and instinct</td></tr>':'')
+        + (d9Lagna?'<tr><td>D9 Lagna</td><td>'+d9Lagna+'</td><td>Soul strength and delivery</td></tr>':'')
+        + '</tbody></table>';
+      // Extract Kaarkamsh from s1 for the table
+      var kaarkamshM = s1.match(/Kaarkamsh[^:]*[:\s]+([^\n\u2014\u2013.]{1,60})/i);
+      var kaarkamsh = kaarkamshM ? kaarkamshM[1].trim().split(/[,.(]/)[0].trim() : '';
+      if(kaarkamsh) whoTable += '<table class="who-table" style="margin-top:8px;"><tbody><tr><td>Kaarkamsh</td><td>'+kaarkamsh+'</td><td>Soul career inclination</td></tr></tbody></table>';
+      return whoTable + mdToHtml(s1);
+    })())
+  + (chartsHtml?sectionHtml('03','Your Birth Charts',chartsHtml):'')
+  + sectionHtml('04','Job or Business? Here Is Why', (function(){
+      // Remove raw calculation lines — keep table and insights only
+      var cleaned = s3
+        .replace(/\*\*INDU LAGNA CALCULATION[\s\S]*?(?=\n\n|\|Factor|$)/gi, '')
+        .replace(/\*\*ARUDHA LAGNA CALCULATION[\s\S]*?(?=\n\n|\|Factor|$)/gi, '')
+        .replace(/\*\*AMATYAKARAKA[^\n]*degree[\s\S]*?(?=\n\n|\|Factor|$)/gi, '')
+        .replace(/^[-•]\s+9th lord[^\n]*/gm, '')
+        .replace(/^[-•]\s+Sum\s*=[^\n]*/gm, '')
+        .replace(/^[-•]\s+Count[^\n]*/gm, '')
+        .replace(/^[-•]\s+Kala[^\n]*/gm, '')
+        .replace(/^[-•]\s+Divide[^\n]*/gm, '')
+        .replace(/Step \d+:[^\n]*/gm, '')
+        .replace(/Kala values:[^\n]*/gm, '')
+        .replace(/\n{3,}/g, '\n\n');
+      return mdToHtml(cleaned);
+    })())
+  + sectionHtml('05','What Kind of Work Is Meant for You', workHtml)
+  + sectionHtml('06','Planetary Combinations in Your Favour', (function(){
+      // Parse yogas — each starts with a bold name or **Name**
+      var yogaHtml = '';
+      var yogaBlocks = s4.split(/\n\n+/).filter(function(b){return b.trim();});
+      var num = 0;
+      yogaBlocks.forEach(function(block){
+        block = block.trim();
+        if(!block) return;
+        // Match yoga name — bold text at start
+        var nameM = block.match(/^\*\*([^*]+)\*\*/);
+        if(!nameM) {
+          // Try plain text yoga name followed by (description)
+          nameM = block.match(/^([A-Z][a-zA-Z\s-]+(?:Yoga|Raja|Bhanga))/);
+        }
+        if(nameM){
+          num++;
+          var name = nameM[1].trim();
+          // Extract Sanskrit name in parens
+          var sanskritM = block.match(/\(([^)]+(?:Yoga|yoga)[^)]*)\)/i);
+          var sanskrit = sanskritM ? sanskritM[1] : '';
+          // Get the meaning — text after the name
+          var body = block.replace(/^\*\*[^*]+\*\*\s*/,'').replace(/^[A-Z][a-zA-Z\s-]+(?:Yoga|Raja|Bhanga)\s*/,'').trim();
+          // Extract "What it means" and "Status" — then REMOVE status from body to prevent duplication
+          var statusM = body.match(/Status:\s*([^\n]+)/i);
+          var status = statusM ? statusM[1].trim().replace(/\*\*/g,'') : '';
+          // Remove status line from body before extracting means
+          var bodyNoStatus = body.replace(/Status:[^\n]*/gi,'').trim();
+          var meansM = bodyNoStatus.match(/What it means[^:]*:\s*([\s\S]*?)(?=\n\n|$)/i);
+          var means = meansM ? meansM[1].trim().replace(/\*\*/g,'') : bodyNoStatus.split('\n')[0].replace(/\*\*/g,'');
+          // Trim means to 2 sentences max
+          var meansSentences = (means.match(/[^.!?]+[.!?]+/g)||[means]);
+          means = meansSentences.slice(0,2).join(' ').trim();
+          yogaHtml += '<div style="display:flex;gap:14px;margin-bottom:14px;padding:14px 16px;background:#fafaf8;border-radius:8px;border:0.5px solid #e8e8e8;page-break-inside:avoid;">'
+            + '<span style="font-size:20px;font-weight:700;color:#c9a96e;line-height:1;min-width:24px;flex-shrink:0;">'+num+'</span>'
+            + '<div>'
+            + '<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px;">'+name+(sanskrit?' <span style="font-size:11px;color:#888;font-weight:400;font-style:italic;">('+sanskrit+')</span>':'')+'</div>'
+            + '<div style="font-size:12px;color:#555;line-height:1.6;margin-bottom:4px;">'+means+'</div>'
+            + (status?'<div style="font-size:11px;color:#1D9E75;font-weight:500;">'+status+'</div>':'')
+            + '</div></div>';
+        } else {
+          // Not a yoga block — render as plain text
+          yogaHtml += '<p style="font-size:13px;color:#555;line-height:1.7;margin-bottom:8px;">'+block.replace(/\*\*/g,'')+'</p>';
+        }
+      });
+      return yogaHtml || mdToHtml(s4);
+    })())
+  + sectionHtml('07','How You Earn and Work Best', mdToHtml(s5))
+  + sectionHtml('08','Your Strengths and Hidden Talents', mdToHtml(s7))
+  + sectionHtml('09','Your Planetary Period Timeline', (function(){
+      // Strip raw markdown table header line from s8 intro text
+      var s8intro = s8.split('\n').filter(function(l){
+        return !l.trim().startsWith('|') && !l.trim().match(/^[-|]+$/);
+      }).slice(0,3).join('\n');
+      return mdToHtml(s8intro)+'<div class="dasha-timeline">'+dashaHtml+'</div>';
+    })())
+  + sectionHtml('10','When Will It Happen', '<div class="windows-grid">'+windowHtml+'</div>')
+  + sectionHtml('11','What the Skies Say Right Now', '<div class="gochar-grid">'+gocharHtml+'</div>')
+  + sectionHtml('12','Your Next Step', '<div class="nextstep"><div class="nextstep-stars"></div><div class="nextstep-inner">'+mdToHtml(s11.replace(/Your report is complete[\s\S]*/,'').trim())+'</div></div>')
+  + '<div class="report-footer"><div class="footer-brand">Career Destiny</div><div class="footer-note">D1 · D9 · D10 · Gochar<br>Timing indicates probability windows — your choices determine the outcome.</div></div>'
+  + '</div></body></html>';
+
+  function savePDF(){
+    var btn = document.getElementById('pdf-btn');
+    if(!btn) return window.print();
+    btn.textContent = 'Generating...';
+    btn.disabled = true;
+    var verdictCardHtml = '<div class="verdict-card">'
+    + '<div class="verdict-main"><div class="verdict-main-label">Career Destiny</div>'
+    + '<div class="verdict-main-value" style="color:'+verdictColor+'">'+verdict+'</div>'
+    + '<div class="verdict-main-sub">'+(verdict==='MIXED'?'Balanced with directional signals':verdict==='BUSINESS'?'Independent path indicated':'Structured employment indicated')+'</div></div>'
+    + '<div class="verdict-drivers"><div class="verdict-drivers-label">Key Verdict Drivers</div>'
+    + (function(){
+        var rows = s3.split('\n').filter(function(l){
+          return l.includes('|') && (l.toLowerCase().includes('business')||l.toLowerCase().includes('job')||l.toLowerCase().includes('neutral'));
+        }).slice(0,7);
+        return rows.map(function(l){
+          var cells = l.split('|').map(function(c){return c.trim();}).filter(function(c){return c;});
+          if(cells.length < 2) return '';
+          // cells[0] = factor name, last cell = verdict
+          var factorRaw = cells[0];
+          var verdictCell = cells[cells.length-1].replace(/\*\*/g,'').trim();
+          // Clean factor name — remove sutra number and keep just the label
+          var factor = factorRaw
+            .replace(/\(Sutra \d+\)/gi,'')
+            .replace(/\*\*/g,'')
+            .trim();
+          // Add back 'most decisive' label for Saturn
+          if(factor.toLowerCase().includes('saturn')) factor = 'Saturn (most decisive)';
+          // Keep it short — first 3 words max
+          var words = factor.split(/\s+/).slice(0,4).join(' ');
+          var isB = verdictCell.toLowerCase().includes('business');
+          var isJ = verdictCell.toLowerCase().includes('job');
+          var badge = isB
+            ? '<span style="font-size:10px;background:rgba(29,158,117,0.12);color:#1D9E75;padding:2px 8px;border-radius:10px;font-weight:600;">Business</span>'
+            : isJ
+            ? '<span style="font-size:10px;background:rgba(83,74,183,0.1);color:#534AB7;padding:2px 8px;border-radius:10px;font-weight:600;">Job</span>'
+            : '<span style="font-size:10px;background:#f0f0f0;color:#888;padding:2px 8px;border-radius:10px;">Neutral</span>';
+          return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;font-size:12px;color:#444;">'+words+' '+badge+'</div>';
+        }).join('');
+      })()
+    + '</div></div>';
+
+  var html = '<!DOCTYPE html>' + document.documentElement.outerHTML;
+    fetch('/api/pdf', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({html: html, filename: 'Career_Destiny_Report'})
+    }).then(function(r){
+      if(!r.ok) throw new Error('PDF failed: ' + r.status);
+      return r.blob();
+    }).then(function(blob){
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'Career_Destiny_Report.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      btn.textContent = 'Download PDF';
+      btn.disabled = false;
+    }).catch(function(e){
+      console.error('PDF error:', e);
+      btn.textContent = 'Download PDF';
+      btn.disabled = false;
+      window.print();
+    });
+  }
+  function sectionHtml(num, title, content){
+    return '<div class="section"><div class="section-header"><span class="section-num">'+num+'</span><span class="section-title">'+title+'</span></div>'+content+'</div>';
+  }
+
+
+
+
+  // If building for email, capture html and return without opening window
+  if(window._buildingForEmail){
+    window._reportHtmlResult = html;
+    return;
+  }
+
+  // If building for email, capture html and return without opening window
+  if(window._buildingForEmail){
+    window._reportHtmlResult = html;
+    return;
+  }
+
+  // If building for email, capture html and return without opening window
+  if(window._buildingForEmail){
+    window._reportHtmlResult = html;
+    return;
+  }
+
+  var w = window.open('','_blank');
+  if(!w){ alert('Please allow popups for this site.'); return; }
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+}
+function preCompute(c){
+  var result={};
+  try{
+    var planets=c.planets&&c.planets.data&&c.planets.data.planet_position||[];
+    var lagna=planets.find(function(p){return p.name==='Ascendant';});
+    var lagnaHouse=lagna?lagna.position:1;
+    var lagnaSign=lagna&&lagna.rasi?lagna.rasi.name:'?';
+
+    // Amatyakaraka: 2nd highest degree planet (excluding Rahu/Ketu/Ascendant)
+    var sorted=planets.filter(function(p){return p.name!=='Ascendant'&&p.name!=='Rahu'&&p.name!=='Ketu';})
+      .sort(function(a,b){return b.degree-a.degree;});
+    result.amatyakaraka=sorted.length>1?sorted[1].name:'?';
+    result.atmakarak=sorted.length>0?sorted[0].name:'?';
+
+    // Sutra 1: Planet count in houses 7-12 and 10-3
+    var zoneA=planets.filter(function(p){return p.name!=='Ascendant'&&p.position>=7&&p.position<=12;}).length;
+    var zoneB=planets.filter(function(p){return p.name!=='Ascendant'&&(p.position>=10||p.position<=3);}).length;
+    result.sutra1={zoneA:zoneA,zoneB:zoneB,indicates:zoneA>=5||zoneB>=5?'Business':'Job',detail:'Zone A (7-12): '+zoneA+' planets, Zone B (10-3): '+zoneB+' planets'};
+
+    // Sutra 3: Saturn check
+    var saturn=planets.find(function(p){return p.name==='Saturn';});
+    if(saturn){
+      var satSign=saturn.rasi?saturn.rasi.name:'?';
+      var satHouse=saturn.position;
+      var ownSigns=['Capricorn','Aquarius','Makar','Kumbha'];
+      var exaltSign=['Libra','Tula'];
+      var debilSign=['Aries','Mesha'];
+      var trikHouses=[6,8,12];
+      var isOwn=ownSigns.indexOf(satSign)>-1;
+      var isExalt=exaltSign.indexOf(satSign)>-1;
+      var isDebil=debilSign.indexOf(satSign)>-1;
+      var inTrik=trikHouses.indexOf(satHouse)>-1;
+      var isCombust=saturn.degree<6;
+      var gocharstha=( isOwn||isExalt)&&!inTrik&&!isDebil&&!isCombust;
+      result.sutra3={
+        sign:satSign,house:satHouse,
+        isOwn:isOwn,isExalt:isExalt,isDebil:isDebil,inTrik:inTrik,isCombust:isCombust,
+        gocharstha:gocharstha,
+        indicates:gocharstha?'Business':'Job',
+        detail:'Saturn in '+satSign+' (House '+satHouse+')'+(isOwn?' own sign':isExalt?' exalted':isDebil?' debilitated':'')+( inTrik?' in trik house':'')+( isCombust?' combust':'')
+      };
+    }
+
+    // Indu Lagna calculation
+    var kala={Sun:30,Moon:16,Mars:6,Mercury:8,Jupiter:10,Venus:12,Saturn:1};
+    var signs=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makar','Kumbha','Meena'];
+    var moon=planets.find(function(p){return p.name==='Moon';});
+    if(moon&&lagna){
+      var lagnaSignIdx=signs.indexOf(lagnaSign);
+      var moonSignIdx=signs.indexOf(moon.rasi?moon.rasi.name:'');
+      if(lagnaSignIdx>-1&&moonSignIdx>-1){
+        var ninthFromLagna=(lagnaSignIdx+8)%12;
+        var ninthFromMoon=(moonSignIdx+8)%12;
+        var lordOfNinthFromLagna=getLordOfSign(ninthFromLagna);
+        var lordOfNinthFromMoon=getLordOfSign(ninthFromMoon);
+        var kalaLagna=kala[lordOfNinthFromLagna]||0;
+        var kalaMoon=kala[lordOfNinthFromMoon]||0;
+        var total=kalaLagna+kalaMoon;
+        var remainder=total%12;
+        var induLagnaIdx=(moonSignIdx+remainder-1+12)%12;
+        var induSign=signs[induLagnaIdx];
+        var induHouseFromLagna=((induLagnaIdx-lagnaSignIdx+12)%12)+1;
+        var kendras=[1,4,7,10];
+        var trikonas=[1,5,9];
+        var trikHouses2=[6,8,12];
+        var strong=kendras.indexOf(induHouseFromLagna)>-1||trikonas.indexOf(induHouseFromLagna)>-1;
+        var weak=trikHouses2.indexOf(induHouseFromLagna)>-1;
+        result.induLagna={
+          sign:induSign,houseFromLagna:induHouseFromLagna,
+          kalaLagna:kalaLagna,kalaMoon:kalaMoon,total:total,remainder:remainder,
+          indicates:strong?'Business':weak?'Job':'Neutral',
+          detail:'9th lord from Lagna Kala='+kalaLagna+' + 9th lord from Moon Kala='+kalaMoon+'='+total+', remainder '+remainder+', Indu Lagna='+induSign+' (House '+induHouseFromLagna+')'
+        };
+      }
+    }
+
+    // Current dasha
+    var dd=c.dasha&&c.dasha.data;
+    if(dd&&dd.dasha_periods){
+      var now=new Date();
+      var cur=dd.dasha_periods.find(function(x){return new Date(x.start)<=now&&new Date(x.end)>=now;});
+      if(cur){
+        result.mahadasha={name:cur.planet&&cur.planet.name||cur.name,from:cur.start.slice(0,10),to:cur.end.slice(0,10)};
+        if(cur.antardasha){
+          var ca=cur.antardasha.find(function(x){return new Date(x.start)<=now&&new Date(x.end)>=now;});
+          if(ca)result.antardasha={name:ca.planet&&ca.planet.name||ca.name,from:ca.start.slice(0,10),to:ca.end.slice(0,10)};
+        }
+      }
+    }
+
+
+
+    // CHANDRA-MANGAL YOGA
+    try{
+      var moonP=planets.find(function(p){return p.name==='Moon';});
+      var marsP=planets.find(function(p){return p.name==='Mars';});
+      if(moonP&&marsP){
+        var sameHouseCM=moonP.position===marsP.position;
+        var mutualAspect=Math.abs(moonP.position-marsP.position)===6||Math.abs(moonP.position-marsP.position)===6;
+        var sevenApart=((moonP.position-marsP.position+12)%12)===6||((marsP.position-moonP.position+12)%12)===6;
+        result.chandraMangal={
+          present:sameHouseCM||sevenApart,
+          type:sameHouseCM?'Conjunction':'Mutual 7th Aspect',
+          description:sameHouseCM?'Moon and Mars conjunct in H'+moonP.position+' — strong Chandra-Mangal Yoga':
+            sevenApart?'Moon in H'+moonP.position+' and Mars in H'+marsP.position+' — mutual 7th aspect':
+            'Chandra-Mangal Yoga absent'
+        };
+      }
+    }catch(e){result.chandraMangalError=e.message;}
+
+    // AMALA YOGA
+    try{
+      var benefics=['Jupiter','Venus','Mercury','Moon'];
+      var malefics=['Sun','Mars','Saturn','Rahu','Ketu'];
+      var lagnaPos=lagna?lagna.position:1;
+      var moonPos2=planets.find(function(p){return p.name==='Moon';}); moonPos2=moonPos2?moonPos2.position:1;
+      var tenthFromLagna=((lagnaPos+8)%12)+1;
+      var tenthFromMoon=((moonPos2+8)%12)+1;
+      var planetsIn10thLagna=planets.filter(function(p){return p.position===tenthFromLagna&&p.name!=='Ascendant';});
+      var planetsIn10thMoon=planets.filter(function(p){return p.position===tenthFromMoon&&p.name!=='Ascendant';});
+      var only10thLagnaEmpty=planetsIn10thLagna.length===0;
+      var onlyBeneficsFromLagna=planetsIn10thLagna.every(function(p){return benefics.indexOf(p.name)>-1;});
+      var onlyBeneficsFromMoon=planetsIn10thMoon.every(function(p){return benefics.indexOf(p.name)>-1;});
+      var amalaPresent=(only10thLagnaEmpty||onlyBeneficsFromLagna)&&(planetsIn10thMoon.length===0||onlyBeneficsFromMoon);
+      result.amalaYoga={
+        present:amalaPresent,
+        planetsIn10thLagna:planetsIn10thLagna.map(function(p){return p.name;}),
+        planetsIn10thMoon:planetsIn10thMoon.map(function(p){return p.name;}),
+        description:amalaPresent?
+          '10th house from Lagna has '+(planetsIn10thLagna.length===0?'no planets':planetsIn10thLagna.map(function(p){return p.name;}).join('+'))+' and 10th from Moon has '+(planetsIn10thMoon.length===0?'no planets':planetsIn10thMoon.map(function(p){return p.name;}).join('+')):
+          'Malefic planets in 10th house cancel Amala Yoga'
+      };
+    }catch(e){result.amalaYogaError=e.message;}
+
+    // VIPARITA RAJA YOGA
+    try{
+      var HOUSE_LORDS_FOR_LAGNA={
+        'Simha':{6:'Saturn',8:'Jupiter',12:'Moon'},
+        'Mesha':{6:'Mercury',8:'Mars',12:'Jupiter'},
+        'Vrishabha':{6:'Venus',8:'Jupiter',12:'Mars'},
+        'Mithuna':{6:'Mars',8:'Saturn',12:'Venus'},
+        'Karka':{6:'Jupiter',8:'Saturn',12:'Mercury'},
+        'Kanya':{6:'Saturn',8:'Mars',12:'Sun'},
+        'Tula':{6:'Jupiter',8:'Venus',12:'Mercury'},
+        'Vrischika':{6:'Mars',8:'Mercury',12:'Sun'},
+        'Dhanu':{6:'Venus',8:'Moon',12:'Mars'},
+        'Makar':{6:'Mercury',8:'Sun',12:'Jupiter'},
+        'Kumbha':{6:'Moon',8:'Mercury',12:'Venus'},
+        'Meena':{6:'Sun',8:'Moon',12:'Saturn'}
+      };
+      var lagnaSign2=lagna&&lagna.rasi?lagna.rasi.name:'Simha';
+      var trikLords=HOUSE_LORDS_FOR_LAGNA[lagnaSign2]||{};
+      var lord6=trikLords[6];var lord8=trikLords[8];var lord12=trikLords[12];
+      var lord6P=lord6&&planets.find(function(p){return p.name===lord6;});
+      var lord8P=lord8&&planets.find(function(p){return p.name===lord8;});
+      var lord12P=lord12&&planets.find(function(p){return p.name===lord12;});
+      var vipParas=[];
+      if(lord6P&&lord8P&&lord6P.position===lord8P.position)vipParas.push('6th lord '+lord6+' conjunct 8th lord '+lord8+' in H'+lord6P.position);
+      if(lord6P&&lord12P&&lord6P.position===lord12P.position)vipParas.push('6th lord '+lord6+' conjunct 12th lord '+lord12+' in H'+lord6P.position);
+      if(lord8P&&lord12P&&lord8P.position===lord12P.position)vipParas.push('8th lord '+lord8+' conjunct 12th lord '+lord12+' in H'+lord8P.position);
+      if(lord6P&&lord8P&&((lord6P.position-lord8P.position+12)%12)===6)vipParas.push('6th lord '+lord6+' and 8th lord '+lord8+' in mutual aspect');
+      if(lord6P&&lord12P&&((lord6P.position-lord12P.position+12)%12)===6)vipParas.push('6th lord '+lord6+' and 12th lord '+lord12+' in mutual aspect');
+      result.viparitraRaja={
+        present:vipParas.length>0,
+        conditions:vipParas,
+        description:vipParas.length>0?'Viparita Raja Yoga present — '+vipParas.join('; '):'Viparita Raja Yoga absent'
+      };
+    }catch(e){result.viparitraRajaError=e.message;}
+
+    // DHARMA-KARMA ADHIPATI YOGA
+    try{
+      var NINTH_TENTH_LORDS={
+        'Simha':{9:'Mars',10:'Venus'},
+        'Mesha':{9:'Jupiter',10:'Saturn'},
+        'Vrishabha':{9:'Saturn',10:'Jupiter'},
+        'Mithuna':{9:'Saturn',10:'Jupiter'},
+        'Karka':{9:'Jupiter',10:'Mars'},
+        'Kanya':{9:'Venus',10:'Mercury'},
+        'Tula':{9:'Mercury',10:'Saturn'},
+        'Vrischika':{9:'Moon',10:'Sun'},
+        'Dhanu':{9:'Sun',10:'Saturn'},
+        'Makar':{9:'Mercury',10:'Venus'},
+        'Kumbha':{9:'Venus',10:'Mars'},
+        'Meena':{9:'Mars',10:'Saturn'}
+      };
+      var lagnaSign3=lagna&&lagna.rasi?lagna.rasi.name:'Simha';
+      var ninthTenth=NINTH_TENTH_LORDS[lagnaSign3]||{};
+      var lord9name=ninthTenth[9];var lord10name=ninthTenth[10];
+      var lord9P=lord9name&&planets.find(function(p){return p.name===lord9name;});
+      var lord10P=lord10name&&planets.find(function(p){return p.name===lord10name;});
+      var dkConditions=[];
+      if(lord9P&&lord10P){
+        if(lord9P.position===lord10P.position)dkConditions.push('9th lord '+lord9name+' conjunct 10th lord '+lord10name+' in H'+lord9P.position);
+        var mutual=((lord9P.position-lord10P.position+12)%12)===6;
+        if(mutual)dkConditions.push('9th lord '+lord9name+' and 10th lord '+lord10name+' in mutual 7th aspect');
+        var exchange=lord9P.rasi&&lord10P.rasi&&lord9P.rasi.name===EXALT[lord10name]&&lord10P.rasi.name===EXALT[lord9name];
+        var sameSign9=lord9P.rasi&&lord9P.rasi.name;
+        var sameSign10=lord10P.rasi&&lord10P.rasi.name;
+        if(lord9name&&lord10name){
+          var SIGN_OWN={'Sun':'Simha','Moon':'Karka','Mars':['Mesha','Vrischika'],'Mercury':['Mithuna','Kanya'],'Jupiter':['Dhanu','Meena'],'Venus':['Vrishabha','Tula'],'Saturn':['Makar','Kumbha']};
+          var own9=SIGN_OWN[lord9name];var own10=SIGN_OWN[lord10name];
+          var ownArr9=Array.isArray(own9)?own9:[own9];
+          var ownArr10=Array.isArray(own10)?own10:[own10];
+          if(sameSign9&&ownArr10.indexOf(sameSign9)>-1&&sameSign10&&ownArr9.indexOf(sameSign10)>-1){
+            dkConditions.push('Exchange: '+lord9name+' in '+sameSign9+' ('+lord10name+" sign) and "+lord10name+' in '+sameSign10+' ('+lord9name+' sign)');
+          }
+        }
+      }
+      result.dharmaKarma={
+        present:dkConditions.length>0,
+        lord9:lord9name,lord10:lord10name,
+        conditions:dkConditions,
+        description:dkConditions.length>0?'Dharma-Karma Adhipati Yoga: '+dkConditions.join('; '):'Dharma-Karma Adhipati Yoga absent — 9th lord ('+lord9name+') and 10th lord ('+lord10name+') not connected'
+      };
+    }catch(e){result.dharmaKarmaError=e.message;}
+
+    // BUDH-ADITYA YOGA
+    try{
+      var sun=planets.find(function(p){return p.name==='Sun';});
+      var mercury=planets.find(function(p){return p.name==='Mercury';});
+      if(sun&&mercury){
+        var sameHouse=sun.position===mercury.position;
+        var degreeDiff=Math.abs(sun.longitude-mercury.longitude);
+        if(degreeDiff>180)degreeDiff=360-degreeDiff;
+        var within10deg=degreeDiff<=10;
+        var sunDebil=sun.rasi&&sun.rasi.name==='Tula';
+        var merDebil=mercury.rasi&&mercury.rasi.name==='Meena';
+        var sunStrong=sun.rasi&&(sun.rasi.name==='Mesha'||sun.rasi.name==='Simha');
+        var merStrong=mercury.rasi&&(mercury.rasi.name==='Kanya'||mercury.rasi.name==='Mithuna');
+        result.budhAditya={
+          present:sameHouse&&!sunDebil&&!merDebil,
+          strong:sameHouse&&!sunDebil&&!merDebil&&within10deg&&(sunStrong||merStrong),
+          house:sun.position,
+          sign:sun.rasi&&sun.rasi.name,
+          degreeDiff:parseFloat(degreeDiff.toFixed(2)),
+          description:sameHouse&&!sunDebil&&!merDebil?
+            'Sun and Mercury conjunct in House '+sun.position+' ('+( sun.rasi&&sun.rasi.name)+')'+(within10deg?' within '+degreeDiff.toFixed(1)+'° — strong yoga':'— moderate yoga'):
+            !sameHouse?'Sun and Mercury in different houses — yoga absent':
+            'Yoga cancelled due to debilitation'
+        };
+      }
+    }catch(e){result.budhAdityaError=e.message;}
+
+    // NEECHA BHANGA RAJA YOGA
+    try{
+      var DEBIL={Sun:'Tula',Moon:'Vrischika',Mars:'Karka',Mercury:'Meena',Jupiter:'Makar',Venus:'Kanya',Saturn:'Mesha'};
+      var EXALT={Sun:'Mesha',Moon:'Vrishabha',Mars:'Makar',Mercury:'Kanya',Jupiter:'Karka',Venus:'Meena',Saturn:'Tula'};
+      var SIGN_LORDS={'Mesha':'Mars','Vrishabha':'Venus','Mithuna':'Mercury','Karka':'Moon','Simha':'Sun','Kanya':'Mercury','Tula':'Venus','Vrischika':'Mars','Dhanu':'Jupiter','Makar':'Saturn','Kumbha':'Saturn','Meena':'Jupiter'};
+      var KENDRA=[1,4,7,10];
+      var lagnaHouse2=lagna?lagna.position:1;
+      var moonPlanet=planets.find(function(p){return p.name==='Moon';});
+      var moonHouse=moonPlanet?moonPlanet.position:1;
+
+      var nbry=[];
+      Object.keys(DEBIL).forEach(function(pname){
+        var p=planets.find(function(x){return x.name===pname;});
+        if(!p)return;
+        var pSign=p.rasi&&p.rasi.name;
+        if(pSign!==DEBIL[pname])return; // not debilitated
+
+        var conditions=[];
+        // Condition 1: Lord of debilitation sign in kendra from Lagna
+        var debilLord=SIGN_LORDS[DEBIL[pname]];
+        var debilLordPlanet=planets.find(function(x){return x.name===debilLord;});
+        if(debilLordPlanet){
+          var houseFromLagna=debilLordPlanet.position;
+          if(KENDRA.indexOf(houseFromLagna)>-1)conditions.push('Lord of debil sign ('+debilLord+') in kendra H'+houseFromLagna+' from Lagna');
+          var relativeToMoon=((debilLordPlanet.position-moonHouse+12)%12)+1;
+          if(KENDRA.indexOf(relativeToMoon)>-1)conditions.push('Lord of debil sign ('+debilLord+') in kendra from Moon');
+        }
+        // Condition 2: Lord of exaltation sign of debilitated planet in kendra from Lagna/Moon
+        var exaltSign=EXALT[pname];
+        var exaltLord=SIGN_LORDS[exaltSign];
+        var exaltLordPlanet=planets.find(function(x){return x.name===exaltLord;});
+        if(exaltLordPlanet){
+          if(KENDRA.indexOf(exaltLordPlanet.position)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra H'+exaltLordPlanet.position+' from Lagna');
+          var relToMoon=((exaltLordPlanet.position-moonHouse+12)%12)+1;
+          if(KENDRA.indexOf(relToMoon)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra from Moon');
+        }
+        // Condition 3: Debilitated planet conjunct exalted planet
+        planets.forEach(function(op){
+          if(op.name===pname||op.name==='Ascendant')return;
+          if(op.rasi&&op.rasi.name===EXALT[op.name]&&op.position===p.position){
+            conditions.push(op.name+' exalted and conjunct in H'+p.position);
+          }
+        });
+        // Condition 4: Retrograde
+        if(p.is_retrograde)conditions.push(pname+' is retrograde');
+
+        // Check D9 exaltation
+        var d9planets=c.navamsha&&c.navamsha.data&&c.navamsha.data.planet_position||[];
+        var pd9=d9planets.find(function(x){return x.name===pname;});
+        if(pd9&&pd9.rasi&&pd9.rasi.name===EXALT[pname])conditions.push(pname+' exalted in D9 Navamsha');
+
+        if(conditions.length>0){
+          nbry.push({
+            planet:pname,
+            debilSign:DEBIL[pname],
+            house:p.position,
+            conditions:conditions,
+            strength:conditions.length>=2?'Strong':'Moderate',
+            description:pname+' debilitated in '+DEBIL[pname]+' (H'+p.position+') — '+conditions.length+' cancellation condition'+(conditions.length>1?'s':'')+' met'
+          });
+        }
+      });
+      result.neechaBhanga=nbry;
+    }catch(e){result.neechaBhangaError=e.message;}
+
+    // Gochar: Jupiter and Saturn only
+    var gd=c.gochar&&c.gochar.data&&c.gochar.data.planet_position||[];
+    var gJup=gd.find(function(p){return p.name==='Jupiter';});
+    var gSat=gd.find(function(p){return p.name==='Saturn';});
+    result.gochar={
+      jupiter:gJup?'Jupiter in '+(gJup.rasi&&gJup.rasi.name||'?')+' at '+gJup.degree.toFixed(1)+'°'+(gJup.is_retrograde?' (R)':''):'?',
+      saturn:gSat?'Saturn in '+(gSat.rasi&&gSat.rasi.name||'?')+' at '+gSat.degree.toFixed(1)+'°'+(gSat.is_retrograde?' (R)':''):'?'
+    };
+
+  }catch(e){result.error=e.message;}
+  return result;
+}
+
+function getLordOfSign(signIdx){
+  var lords=['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+  return lords[signIdx]||'?';
+}
+
+
+function buildSummary(c,meta){
+  var SIGNS=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makar','Kumbha','Meena'];
+  var SIGN_NUMS={'Mesha':1,'Vrishabha':2,'Mithuna':3,'Karka':4,'Simha':5,'Kanya':6,'Tula':7,'Vrischika':8,'Dhanu':9,'Makar':10,'Kumbha':11,'Meena':12};
+  var RASHI_EN={'Mesha':'Aries','Vrishabha':'Taurus','Mithuna':'Gemini','Karka':'Cancer','Simha':'Leo','Kanya':'Virgo','Tula':'Libra','Vrischika':'Scorpio','Dhanu':'Sagittarius','Makar':'Capricorn','Kumbha':'Aquarius','Meena':'Pisces'};
+  var RASHI_HI={'Mesha':'मेष','Vrishabha':'वृषभ','Mithuna':'मिथुन','Karka':'कर्क','Simha':'सिंह','Kanya':'कन्या','Tula':'तुला','Vrischika':'वृश्चिक','Dhanu':'धनु','Makar':'मकर','Kumbha':'कुंभ','Meena':'मीन'};
+  var lang=window._lang||'en';
+
+  function houseFromLagna(planetSign, lagnaSign){
+    var pNum=SIGN_NUMS[planetSign]||1;
+    var lNum=SIGN_NUMS[lagnaSign]||1;
+    return ((pNum - lNum + 12) % 12) + 1;
+  }
+
+  function rashiDisplay(sign){
+    var en=RASHI_EN[sign]||sign;
+    var hi=RASHI_HI[sign]||sign;
+    return lang==='hi'? sign+' ('+hi+')' : sign+' ('+en+')';
+  }
+
+  var s='BIRTH DETAILS:\n';
+  s+='Name: '+meta.name+'\n';
+  s+='DOB: '+meta.dob+' | Time: '+meta.time+' | Place: '+meta.place+(meta.gender?' | Gender: '+meta.gender:'')+' \n';
+  s+='Today: '+new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'})+'\n\n';
+
+  // D1 PLANETS
+  try{
+    var pd=c.planets&&c.planets.data;
+    if(pd&&pd.planet_position){
+      var lagna=pd.planet_position.find(function(p){return p.name==='Ascendant';});
+      var lagnaSign=lagna?(lagna.rasi&&lagna.rasi.name||'Mesha'):'Mesha';
+      var lagnaSignNum=SIGN_NUMS[lagnaSign]||1;
+
+      s+='D1 BIRTH CHART (Lahiri Ayanamsa):\n';
+      s+='Lagna (Ascendant): '+rashiDisplay(lagnaSign)+' | House 1\n';
+      s+='D1 Lagna Sign Number: '+lagnaSignNum+'\n';
+
+      pd.planet_position.forEach(function(p){
+        if(p.name==='Ascendant')return;
+        var sign=p.rasi&&p.rasi.name||'Mesha';
+        var house=houseFromLagna(sign, lagnaSign);
+        s+='- '+p.name+': '+rashiDisplay(sign)+' | House '+house+' | '+p.degree.toFixed(2)+'deg | '+(p.is_retrograde?'Retrograde':'Direct')+'\n';
+      });
+
+      // Element distribution
+      var fireSign=['Mesha','Simha','Dhanu'];
+      var earthSign=['Vrishabha','Kanya','Makar'];
+      var airSign=['Mithuna','Tula','Kumbha'];
+      var waterSign=['Karka','Vrischika','Meena'];
+      var elems={fire:0,earth:0,air:0,water:0};
+      pd.planet_position.forEach(function(p){
+        if(p.name==='Ascendant')return;
+        var sign=p.rasi&&p.rasi.name||'';
+        if(fireSign.indexOf(sign)>=0)elems.fire++;
+        else if(earthSign.indexOf(sign)>=0)elems.earth++;
+        else if(airSign.indexOf(sign)>=0)elems.air++;
+        else if(waterSign.indexOf(sign)>=0)elems.water++;
+      });
+      s+='\nELEMENT DISTRIBUTION:\n';
+      s+='Fire: '+elems.fire+' | Earth: '+elems.earth+' | Air: '+elems.air+' | Water: '+elems.water+'\n';
+      s+='Dominant: '+Object.keys(elems).reduce(function(a,b){return elems[a]>=elems[b]?a:b;})+'\n';
+
+      window._d1LagnaSign = lagnaSign;
+      // Store Moon sign (Rashi) for report
+      var moonPlanet = pd.planet_position.find(function(p){return p.name==='Moon';});
+      window._moonRashi = moonPlanet ? (moonPlanet.rasi&&moonPlanet.rasi.name||'') : '';
+    }
+  }catch(e){s+='[D1 error: '+e.message+']\n';}
+
+  // DASHA
+  try{
+    var dd=c.dasha&&c.dasha.data;
+    if(dd&&dd.dasha_periods){
+      var now=new Date();
+      var curIdx=-1;
+      dd.dasha_periods.forEach(function(md,i){
+        if(new Date(md.start)<=now&&new Date(md.end)>=now)curIdx=i;
+      });
+
+      if(curIdx>=0){
+        var cur=dd.dasha_periods[curIdx];
+        s+='\nCURRENT MAHADASHA:\n';
+        s+='- '+(cur.planet&&cur.planet.name||cur.name)+': '+cur.start.slice(0,10)+' to '+cur.end.slice(0,10)+' [CURRENT]\n';
+
+        if(cur.antardasha){
+          s+='\nANTARDASHA SUB-PERIODS (next 3 years):\n';
+          var cutoff=new Date(now.getTime()+3*365*24*60*60*1000);
+          cur.antardasha.forEach(function(ad){
+            var adEnd=new Date(ad.end);
+            var adStart=new Date(ad.start);
+            if(adEnd>=now&&adStart<=cutoff){
+              var isCur=adStart<=now&&adEnd>=now;
+              s+='- '+(ad.planet&&ad.planet.name||ad.name)+': '+ad.start.slice(0,10)+' to '+ad.end.slice(0,10)+(isCur?' [CURRENT]':'')+' \n';
+
+              // Pratyantar for current antardasha
+              if(isCur&&ad.pratyantardasha){
+                s+='\nPRATYANTAR DASHA (sub-sub-periods):\n';
+                var pCutoff=new Date(now.getTime()+2*365*24*60*60*1000);
+                ad.pratyantardasha.forEach(function(pd2){
+                  var pdStart=new Date(pd2.start);
+                  var pdEnd=new Date(pd2.end);
+                  if(pdEnd>=now&&pdStart<=pCutoff){
+                    var isCurP=pdStart<=now&&pdEnd>=now;
+                    s+='- '+(pd2.planet&&pd2.planet.name||pd2.name)+': '+pd2.start.slice(0,10)+' to '+pd2.end.slice(0,10)+(isCurP?' [CURRENT]':'')+' \n';
+                  }
+                });
+              }
+            }
+          });
+        }
+      }
+
+      s+='\nFULL MAHADASHA TIMELINE:\n';
+      dd.dasha_periods.forEach(function(md,i){
+        s+='- '+(md.planet&&md.planet.name||md.name)+': '+md.start.slice(0,10)+' to '+md.end.slice(0,10)+(i===curIdx?' [CURRENT]':'')+' \n';
+      });
+
+      if(curIdx>=0&&curIdx+1<dd.dasha_periods.length){
+        s+='\nUPCOMING MAHADASHAS:\n';
+        for(var ni=curIdx+1;ni<=Math.min(curIdx+2,dd.dasha_periods.length-1);ni++){
+          var nmd=dd.dasha_periods[ni];
+          s+='- '+(nmd.planet&&nmd.planet.name||nmd.name)+': '+nmd.start.slice(0,10)+' to '+nmd.end.slice(0,10)+'\n';
+        }
+      }
+    }
+  }catch(e){s+='[Dasha error: '+e.message+']\n';}
+
+  // D9 NAVAMSHA
+  try{
+    var nd=c.navamsha&&c.navamsha.data;
+    if(nd&&nd.planet_position){
+      var d9Lagna=nd.planet_position.find(function(p){return p.name==='Ascendant';});
+      var d9LagnaSign=d9Lagna?(d9Lagna.rasi&&d9Lagna.rasi.name||'Mesha'):'Mesha';
+      s+='\nNAVAMSHA D9 LAGNA: '+rashiDisplay(d9LagnaSign)+'\n';
+      s+='\nNAVAMSHA D9 POSITIONS:\n';
+      nd.planet_position.forEach(function(p){
+        if(p.name==='Ascendant')return;
+        var sign=p.rasi&&p.rasi.name||'Mesha';
+        var house=houseFromLagna(sign, d9LagnaSign);
+        s+='- '+p.name+': '+rashiDisplay(sign)+' | House '+house+' | '+p.degree.toFixed(2)+'deg'+(p.is_retrograde?' (R)':'')+' \n';
+      });
+      window._d9LagnaSign = d9LagnaSign;
+    }
+  }catch(e){s+='[D9 error: '+e.message+']\n';}
+
+  // D10 DASHAMSHA
+  try{
+    var d10=c.dashamsha&&c.dashamsha.data;
+    if(d10&&d10.planet_position){
+      var d10Lagna=d10.planet_position.find(function(p){return p.name==='Ascendant';});
+      var d10LagnaSign=d10Lagna?(d10Lagna.rasi&&d10Lagna.rasi.name||'Mesha'):'Mesha';
+      s+='\nDASHAMSHA D10 LAGNA: '+rashiDisplay(d10LagnaSign)+'\n';
+      s+='\nDASHAMSHA D10 POSITIONS:\n';
+      d10.planet_position.forEach(function(p){
+        if(p.name==='Ascendant')return;
+        var sign=p.rasi&&p.rasi.name||'Mesha';
+        var house=houseFromLagna(sign, d10LagnaSign);
+        s+='- '+p.name+': '+rashiDisplay(sign)+' | House '+house+' | '+p.degree.toFixed(2)+'deg'+(p.is_retrograde?' (R)':'')+' \n';
+      });
+    }
+  }catch(e){s+='[D10 error: '+e.message+']\n';}
+
+  // GOCHAR
+  try{
+    var gd=c.gochar&&c.gochar.data;
+    var pd3=c.planets&&c.planets.data;
+    if(gd&&gd.planet_position&&pd3){
+      var lagnaP=pd3.planet_position.find(function(p){return p.name==='Ascendant';});
+      var lagnaSignG=lagnaP?(lagnaP.rasi&&lagnaP.rasi.name||'Mesha'):'Mesha';
+      s+='\nCURRENT GOCHAR (Transits today) from natal Lagna:\n';
+      gd.planet_position.forEach(function(p){
+        if(p.name==='Ascendant')return;
+        var sign=p.rasi&&p.rasi.name||'Mesha';
+        var house=houseFromLagna(sign, lagnaSignG);
+        s+='- '+p.name+': '+rashiDisplay(sign)+' | Natal House '+house+' | '+p.degree.toFixed(2)+'deg'+(p.is_retrograde?' (R)':'')+' \n';
+      });
+    }
+  }catch(e){s+='[Gochar error: '+e.message+']\n';}
+
+  return s;
+}
+
+function getVerdict(t){
+  var u=t.toUpperCase();
+  if(u.match(/VERDICT:\s*MIXED/))return'mixed';
+  if(u.match(/VERDICT:\s*BUSINESS/))return'business';
+  if(u.match(/VERDICT:\s*JOB/))return'job';
+  return'mixed';
+}
+
+function cleanMeta(text){
+  var lines=text.split('\n');
+  var filtered=lines.filter(function(l){
+    var low=l.toLowerCase().trim();
+    if(low.startsWith('i notice'))return false;
+    if(low.startsWith('i will derive'))return false;
+    if(low.startsWith('i will now'))return false;
+    if(low.startsWith('i cannot find'))return false;
+    if(low.startsWith('i do not see'))return false;
+    if(low.startsWith("i'll calculate"))return false;
+    if(low.startsWith("i'll now"))return false;
+    if(low.startsWith('pre-calculation'))return false;
+    if(low.startsWith('let me'))return false;
+    if(low.startsWith('note:')&&low.includes('chart data'))return false;
+    if(low.startsWith('looking at'))return false;
+    if(low.startsWith('based on the chart data'))return false;
+    if(low.includes('pre-computed')&&low.includes('not'))return false;
+    if(low.includes('before generating'))return false;
+    if(low.match(/^-\s*$/))return false;
+    return true;
+  });
+  return filtered.join('\n');
+}
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TEASER RENDERERS — chat UI shows hooks, not full report
+// Claude outputs: ## SECTION N — TITLE ... ## SECTION N+1
+// ─────────────────────────────────────────────────────────────────────────────
+
+function extractVerdict(text){
+  var m = text.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
+  return m ? m[1].toUpperCase() : 'MIXED';
+}
+
+function extractSutriScore(text){
+  // Match "5 of 7 point toward Business" — NOT the verdict line score
+  var m = text.match(/(\d)\s+of\s+7\s+point/i);
+  if(m) return m[1]+'/7';
+  // Fallback: match score line
+  var m2 = text.match(/Score:\s*(\d)\s*of\s*7/i);
+  if(m2) return m2[1]+'/7';
+  return '';
+}
+
+// Extract a section by number — handles both ## SECTION N and --- SECTION N --- formats
+function extractSectionFlex(text, num){
+  // Primary: --- SECTION N --- format
+  var re1 = new RegExp('---\\s*\\nSECTION\\s+'+num+'[^\\n]*\\n---\\n?([\\s\\S]*?)(?=\\n---\\s*\\nSECTION |\\n---\\s*$|$)');
+  var m1 = text.match(re1);
+  if(m1 && m1[1].trim()) return m1[1].trim();
+  // Fallback: ## SECTION N format (legacy)
+  var re_legacy = new RegExp('##\\s+SECTION\\s+'+num+'\\s*[—–-][^\\n]*\\n([\\s\\S]*?)(?=\\n##\\s+SECTION\\s+\\d|\\n---\\s*$|$)');
+  var m1 = text.match(re1);
+  if(m1) return m1[1].trim();
+  // Try --- SECTION N --- format (old format)
+  var re2 = new RegExp('---\\s*\\nSECTION\\s+'+num+'[^\\n]*\\n---\\n([\\s\\S]*?)(?=\\n---\\s*\\nSECTION |\\n---\\s*$|$)');
+  var m2 = text.match(re2);
+  if(m2) return m2[1].trim();
+  return '';
+}
+
+function getTeaserColor(verdict){
+  return verdict==='BUSINESS'?'#1D9E75':verdict==='JOB'?'#534AB7':'#c9a96e';
+}
+
+// CALL 1 TEASER — Verdict + 3-line personality + Saturn hook + one factor that changed verdict
+function renderTeaser(text){
+  text = cleanMeta(text);
+  var verdict = extractVerdict(text);
+  var score = extractSutriScore(text);
+  var color = getTeaserColor(verdict);
+  var s1 = extractSectionFlex(text, 1);
+  var s3 = extractSectionFlex(text, 3);
+
+  // Extract 3 personality lines from s1 (lines starting with sign name or **Sign**)
+  var personalityLines = [];
+  s1.split('\n').forEach(function(l){
+    l = l.trim();
+    if(!l) return;
+    // Match lines like "**Simha (Leo) Lagna** — ..." or "Line 1: ..."
+    var m = l.match(/^\*\*([^*]+)\*\*\s*[—–-]\s*(.+)/) || l.match(/^Line \d+:\s*(.+)/);
+    if(m && personalityLines.length < 3){
+      personalityLines.push(m[2]||m[1]);
+    }
+  });
+  // Fallback: first 3 non-empty lines
+  if(personalityLines.length === 0){
+    s1.split('\n').filter(function(l){return l.trim()&&!l.startsWith('#');}).slice(0,3).forEach(function(l){
+      personalityLines.push(l.trim().replace(/\*\*/g,''));
+    });
+  }
+
+  // Extract confirmation paragraph (plain English, no pipes, after Score line)
+  var afterScore = s3.replace(/[\s\S]*Score:[^\n]*\n/,'').trim();
+  // Remove "CONFIRMATION PARAGRAPH:" header
+  afterScore = afterScore.replace(/\*?\*?CONFIRMATION PARAGRAPH:\*?\*?\n?/i,'').trim();
+  var sentences = (afterScore.match(/[^.!?]+[.!?]+/g)||[]);
+  var teaserPara = sentences.slice(0,2).join(' ').trim();
+
+  // Extract Saturn row from the table
+  var saturnM = s3.match(/\|\s*Saturn[^|]*\|([^|]+)\|([^|]+)\|/i);
+  var saturnDesc = saturnM ? saturnM[1].trim() : '';
+  // Extract what Saturn points to
+  var saturnVerdict = saturnM ? saturnM[2].trim().replace(/\*\*/g,'') : '';
+
+  // Find the one factor that could have changed the verdict
+  var pivotFactor = '';
+  if(verdict === 'MIXED'){
+    pivotFactor = 'Saturn in an enemy sign and the 8th house is the single factor holding back a full Business verdict — if Saturn were in own sign or exalted, this would be confirmed Business.';
+  } else if(verdict === 'BUSINESS'){
+    var jobRows = s3.split('\n').filter(function(l){return l.includes('|') && l.toLowerCase().includes('job');});
+    pivotFactor = jobRows.length > 0 ? 'One factor pointed toward Job: ' + jobRows[0].replace(/\|/g,'').replace(/\*\*/g,'').trim().slice(0,100) : '';
+  } else {
+    var bizRows = s3.split('\n').filter(function(l){return l.includes('|') && l.toLowerCase().includes('business');});
+    pivotFactor = bizRows.length > 0 ? 'One factor pointed toward Business: ' + bizRows[0].replace(/\|/g,'').replace(/\*\*/g,'').trim().slice(0,100) : '';
+  }
+
+  var html = '<div style="font-family:-apple-system,sans-serif;max-width:480px;">';
+
+  // Verdict badge
+  html += '<div style="display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,0.04);border:1.5px solid '+color+';border-radius:8px;padding:10px 16px;margin-bottom:14px;">'
+       +  '<span style="font-size:10px;color:#888;letter-spacing:0.12em;text-transform:uppercase;">Career Destiny</span>'
+       +  '<span style="font-size:22px;font-weight:700;color:'+color+';">'+verdict+'</span>'
+       +  (score?'<span style="font-size:13px;color:#aaa;font-weight:500;">'+score+'</span>':'')
+       +  '</div>';
+
+  // 3-line personality
+  if(personalityLines.length > 0){
+    html += '<div style="margin-bottom:12px;">';
+    personalityLines.forEach(function(line){
+      html += '<div style="font-size:13px;color:#444;line-height:1.7;padding:2px 0;">'+line+'</div>';
+    });
+    html += '</div>';
+  }
+
+  // Confirmation teaser (2 sentences)
+  if(teaserPara){
+    html += '<p style="font-size:13px;color:#333;line-height:1.7;margin-bottom:10px;padding:10px 14px;background:#fafaf8;border-radius:6px;">'+teaserPara+'</p>';
+  }
+
+  // Saturn hook
+  if(saturnDesc){
+    html += '<div style="background:#fffdf5;border-left:3px solid #c9a96e;padding:10px 14px;margin:10px 0;border-radius:0 6px 6px 0;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#c9a96e;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Saturn — The Most Decisive Factor</div>'
+         +  '<div style="font-size:12px;color:#555;line-height:1.6;">'+saturnDesc.slice(0,200)+'</div>'
+         +  (saturnVerdict?'<div style="font-size:11px;font-weight:600;color:#888;margin-top:4px;">→ Points to: '+saturnVerdict+'</div>':'')
+         +  '</div>';
+  }
+
+  // Pivot factor
+  if(pivotFactor){
+    html += '<div style="font-size:12px;color:#666;font-style:italic;margin:8px 0 12px;padding:0 2px;">'+pivotFactor+'</div>';
+  }
+
+  // Download nudge
+  html += '<div style="margin-top:10px;padding:10px 14px;background:#f0f4ff;border-radius:6px;font-size:12px;color:#534AB7;">'
+       +  '📄 Your full report has the complete 7-factor scorecard, wealth picture, career suggestions, dasha timeline, and timing windows. <strong>Download below.</strong>'
+       +  '</div>';
+
+  html += '</div>';
+  var wrap = document.createElement('div');
+  wrap.className = 'rpt';
+  wrap.innerHTML = html;
+  return wrap;
+}
+
+// CALL 2 TEASER — 2 career paths + hidden talent hook + wealth teaser
+function renderTeaser2(text){
+  text = cleanMeta(text);
+  var s2 = extractSectionFlex(text, 2);
+  var s6 = extractSectionFlex(text, 6);
+  var s7 = extractSectionFlex(text, 7);
+
+  // Wealth: WHEN line
+  var whenM = s2.match(/\*\*WHEN[:\*]*\*?\*?\s*([^\n]+(?:\n(?!\*\*)[^\n]+)*)/i) ||
+              s2.match(/WHEN[:\s]+([^\n]+)/i);
+  var wealthWhen = whenM ? whenM[1].trim().replace(/\*\*/g,'').split('.')[0]+'.' : '';
+
+  // Wealth: OBSTACLE line (first sentence)
+  var obstacleM = s2.match(/\*\*OBSTACLE[:\*]*\*?\*?\s*([^\n]+)/i) ||
+                  s2.match(/OBSTACLE[:\s]+([^\n]+)/i);
+  var obstacle = obstacleM ? obstacleM[1].trim().replace(/\*\*/g,'').split('.')[0]+'.' : '';
+
+  // Extract first 2 numbered career items from s6
+  var items = [];
+  s6.split('\n').forEach(function(l){
+    var m = l.trim().match(/^(\d+)\.\s+\*?\*?([^*—–\n]+?)\*?\*?\s*[—–]\s*(.+)/);
+    if(m && items.length < 2){
+      items.push({num:m[1], title:m[2].trim().replace(/\*\*/g,''), desc:m[3].trim().replace(/\*\*/g,'')});
+    }
+  });
+
+  // Count total items for "X more in report"
+  var totalItems = (s6.match(/^\d+\./gm)||[]).length;
+  var moreCount = Math.max(0, totalItems - 2);
+
+  // Hidden talent from s7 — strip ** markers and table lines
+  var hiddenM = s7.match(/Hidden[^:]*:\s*([^\n|]+(?:\n(?!Active|\||$)[^\n|]+)*)/i);
+  var hidden = hiddenM ? hiddenM[1].trim().replace(/\*\*/g,'').split('.')[0]+'.' : '';
+
+  // Active strength first sentence — strip ** markers and table lines
+  var activeM = s7.match(/Active[^:]*:\s*([^\n|]+)/i);
+  var active = activeM ? activeM[1].trim().replace(/\*\*/g,'').split('.')[0]+'.' : '';
+  // If active came from a table row, clear it
+  if(active.includes('|')) active = '';
+  if(hidden.includes('|')) hidden = '';
+
+  var html = '<div style="font-family:-apple-system,sans-serif;max-width:480px;">';
+
+  // Career paths
+  if(items.length > 0){
+    html += '<div style="font-size:10px;font-weight:600;color:#888;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:10px;">Your Top Career Paths</div>';
+    items.forEach(function(item){
+      html += '<div style="display:flex;gap:10px;margin-bottom:10px;padding:10px 14px;background:#fafaf8;border-radius:8px;border:0.5px solid #e8e8e8;">'
+           +  '<span style="font-size:20px;font-weight:700;color:#c9a96e;line-height:1;min-width:22px;flex-shrink:0;">'+item.num+'</span>'
+           +  '<div><div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;">'+item.title+'</div>'
+           +  '<div style="font-size:12px;color:#666;line-height:1.5;">'+item.desc.slice(0,140)+'</div></div>'
+           +  '</div>';
+    });
+    if(moreCount > 0){
+      html += '<div style="font-size:12px;color:#888;margin-bottom:12px;padding-left:4px;">+ '+moreCount+' more career paths in your full report.</div>';
+    }
+  }
+
+  // Wealth teaser
+  if(wealthWhen){
+    html += '<div style="background:#f5fff9;border-left:3px solid #1D9E75;padding:10px 14px;margin-bottom:8px;border-radius:0 6px 6px 0;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#1D9E75;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">When Wealth Arrives</div>'
+         +  '<div style="font-size:12px;color:#333;line-height:1.6;">'+wealthWhen.slice(0,200)+'</div>'
+         +  (obstacle?'<div style="font-size:11px;color:#888;margin-top:4px;">⚠ '+obstacle.slice(0,120)+'</div>':'')
+         +  '</div>';
+  }
+
+  // Hidden talent hook
+  if(hidden || active){
+    html += '<div style="background:#f8f5ff;border-left:3px solid #534AB7;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#534AB7;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Strength + Hidden Talent</div>'
+         +  (active?'<div style="font-size:12px;color:#333;margin-bottom:4px;">'+active.slice(0,150)+'</div>':'')
+         +  (hidden?'<div style="font-size:12px;color:#666;font-style:italic;">Hidden: '+hidden.slice(0,150)+'</div>':'')
+         +  '</div>';
+  }
+
+  html += '</div>';
+  var wrap = document.createElement('div');
+  wrap.className = 'rpt';
+  wrap.innerHTML = html;
+  return wrap;
+}
+
+// CALL 3 TEASER — Best window + caution + next step + situation selector
+function renderTeaser3(text){
+  text = cleanMeta(text);
+  var s8 = extractSectionFlex(text, 8);
+  var s9 = extractSectionFlex(text, 9);
+  var s11 = extractSectionFlex(text, 11);
+
+  // Current dasha planet from table
+  var dashaM = s8.match(/Mahadasha[^|]*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|\s*([^|]+)\s*\|([^|\n]+)/i);
+  var dashaDesc = dashaM ? dashaM[4].trim().split('.')[0]+'.' : '';
+  var dashaPlanet = dashaM ? dashaM[1].trim() : '';
+
+  // Window 1 — first sentence
+  var w1m = s9.match(/Window 1[:\s–—]*([^\n]+)/i);
+  var window1 = w1m ? w1m[1].trim() : '';
+  // Extract dates from window1
+  var dateM = window1.match(/([A-Z][a-z]+ \d{4})/g);
+  var windowDates = dateM ? dateM.join(' – ') : '';
+
+  // Caution — first sentence
+  var cautionM = s9.match(/Caution[^:]*:\s*([^\n]+)/i);
+  var caution = cautionM ? cautionM[1].trim().split('.')[0]+'.' : '';
+
+  // Next step — first 2 sentences, clean
+  var nextRaw = s11.replace(/Your report is complete[\s\S]*/i,'').trim();
+  var nextSentences = (nextRaw.match(/[^.!?]+[.!?]+/g)||[]);
+  var nextStep = nextSentences.slice(0,2).join(' ').trim();
+
+  var html = '<div style="font-family:-apple-system,sans-serif;max-width:480px;">';
+
+  // Current phase
+  if(dashaDesc || dashaPlanet){
+    html += '<div style="margin-bottom:12px;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Current Phase</div>'
+         +  '<div style="font-size:13px;color:#333;line-height:1.6;">'+(dashaPlanet?'<strong>'+dashaPlanet+' Mahadasha</strong> — ':'')+dashaDesc+'</div>'
+         +  '</div>';
+  }
+
+  // Best window
+  if(window1){
+    html += '<div style="background:#f5fff9;border-left:3px solid #1D9E75;padding:10px 14px;margin-bottom:8px;border-radius:0 6px 6px 0;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#1D9E75;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Best Upcoming Window</div>'
+         +  (windowDates?'<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px;">'+windowDates+'</div>':'')
+         +  '<div style="font-size:12px;color:#555;line-height:1.5;">'+window1.slice(0,180)+'</div>'
+         +  '</div>';
+  }
+
+  // Caution
+  if(caution){
+    html += '<div style="background:#fff8f8;border-left:3px solid #e05050;padding:10px 14px;margin-bottom:10px;border-radius:0 6px 6px 0;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#e05050;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;">Caution Period</div>'
+         +  '<div style="font-size:12px;color:#666;line-height:1.5;">'+caution+'</div>'
+         +  '</div>';
+  }
+
+  // Next step
+  if(nextStep){
+    html += '<div style="margin:10px 0;padding:12px 16px;background:#1a1025;border-radius:8px;">'
+         +  '<div style="font-size:10px;font-weight:600;color:#c9a96e;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">Your Next Step</div>'
+         +  '<div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7;">'+nextStep+'</div>'
+         +  '</div>';
+  }
+
+  // Situation selector
+  html += '<div style="margin-top:16px;padding:14px 16px;background:#f8f8f5;border-radius:10px;">'
+       +  '<div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:12px;">Your report is ready. What is your current situation?</div>'
+       +  '<div style="display:flex;flex-direction:column;gap:8px;" id="situation-btns">'
+       +  ['Still Studying','Working a Job','Running Business','Between Jobs','Just Exploring'].map(function(s){
+            return '<button onclick="selectSituation(\''+s+'\')" style="padding:8px 14px;border:1px solid #c9a96e;background:#fff;color:#1a1a1a;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;transition:background 0.15s;" onmouseover="this.style.background=\'#fdf8f0\'" onmouseout="this.style.background=\'#fff\'">'+s+'</button>';
+          }).join('')
+       +  '</div></div>';
+
+  html += '</div>';
+  var wrap = document.createElement('div');
+  wrap.className = 'rpt';
+  wrap.innerHTML = html;
+  return wrap;
+}
+
+// Situation selector handler
+var SITUATION_QUESTIONS = {
+  'Still Studying': ['Which stream or field suits me?','When will I start earning?','Will I do better in job or business later?'],
+  'Working a Job': ['Should I stay or is it time to move?','When is the right time to switch?','Is business a real option for me?'],
+  'Running Business': ['Why is my business struggling?','When will it turn around?','Am I in the right business type?'],
+  'Between Jobs': ['What kind of role should I target next?','When is my next breakthrough?','Job or business right now?'],
+  'Just Exploring': ['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?']
+};
+
+function selectSituation(situation){
+  cdTrack('situation_selected', {situation: situation});
+  // Replace situation buttons with confirmation
+  var btnsDiv = document.getElementById('situation-btns');
+  if(btnsDiv){
+    var parent = btnsDiv.closest('div');
+    if(parent) parent.innerHTML = '<div style="font-size:12px;color:#888;padding:4px 0;">Situation: <strong style="color:#1a1a1a;">'+situation+'</strong></div>';
+  }
+
+  var qs = SITUATION_QUESTIONS[situation]||[];
+  var opening = situation==='Still Studying'
+    ? 'Based on your chart, here are the 3 most important questions I can answer right now:'
+    : 'Based on your chart, the most important questions right now:';
+
+  addRow('agent','<div style="font-size:13px;color:#444;margin-bottom:10px;font-weight:500;">'+opening+'</div>');
+  addQuick(qs);
+  document.getElementById('bottom-bar').style.display='block';
+  document.getElementById('bottom-bar').style.display='block';
+}
+
+function renderReport(text){
+  text=cleanMeta(text);
+  var wrap=document.createElement('div');wrap.className='rpt';
+  var verdict='mixed';
+  var vm=text.match(/VERDICT[^\n]*/i);
+  if(vm){var raw=vm[0];if(raw.includes('BUSINESS'))verdict='business';else if(raw.includes('JOB'))verdict='job';}
+  var vl=verdict==='business'?'Business':verdict==='job'?'Job / Service':'Mixed';
+  var vc=verdict==='business'?'vb':verdict==='job'?'vj':'vm';
+  var h2='<div class="rpt-hd">Career Destiny Analysis &nbsp;<span class="vbadge '+vc+'">'+vl+'</span></div>';
+  var lines=text.split('\n');
+  var inTable=false;var tableRows=[];
+  for(var i=0;i<lines.length;i++){
+    var l=lines[i].trim();
+    if(!l)continue;
+    if(l.startsWith('|')){
+      if(!l.match(/^[| -]+$/))tableRows.push(l);
+      inTable=true;
+    } else {
+      if(inTable&&tableRows.length>0){
+        h2+='<div style="overflow-x:auto;margin:8px 0"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+        tableRows.forEach(function(row,ri){
+          var cells=row.split('|').filter(function(c){return c.trim();});
+          var tag=ri===0?'th':'td';
+          h2+='<tr>'+cells.map(function(c){return '<'+tag+' style="padding:5px 8px;border:1px solid #eee;text-align:left;">'+c.trim().replace(/\*\*/g,'')+'</'+tag+'>';}).join('')+'</tr>';
+        });
+        h2+='</table></div>';
+        tableRows=[];inTable=false;
+      }
+      l=l.replace(/^[*#]+\s*/,'').trim();
+      if(!l)continue;
+      if(l.match(/^VERDICT:/i))continue;
+      if(l.match(/^Summary:/i)){h2+='<div style="font-size:13px;color:#333;padding:4px 0 8px;font-weight:500">'+l+'</div>';}
+      else if(l.match(/^Final Verdict:/i)){h2+='<div class="fv">'+l.replace(/\*\*/g,'')+'</div>';}
+      else if(l.match(/^Career Obstacles:/i)){h2+='<div style="font-size:13px;color:#555;padding:5px 0;border-top:1px solid #f5f5f0;margin-top:4px">'+l+'</div>';}
+      else if(!l.match(/^[-*]{2,}$/)&&!l.match(/^[A-Z ]{8,}$/)){h2+='<div style="font-size:13px;color:#666;padding:2px 0;line-height:1.65">'+l.replace(/\*\*/g,'')+'</div>';}
+    }
+  }
+  if(tableRows.length>0){
+    h2+='<div style="overflow-x:auto;margin:8px 0"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    tableRows.forEach(function(row,ri){
+      var cells=row.split('|').filter(function(c){return c.trim();});
+      var tag=ri===0?'th':'td';
+      h2+='<tr>'+cells.map(function(c){return '<'+tag+' style="padding:5px 8px;border:1px solid #eee;text-align:left;">'+c.trim().replace(/\*\*/g,'')+'</'+tag+'>';}).join('')+'</tr>';
+    });
+    h2+='</table></div>';
+  }
+  // Apply markdown formatting to h2
+  h2=h2.replace(/\*\*([^*]+)\*\*/g,'<strong style="color:#1a1a1a;font-weight:600;">$1</strong>');
+  h2=h2.replace(/^[-•]\s+(.+)$/gm,'<div style="display:flex;gap:6px;margin:3px 0;"><span style="color:#534AB7;font-weight:700;">•</span><span>$1</span></div>');
+  h2=h2.replace(/^(\d+)\.\s+(.+)$/gm,'<div style="display:flex;gap:8px;margin:4px 0;"><span style="font-weight:700;color:#534AB7;min-width:16px;">$1.</span><span>$2</span></div>');
+  wrap.innerHTML=h2;return wrap;
+}
+
+function renderReport2(text){
+  text=cleanMeta(text);
+  // Convert plain planet lines like "| Sun | Mithuna | 3 | 3.42° | Direct |" into table
+  // Also strip noise lines before first table
+  var lines = text.split('\n');
+  var cleaned = [];
+  var firstTableFound = false;
+  for(var i=0;i<lines.length;i++){
+    var l = lines[i].trim();
+    if(!l) continue;
+    // Skip noise lines before first table
+    if(!firstTableFound){
+      if(l.startsWith('|')) firstTableFound = true;
+      else if(l.match(/^[-*]{2,}$/) || l.match(/^#+\s/) || l.match(/^\*\*Born/) || l.match(/^\*\*Lagna/) || l.match(/^Sapta Sutri/) || l.match(/^[A-Z ]{8,}$/) || l === '---') continue;
+    }
+    cleaned.push(l);
+  }
+  text = cleaned.join('\n');
+
+  var wrap=document.createElement('div');
+  wrap.className='rpt';
+  wrap.style.marginTop='12px';
+  var h2='<div class="rpt-hd" style="font-size:13px;font-weight:600;margin-bottom:8px;">Detailed Sapta Sutri Analysis</div>';
+  var inTable=false;
+  var tableRows=[];
+  text.split('\n').forEach(function(l){
+    l=l.replace(/^[*#]+\s*/,'').trim();
+    if(!l)return;
+    if(l.startsWith('|')){
+      tableRows.push(l);
+      inTable=true;
+    } else {
+      if(inTable&&tableRows.length>0){
+        h2+='<div style="overflow-x:auto;margin:8px 0"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+        tableRows.forEach(function(row,i){
+          if(row.match(/^\|[-| ]+\|$/))return;
+          var cells=row.split('|').filter(function(c){return c.trim();});
+          var tag=i===0?'th':'td';
+          h2+='<tr>'+cells.map(function(c){return '<'+tag+' style="padding:5px 8px;border:1px solid #eee;text-align:left;">'+c.trim()+'</'+tag+'>';}).join('')+'</tr>';
+        });
+        h2+='</table></div>';
+        tableRows=[];
+        inTable=false;
+      }
+      if(l.match(/^Final Verdict:/i)){
+        h2+='<div class="fv" style="margin-top:10px;">'+l+'</div>';
+      } else if(l.match(/^Career Obstacles:/i)){
+        h2+='<div style="font-size:13px;color:#555;padding:5px 0;border-top:1px solid #f5f5f0;margin-top:6px;">'+l+'</div>';
+      } else {
+        h2+='<div style="font-size:13px;color:#666;padding:2px 0;">'+l+'</div>';
+      }
+    }
+  });
+  if(tableRows.length>0){
+    h2+='<div style="overflow-x:auto;margin:8px 0"><table style="width:100%;border-collapse:collapse;font-size:12px">';
+    tableRows.forEach(function(row,i){
+      if(row.match(/^\|[-| ]+\|$/))return;
+      var cells=row.split('|').filter(function(c){return c.trim();});
+      var tag=i===0?'th':'td';
+      h2+='<tr>'+cells.map(function(c){return '<'+tag+' style="padding:5px 8px;border:1px solid #eee;text-align:left;">'+c.trim()+'</'+tag+'>';}).join('')+'</tr>';
+    });
+    h2+='</table></div>';
+  }
+  wrap.innerHTML=h2;
+  return wrap;
+}
+
+
+async function callClaude(userMsg,chartSummary,onChunk,callNum){
+  var messages=hist.slice();
+  var um=userMsg;
+  var cs=chartSummary||window._chartSummary||null;
+  // Always include chart data in every call — use cs (summaryWithScores) not window._chartSummary
+  if(cs&&hist.length===0){
+    var isReportCall = callNum && callNum <= 3;
+    if(isReportCall){
+      um+="\n\n[CHART DATA]\n"+cs+"\n[END CHART DATA]\n\nPlease analyze this chart.";
+    } else {
+      um="[CHART DATA — for context only, do not regenerate the report]\n"+cs+"\n[END CHART DATA]\n\nThe user's question is: "+userMsg+"\n\nAnswer this specific question directly from the chart data above. Do not generate a report. Answer in 3-5 sentences maximum unless a table genuinely helps.";
+    }
+  }
+  // For chat calls: always inject chart data as first context message
+  // For report calls: inject when hist is empty
+  var chartContext = window._chartSummary || cs;
+  if(callNum===4 && chartContext){
+    // Reset hist for clean chat context — only keep the last 4 exchanges
+    if(hist.length > 8) hist = hist.slice(-8);
+    messages = [{
+      role:"user",
+      content:"[CHART DATA]\n"+chartContext+"\n[END CHART DATA]\n\nI have received my Career Destiny report. I will now ask follow-up questions about my chart."
+    },{
+      role:"assistant",
+      content:"Understood. I have your complete chart data and your Career Destiny report. Ask me anything about your chart, career timing, planetary influences, or specific questions — I will answer directly from your chart."
+    }].concat(hist.slice(-6));
+    messages.push({role:"user", content:userMsg});
+  } else if(hist.length>0&&cs){
+    messages.unshift({role:"user",content:"[CHART DATA]\n"+cs+"\n[END CHART DATA]\n\nIMPORTANT: Use the CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS sections exactly. Entries marked [CURRENT] are the active periods. Do not recalculate dashas."},{role:"assistant",content:"Understood. I have the complete chart data. I will read the [CURRENT] marked entries directly for Section 8 and not recalculate any dasha periods."});
+  }
+  messages.push({role:"user",content:um});
+  var r=await fetch(API+"/api/analyze",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4000,temperature:0,messages:messages,lang:window._lang||"en",call:callNum||1})
+  });
+  if(!r.ok){var e=await r.text();throw new Error("Claude "+r.status+": "+e.slice(0,100));}
+  var data=await r.json();
+  if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+  var reply=data.content&&data.content[0]&&data.content[0].text||"";
+  hist.push({role:"user",content:um});
+  hist.push({role:"assistant",content:reply});
+  return reply;
+}
+
+function formatDOB(inp){
+  var v = inp.value.replace(/\D/g,'');
+  if(v.length > 8) v = v.slice(0,8);
+  var out = '';
+  if(v.length >= 1) out = v.slice(0,2);
+  if(v.length >= 3) out += '/' + v.slice(2,4);
+  if(v.length >= 5) out += '/' + v.slice(4,8);
+  inp.value = out;
+  // Validate day/month ranges
+  if(v.length >= 2){
+    var dd = parseInt(v.slice(0,2));
+    if(dd > 31) inp.value = inp.value.replace(/^\d{2}/,'31');
+    if(dd < 1 && v.length === 2) inp.value = inp.value.replace(/^\d{2}/,'01');
+  }
+  if(v.length >= 4){
+    var mm = parseInt(v.slice(2,4));
+    if(mm > 12) inp.value = inp.value.replace(/(\d{2}\/)\d{2}/,'$112');
+    if(mm < 1 && v.length === 4) inp.value = inp.value.replace(/(\d{2}\/)\d{2}/,'$101');
+  }
+}
+
+function handleDOBKey(e, inp){
+  // Allow backspace, delete, tab, arrows
+  if([8,9,37,38,39,40,46].indexOf(e.keyCode) >= 0) return;
+  // Only allow numbers
+  if(e.key < '0' || e.key > '9'){ e.preventDefault(); return; }
+  // Prevent year > 4 digits
+  var v = inp.value.replace(/\D/g,'');
+  if(v.length >= 8){ e.preventDefault(); return; }
+}
+
+function parseDOBToISO(dobStr){
+  // Convert DD/MM/YYYY to YYYY-MM-DD for Date parsing
+  var parts = dobStr.split('/');
+  if(parts.length === 3){
+    return parts[2] + '-' + parts[1] + '-' + parts[0];
+  }
+  return dobStr;
+}
+
+function showChat(){
+  
+  document.getElementById('bottom-bar').style.display='block';
+  document.getElementById('chat-ui').focus();
+}
+
+function hideConfirm(){
+  
+}
+
+function showConfirm(){ /* removed — redundant */ }
+
+
+// Build report HTML for email sending
+function buildReportHtml(meta, analysis, svgs){
+  window._buildingForEmail = true;
+  window._reportHtmlResult = null;
+  downloadReport(meta, analysis, svgs);
+  window._buildingForEmail = false;
+  return window._reportHtmlResult || '';
+}
+
+function triggerDownload(){ triggerEmail(); } // kept for compat
+
+function triggerEmail(){
+  if(!window._analysis || !window._meta){
+    alert('Report not ready yet. Please wait for analysis to complete.');
+    return;
+  }
+  cdTrack('email_report_click', {has_email: (window._meta&&window._meta.email)?'yes':'no'});
+  var email = (window._meta && window._meta.email) || '';
+  if(!email){
+    // Ask for email in chat
+    addRow('agent', renderChatReply(
+      "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
+    ));
+    window._awaitingEmail = true;
+    document.getElementById('bottom-bar').style.display = 'block';
+    document.getElementById('chat-ui').placeholder = 'Enter your email address...';
+    document.getElementById('chat-ui').focus();
+    return;
+  }
+  sendReportEmail(email);
+}
+
+async function sendReportEmail(email){
+  var btn = document.getElementById('dl-report-btn');
+  if(btn){ btn.textContent = '⏳ Generating & Sending...'; btn.disabled = true; }
+
+  try {
+    // Build report HTML (same as downloadReport but return instead of open)
+    var reportHtml = buildReportHtml(window._meta, window._analysis, window._svgs);
+
+    // Extract verdict from analysis
+    var verdictM = (window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
+    var verdictStr = verdictM ? verdictM[1].toUpperCase() : 'MIXED';
+
+    var r = await fetch('/api/email', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        html: reportHtml,
+        email: email,
+        name: window._meta.name || '',
+        verdict: verdictStr
+      })
+    });
+
+    var data = await r.json();
+    if(!r.ok) throw new Error(data.error || 'Send failed');
+
+    // Success
+    if(btn){ btn.textContent = '✓ Report Sent!'; btn.style.background = '#1D9E75'; }
+    addRow('agent', renderChatReply('Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).'));
+    cdTrack('email_sent_success', {verdict: (window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)?RegExp.$1:'MIXED'});
+    setTimeout(function(){
+      if(btn){ btn.textContent = '📧 Email My Report'; btn.style.background = ''; btn.disabled = false; }
+    }, 4000);
+
+  } catch(e) {
+    if(btn){ btn.textContent = '📧 Email My Report'; btn.disabled = false; }
+    addRow('agent', renderChatReply('Sorry, there was an error sending your report: ' + e.message + '. Please try again.'));
+    cdTrack('email_sent_error', {error: e.message});
+  }
+}
+
+function triggerDownload_old(){
+  if(window._analysis && window._svgs && window._meta){
+    var btn = document.getElementById('dl-report-btn');
+    if(btn){ btn.textContent = '⏳ Generating PDF...'; btn.disabled = true; }
+    downloadReport(window._meta, window._analysis, window._svgs);
+    setTimeout(function(){
+      if(btn){ btn.textContent = '📧 Email My Report'; btn.disabled = false; }
+    }, 3000);
+  } else {
+    alert('Report not ready yet. Please wait for analysis to complete.');
+  }
+}
+
+var _placeTimer=null;var _selectedCoords=null;var _selectedPlaceName=null;
+function searchPlace(val){
+  _selectedCoords=null;_selectedPlaceName=null;
+  if(_placeTimer)clearTimeout(_placeTimer);
+  if(!val||val.length<3){hidePlaceDropdown();return;}
+  _placeTimer=setTimeout(function(){
+    fetch(API+"/api/geocode?place="+encodeURIComponent(val)+"&limit=5").then(function(r){return r.json();}).then(function(data){
+      if(data.error||!data.length){hidePlaceDropdown();return;}
+      showPlaceDropdown(data);
+    }).catch(function(){hidePlaceDropdown();});
+  },400);
+}
+function showPlaceDropdown(results){
+  var dd=document.getElementById("place-dropdown");
+  dd.innerHTML="";
+  results.forEach(function(r){
+    var item=document.createElement("div");
+    item.style.cssText="padding:10px 12px;cursor:pointer;font-size:13px;color:#1a1a1a;border-bottom:0.5px solid #eee;line-height:1.4;";
+    item.innerHTML="<div style=\"font-weight:500;\">"+r.short_name+"</div><div style=\"font-size:11px;color:#888;margin-top:2px;\">"+r.display_name.slice(0,60)+"</div>";
+    item.addEventListener("mousedown",function(e){e.preventDefault();document.getElementById("f-place").value=r.short_name;_selectedCoords={lat:r.lat,lon:r.lon,name:r.display_name,coordinates:r.lat+","+r.lon};_selectedPlaceName=r.short_name;hidePlaceDropdown();});
+    item.addEventListener("mouseover",function(){this.style.background="#f5f0e8";});
+    item.addEventListener("mouseout",function(){this.style.background="";});
+    dd.appendChild(item);
+  });
+  dd.style.display="block";
+}
+function hidePlaceDropdown(){
+  setTimeout(function(){var dd=document.getElementById("place-dropdown");if(dd)dd.style.display="none";},150);
+}
+function collectData(meta, verdict, analysis){
+  try{
+    var params = new URLSearchParams({
+      name: meta.name||"",
+      dob: meta.dob||"",
+      time: meta.time||"",
+      place: meta.place||"",
+      email: meta.email||"",
+      verdict: verdict||"",
+      d1Lagna: window._d1LagnaSign||"",
+      rashi: window._moonRashi||"",
+      analysis: analysis ? analysis.slice(0,300) : ""
+    });
+    fetch("https://script.google.com/macros/s/AKfycbxczYOWP-A9Un2RmWFrRNX_4vvgC_pzA1ataP6MUftEmhx-LFP3uJlaelN8tXox23eowQ/exec?"+params.toString(), {
+      method:"GET",
+      mode:"no-cors"
+    });
+  }catch(e){ console.log("Data collection error:",e); }
+}
+
+async function analyze(){
+  var dob=document.getElementById('f-dob').value;
+  var time=document.getElementById('f-time').value;
+  var place=document.getElementById('f-place').value.trim();
+  var name=document.getElementById('f-name').value.trim()||'User';
+  var email=document.getElementById('f-email').value.trim();
+
+  // Track analyze attempt
+  cdTrack('analyze_click', {
+    has_email: email ? 'yes' : 'no',
+    has_name: name !== 'User' ? 'yes' : 'no'
+  });
+
+  if(!dob||!time||!place){
+    cdTrack('form_error', {missing_fields: (!dob?'dob ':'')+(!time?'time ':'')+(!place?'place':'')});
+    alert('Please fill in Date of Birth, Time of Birth, and Place of Birth.');
+    return;
+  }
+
+  // Block future birth datetime
+  var dobISO=parseDOBToISO(dob); var birthDT=new Date(dobISO+'T'+time);
+  var now=new Date();
+  if(birthDT>now){
+    alert('Date and time of birth cannot be in the future. Please enter your actual birth details.');
+    return;
+  }
+
+
+  var btn=document.getElementById('analyze-btn');
+  btn.disabled=true;
+
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('result-section').style.display='block';
+    // Report scroll depth tracking
+(function(){
+  var depths = {25:false, 50:false, 75:false, 100:false};
+  window.addEventListener('scroll', function(){
+    var el = document.getElementById('result-section');
+    if(!el) return;
+    var rect = el.getBoundingClientRect();
+    var total = el.offsetHeight;
+    var scrolled = Math.max(0, -rect.top);
+    var pct = Math.min(100, Math.round((scrolled / total) * 100));
+    [25,50,75,100].forEach(function(d){
+      if(pct >= d && !depths[d]){
+        depths[d] = true;
+        cdTrack('report_scroll_depth', {depth: d+'%'});
+      }
+    });
+  });
+})();
+  document.getElementById('result-name').textContent=name+' · '+dob+' · '+place;
+
+  setStat('ld','Fetching chart...');
+  addProg([['Locating '+place,'act'],['Fetching D1, D9, D10 charts','wait'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
+
+  try{
+    var coords=await geocode(place);
+    var dt=parseDT(parseDOBToISO(dob),time);
+
+    removeProg();
+    addProg([['Location found: '+coords.name.split(',')[0],'done'],['Fetching D1, D9, D10 charts','act'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
+
+    var chart=await fetchChart(dt,coords);
+    chartData=chart;
+    window._meta={name:name,dob:dob,time:time,place:place,email:email,coords:coords};
+    var summary=buildSummary(chart,{name:name,dob:dob,time:time,place:place,email:email,coords:coords});
+    window._chartSummary=summary;
+    removeProg();
+    addProg([['Location found','done'],['Charts ready','done'],['Dasha ready','done'],['Analyzing','act']]);
+    setStat('ld','Analyzing...');
+    cdTrack('analysis_start', {place: place});
+    var _analysisStartTime = Date.now();
+    // Call 1 - fast verdict + planet table
+    // Use summary directly — Claude reasons correctly from raw data
+    var summaryWithScores = summary;
+    window._chartSummary = summary;
+    // Store lagna info for report
+    var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
+    window._d1Lagna = d1LagnaSign ? (d1LagnaSign.rasi&&d1LagnaSign.rasi.name||'?') : '?';
+    // D9 Lagna extracted from summary
+    var d9LagnaMatch = summary.match(/NAVAMSHA D9 LAGNA: (\S+)/);
+    window._d9Lagna = d9LagnaMatch ? d9LagnaMatch[1] : '?';
+
+    // CALL 1 — Sections 1 and 3
+    var reply1='';
+    addProg([['Generating your identity & verdict','act'],['Analysing strengths & career direction','wait'],['Calculating timeline & next steps','wait']]);
+    try{
+      reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,null,1);
+    }catch(e1){ reply1='Analysis error: '+e1.message;
+      cdTrack('analysis_error', {error: e1.message, call: 1}); }
+    removeProg();
+    if(reply1) addRow('agent',renderTeaser(reply1));
+    window._reply1=reply1;
+    cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+
+    // Reset hist so each call gets clean context with chart data at top
+    hist=[];
+
+    // CALL 2 — Sections 4, 5, 6, 7
+    addProg([['Identity & verdict','done'],['Analysing strengths & career direction','act'],['Calculating timeline & next steps','wait']]);
+    var reply2='';
+    try{
+      reply2=await callClaude('Now generate Sections 4, 5, 6 and 7 of the career destiny report.',summaryWithScores,null,2);
+    }catch(e2){ reply2=''; }
+    removeProg();
+    if(reply2) addRow('agent',renderTeaser2(reply2));
+    window._reply2=reply2;
+    cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+
+    hist=[];
+
+    // CALL 3 — Sections 8, 9, 10, 11
+    addProg([['Identity & verdict','done'],['Strengths & career direction','done'],['Calculating timeline & next steps','act']]);
+    var reply3='';
+    try{
+      reply3=await callClaude('Now generate Sections 8, 9, 10 and 11 of the career destiny report. The chart data is in the first message of this conversation — read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates.',summaryWithScores,null,3);
+    }catch(e3){ reply3=''; }
+    removeProg();
+    if(reply3) addRow('agent',renderTeaser3(reply3));
+    // Store combined analysis for download
+    window._analysis = (reply1||'') + '\n' + (reply2||'') + '\n' + (reply3||'');
+    // Collect data
+    var verdictMatch = window._analysis.match(/VERDICT:\s*([A-Z]+)/i);
+    var verdictVal = verdictMatch ? verdictMatch[1] : 'MIXED';
+    collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictVal, window._analysis);
+    window._meta = {name:name,dob:dob,time:time,place:place};
+    // Show download button and confirm section
+    document.getElementById('bottom-bar').style.display='block';
+    
+    window._reply3=reply3;
+    var _verdictM = ((window._reply1||'')+(reply3||'')).match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
+    var _verdict = _verdictM ? _verdictM[1].toUpperCase() : 'MIXED';
+    var _scoreM = ((window._reply1||'')).match(/(\d)\s+of\s+7/i);
+    var _score = _scoreM ? _scoreM[1]+'/7' : '';
+    cdTrack('analysis_complete', {
+      verdict: _verdict,
+      score: _score,
+      total_duration_ms: Date.now()-(_analysisStartTime||Date.now()),
+      has_email: (window._meta&&window._meta.email) ? 'yes' : 'no'
+    });
+    // Store full analysis for PDF report
+    window._analysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + reply3;
+    // Show download button
+    var dlBtn = document.getElementById('dl-report-btn');
+    if(dlBtn) dlBtn.style.display='inline-block';
+    // Store full analysis for PDF report
+    window._analysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + reply3;
+    // Show download button
+    var dlBtn = document.getElementById('dl-report-btn');
+    if(dlBtn) dlBtn.style.display='inline-block';
+
+    // Combine all for PDF
+    window._analysis=reply1+(reply2?'\n\n'+reply2:'')+(reply3?'\n\n'+reply3:'');
+    showDownloadButton();
+    setStat('ld','Fetching charts for PDF...');
+    addLoader('Preparing your report...');
+    try{ var svgs=await fetchChartSVGs(dt,coords); window._svgs=svgs; }catch(e){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; }
+    removeLoader();
+  }catch(e){
+    removeProg();removeLoader();
+    addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
+    document.getElementById('form-section').style.display='block';
+    document.getElementById('result-section').style.display='none';
+  document.getElementById('bottom-bar').style.display='none';
+    setStat('er','Error');
+  }
+  document.getElementById('analyze-btn').disabled=false;
+}
+function showRegenButton(reply1, partialReply2){
+  var row=document.createElement('div');row.className='row agent';row.id='regen-row';
+  var av=document.createElement('div');av.className='av a';av.textContent='ज';
+  var bub=document.createElement('div');bub.className='bub a';
+  bub.innerHTML='<div style="font-size:13px;color:#555;margin-bottom:10px;">The detailed analysis did not complete fully. Click below to regenerate.</div>';
+  var btn=document.createElement('button');
+  btn.style.cssText='padding:9px 18px;background:#534AB7;color:white;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;width:100%;';
+  btn.textContent='Regenerate Detailed Analysis';
+  btn.onclick=async function(){
+    btn.disabled=true;btn.textContent='Generating...';
+    try{
+      var r2=await callClaude('Now provide the complete Sapta Sutri analysis, dasha timeline, transits and final verdict for this chart.',null,null,2);
+      window._analysis=reply1+(r2?'\n\n'+r2:'');
+      document.getElementById('regen-row').remove();
+      // Remove any previous partial Call 2 response
+      var prevRow=document.getElementById('call2-row');
+      if(prevRow)prevRow.remove();
+      var newRow=addRow('agent',renderReport2(r2));
+      if(newRow)newRow.id='call2-row';
+      var isComplete=r2&&r2.toLowerCase().includes('final verdict');
+      if(isComplete){
+        showDownloadButton();
+      } else {
+        showRegenButton(reply1,r2);
+      }
+    }catch(e){
+      btn.disabled=false;btn.textContent='Retry Detailed Analysis';
+      addRow('agent','Still timing out. Please try again in a moment.','er');
+    }
+  };
+  bub.appendChild(btn);
+  row.appendChild(av);row.appendChild(bub);
+  document.getElementById('msgs').appendChild(row);
+  document.getElementById('msgs').scrollTop=document.getElementById('msgs').scrollHeight;
+}
+
+function showDownloadButton(){
+    var dlRow=document.createElement('div'); dlRow.className='row agent';
+    var dlAv=document.createElement('div'); dlAv.className='av a'; dlAv.textContent='\u091C';
+    var dlBub=document.createElement('div'); dlBub.className='bub a';
+    var dlBtn=document.createElement('button');
+    dlBtn.style.cssText='padding:11px 20px;background:#534AB7;color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:4px;';
+    dlBtn.textContent='📧 Email My Report';
+    dlBtn.onclick=function(){
+      downloadReport(window._meta,window._analysis,window._svgs);
+      dlBtn.textContent='Downloaded! Click to download again';
+      dlBtn.style.background='#1D9E75';
+      setTimeout(function(){ dlBtn.textContent='📧 Email My Report'; dlBtn.style.background='#534AB7'; },3000);
+      setTimeout(function(){
+        var askRow=document.createElement('div'); askRow.className='row agent';
+        var askAv=document.createElement('div'); askAv.className='av a'; askAv.textContent='\u091C';
+        var askBub=document.createElement('div'); askBub.className='bub a';
+        askBub.innerHTML='Would you like a detailed conversation about your analysis?';
+        var yn=document.createElement('div'); yn.style.cssText='display:flex;gap:10px;margin-top:10px;';
+        var yBtn=document.createElement('button');
+        yBtn.textContent='Yes, let\'s discuss';
+        yBtn.style.cssText='flex:1;padding:10px;background:#534AB7;color:white;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;';
+        var nBtn=document.createElement('button');
+        nBtn.textContent='No, thank you';
+        nBtn.style.cssText='flex:1;padding:10px;background:#f5f5f0;color:#555;border:1px solid #ddd;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;';
+        yBtn.onclick=function(){ yn.remove();  addRow('agent','Great! Ask me anything about your chart.'); addQuick(['Explain Sutra 3 (Saturn)','What does my Dasha indicate?','What profession suits me?','What do Gochar transits say?']); };
+        nBtn.onclick=function(){ yn.remove(); addRow('agent','Thank you! Wishing you clarity and success. Namaste \uD83D\uDE4F'); };
+        yn.appendChild(yBtn); yn.appendChild(nBtn);
+        askBub.appendChild(yn);
+        askRow.appendChild(askAv); askRow.appendChild(askBub);
+        document.getElementById('msgs').appendChild(askRow);
+        document.getElementById('msgs').scrollTop=document.getElementById('msgs').scrollHeight;
+      },600);
+    };
+    dlBub.appendChild(dlBtn);
+    dlRow.appendChild(dlAv); dlRow.appendChild(dlBub);
+    document.getElementById('msgs').appendChild(dlRow);
+    document.getElementById('msgs').scrollTop=document.getElementById('msgs').scrollHeight;
+    setStat('ok','Analysis complete');
+}
+
+function renderChatReply(text){
+  if(!text) return document.createElement('div');
+  text = cleanMeta(text);
+  var wrap = document.createElement('div');
+  wrap.className = 'rpt';
+  // Use the existing mdToHtml renderer which handles tables, bold, bullets etc.
+  wrap.innerHTML = mdToHtml(text);
+  return wrap;
+}
+
+async function sendChat(){
+  var ui=document.getElementById('chat-ui');
+  var btn=document.getElementById('chat-btn');
+  var txt=ui.value.trim();
+  if(!txt)return;
+  ui.value='';btn.disabled=true;
+
+  // Handle email collection flow
+  if(window._awaitingEmail){
+    var emailInput = txt.trim();
+    // Basic email validation
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)){
+      addRow('user', emailInput);
+      addRow('agent', renderChatReply("That doesn't look like a valid email address. Please try again — for example: yourname@gmail.com"));
+      btn.disabled=false;
+      ui.placeholder='Enter your email address...';
+      ui.focus();
+      return;
+    }
+    // Valid email — store and send
+    window._awaitingEmail = false;
+    window._meta = window._meta || {};
+    window._meta.email = emailInput;
+    ui.placeholder='Ask a follow-up question...';
+    addRow('user', emailInput);
+    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'));
+    btn.disabled=false;
+    sendReportEmail(emailInput);
+    return;
+  }
+
+  cdTrack('chat_message_sent', {message_length: txt.length});
+  addRow('user',txt);
+  addLoader('Thinking...');
+  setStat('ld','...');
+  try{
+    var reply=await callClaude(txt,window._chartSummary,null,4);
+    removeLoader();
+    addRow('agent',renderChatReply(reply));
+    setStat('ok','Ready');
+  }catch(e){
+    removeLoader();
+    addRow('agent','Error: '+e.message,'er');
+    setStat('er','Error');
+  }
+  btn.disabled=false;
+  ui.focus();
+}
+
+function reset(){
+  cdTrack('analyze_another');
+  // Clear all cached data
+  hist=[];
+  chartData=null;
+  window._chartSummary=null;
+  window._analysis=null;
+  window._svgs=null;
+  window._meta=null;
+  window._reply1=null;
+  window._reply2=null;
+  window._reply3=null;
+  window._d1LagnaSign=null;
+  window._d9LagnaSign=null;
+  window._moonRashi=null;
+  window._lang=window._lang||'en';
+  // Reset UI
+  M.innerHTML='';
+  document.getElementById('result-section').style.display='none';
+  document.getElementById('bottom-bar').style.display='none';
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('bottom-bar').style.display='none';
+  
+  var dlBtn=document.getElementById('dl-report-btn');
+  if(dlBtn) dlBtn.style.display='none';
+  document.getElementById('analyze-btn').disabled=false;
+  // Clear form
+  document.getElementById('f-name').value='';
+  document.getElementById('f-dob').value='';
+  document.getElementById('f-time').value='';
+  document.getElementById('f-place').value='';
+  setStat('ok','');
+}
+
+document.getElementById('chat-ui').addEventListener('keydown',function(e){
+  if(e.key==='Enter')sendChat();
+});
+
+var SYSTEM_1_CLIENT='You are an expert Vedic Jyotish practitioner. The chart data includes PRE-COMPUTED ANALYSIS with verified calculations. Use pre-computed values directly. Return ONLY: 1) VERDICT line 2) Two sentence summary 3) Planet positions table. VERDICT must be BUSINESS/JOB/MIXED. FORMAT: VERDICT: [BUSINESS/JOB/MIXED — description]\n\nSummary: [sentence 1. sentence 2.]\n\n| Planet | Sign | House | Degree | Status |\n|--------|------|-------|--------|--------|\n[one row per planet]. Rules: never mention book or author. Under 350 words. Nothing else.';
+
+var SYSTEM_2_CLIENT='You are an expert Vedic Jyotish practitioner. Use PRE-COMPUTED values from chart data directly — do not recalculate Sutra 1, Sutra 3, Indu Lagna, Amatyakaraka or Dasha. Provide detailed analysis. FORMAT:\n\n| Principle | What Your Chart Shows | Indicates |\n|-----------|----------------------|-----------|\n[7 sutras]\n\n| Planet | D9 Sign | Key Insight |\n|--------|---------|-------------|\n[Saturn Jupiter Mercury Mars Lagna only]\n\n| Planet | D10 House | Career Significance |\n|--------|-----------|-------------------|\n[Sun Saturn D10 Lagna only]\n\n| Period | Planet | From | To | Significance |\n|--------|--------|------|----|--------------|\n[use ONLY provided dasha data]\n\n| Transit | Position | Effect |\n|---------|----------|--------|\n[Jupiter and Saturn only]\n\nCareer Obstacles: [1-2 lines]\n\nFinal Verdict: [3-4 complete sentences. NEVER end mid-sentence.]\n\nRules: never mention book or author. Always complete Final Verdict.';
+
+var _lang="en";
+var _strings={
+  en:{
+    appTitle:"Career Destiny",
+    appSub:"Vedic Analysis · Sapta Sutri Siddhant",
+    formTitle:"Enter Birth Details",
+    formSub:"All fields required for accurate analysis",
+    nameLabel:"Your Name (optional)",
+    namePlaceholder:"e.g. Rahul Sharma",
+    dobLabel:"Date of Birth",
+    timeLabel:"Time of Birth",
+    placeLabel:"Place of Birth",
+    placePlaceholder:"e.g. Ghaziabad, Uttar Pradesh",
+    genderLabel:"Gender",
+    genderDefault:"Prefer not to say",
+    genderM:"Male",
+    genderF:"Female",
+    analyzeBtn:"Analyze My Career Destiny",
+    langBtn:"हिंदी",
+    chatPlaceholder:"Ask a follow-up question..."
+  },
+  hi:{
+    appTitle:"करियर भविष्य",
+    appSub:"वैदिक विश्लेषण · सप्त सूत्री सिद्धांत",
+    formTitle:"जन्म विवरण दर्ज करें",
+    formSub:"सटीक विश्लेषण के लिए सभी क्षेत्र आवश्यक हैं",
+    nameLabel:"आपका नाम (वैकल्पिक)",
+    namePlaceholder:"जैसे राहुल शर्मा",
+    dobLabel:"जन्म तिथि",
+    timeLabel:"जन्म समय",
+    placeLabel:"जन्म स्थान",
+    placePlaceholder:"जैसे गाजियाबाद, उत्तर प्रदेश",
+    genderLabel:"लिंग",
+    genderDefault:"बताना नहीं चाहते",
+    genderM:"पुरुष",
+    genderF:"महिला",
+    analyzeBtn:"मेरे करियर भविष्य का विश्लेषण करें",
+    langBtn:"English",
+    chatPlaceholder:"अपना प्रश्न पूछें..."
+  }
+};
+function toggleLang(){
+  _lang=_lang==="en"?"hi":"en";
+  applyLang();
+}
+function applyLang(){
+  var s=_strings[_lang];
+  document.getElementById("app-title").textContent=s.appTitle;
+  document.getElementById("hsub").textContent=s.appSub;
+  document.getElementById("lang-btn").textContent=s.langBtn;
+  var ft=document.querySelector(".form-title");
+  var fs2=document.querySelector(".form-sub");
+  if(ft)ft.textContent=s.formTitle;
+  if(fs2)fs2.textContent=s.formSub;
+  var nl=document.querySelector("label[for='f-name']");
+  var np=document.getElementById("f-name");
+  var dl=document.querySelector("label[for='f-dob']");
+  var tl=document.querySelector("label[for='f-time']");
+  var pl=document.querySelector("label[for='f-place']");
+  var pp=document.getElementById("f-place");
+  var gl=document.querySelector("label[for='f-gender']");
+  var gs=document.getElementById("f-gender");
+  var ab=document.getElementById("analyze-btn");
+  var ci=document.getElementById("chat-ui");
+  if(nl)nl.textContent=s.nameLabel;
+  if(np)np.placeholder=s.namePlaceholder;
+  if(dl)dl.textContent=s.dobLabel;
+  if(tl)tl.textContent=s.timeLabel;
+  if(pl)pl.textContent=s.placeLabel;
+  if(pp)pp.placeholder=s.placePlaceholder;
+  if(gl)gl.textContent=s.genderLabel;
+  if(gs){
+    gs.options[0].text=s.genderDefault;
+    gs.options[1].text=s.genderM;
+    gs.options[2].text=s.genderF;
+  }
+  if(ab)ab.textContent=s.analyzeBtn;
+  if(ci)ci.placeholder=s.chatPlaceholder;
+  // Also update system prompt language instruction
+  window._lang=_lang;
+}
+</script>
+</body>
+</html>
