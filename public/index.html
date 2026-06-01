@@ -2056,6 +2056,19 @@ var SITUATION_QUESTIONS = {
   'Just Exploring': ['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?']
 };
 
+function showSituationSelector(){
+  // Show situation selector in chat after CALL1
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'max-width:480px;';
+  wrap.innerHTML = '<div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:12px;">Your analysis is ready. Tell me your current situation and I'll answer your most important questions — while your full report generates in the background:</div>'
+    + '<div style="display:flex;flex-direction:column;gap:8px;" id="situation-btns">'
+    + ['Still Studying','Working a Job','Running Business','Between Jobs','Just Exploring'].map(function(s){
+        return '<button onclick="selectSituation(''+s+'')" style="padding:10px 14px;border:1px solid #c9a96e;background:#fff;color:#1a1a1a;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left;display:block;width:100%;" onmouseover="this.style.background='#fdf8f0'" onmouseout="this.style.background='#fff'">'+s+'</button>';
+      }).join('')
+    + '</div>';
+  addRow('agent', wrap);
+}
+
 function selectSituation(situation){
   cdTrack('situation_selected', {situation: situation});
   // Replace situation buttons with confirmation
@@ -2648,30 +2661,65 @@ async function analyze(){
     window._reply1=reply1;
     cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
 
-    // Reset hist so each call gets clean context with chart data at top
-    hist=[];
+    // Unlock chat immediately after CALL1
+    window._call1Ready = true;
+    document.getElementById('bottom-bar').style.display='block';
+    showSituationSelector();
 
-    // CALL 2 — Sections 4, 5, 6, 7
-    // Progress shown via streaming bubble
-    var reply2='';
-    try{
-      reply2=await callClaude('Now generate Sections 4, 5, 6 and 7 of the career destiny report.',summaryWithScores,makeStreamHandler(2),2);
-    }catch(e2){ reply2=''; }
-    removeProg();
-    if(reply2) replaceStreamWithTeaser(2, renderTeaser2(reply2));
-    window._reply2=reply2;
-    cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+    // Run CALL2 and CALL3 silently in background — no UI updates
+    window._reply2 = '';
+    window._reply3 = '';
+    window._call2Ready = false;
+    window._call3Ready = false;
 
-    hist=[];
+    // Background function — silent, no streaming UI
+    async function runBackgroundCalls(){
+      try{
+        var bgHist1 = [];
+        var bgMsg2 = summaryWithScores + "\n\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.";
+        var bgRes2 = await fetch(API+"/api/analyze",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            messages:[{role:"user",content:"[CHART DATA]\n"+summaryWithScores+"\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report."}],
+            lang:window._lang||"en",
+            call:2
+          })
+        });
+        if(bgRes2.ok){
+          var bgData2 = await bgRes2.json();
+          window._reply2 = bgData2.content&&bgData2.content[0]&&bgData2.content[0].text||'';
+          window._call2Ready = true;
+          cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+        }
+      }catch(e){ console.log('BG CALL2 error:', e.message); }
 
-    // CALL 3 — Sections 8, 9, 10, 11
-    // Progress shown via streaming bubble
-    var reply3='';
-    try{
-      reply3=await callClaude('Now generate Sections 8, 9, 10 and 11 of the career destiny report. The chart data is in the first message of this conversation — read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates.',summaryWithScores,makeStreamHandler(3),3);
-    }catch(e3){ reply3=''; }
-    removeProg();
-    if(reply3) replaceStreamWithTeaser(3, renderTeaser3(reply3));
+      try{
+        var bgRes3 = await fetch(API+"/api/analyze",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            messages:[{role:"user",content:"[CHART DATA]\n"+summaryWithScores+"\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11 of the career destiny report. Read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates."}],
+            lang:window._lang||"en",
+            call:3
+          })
+        });
+        if(bgRes3.ok){
+          var bgData3 = await bgRes3.json();
+          window._reply3 = bgData3.content&&bgData3.content[0]&&bgData3.content[0].text||'';
+          window._call3Ready = true;
+          cdTrack('analysis_call3_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+          // Now full analysis is ready — store it
+          window._analysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + (window._reply3||'');
+          cdTrack('analysis_complete', {verdict: (window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
+        }
+      }catch(e){ console.log('BG CALL3 error:', e.message); }
+    }
+
+    // Fire background calls — don't await, let them run while user chats
+    runBackgroundCalls();
+
+    var reply2 = '', reply3 = '';
     // Store combined analysis for download
     window._analysis = (reply1||'') + '\n' + (reply2||'') + '\n' + (reply3||'');
     // Collect data
@@ -2679,8 +2727,7 @@ async function analyze(){
     var verdictVal = verdictMatch ? verdictMatch[1] : 'MIXED';
     collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictVal, window._analysis);
     window._meta = {name:name,dob:dob,time:time,place:place};
-    // Show download button and confirm section
-    document.getElementById('bottom-bar').style.display='block';
+    // bottom-bar already shown after CALL1
     
     window._reply3=reply3;
     var _verdictM = ((window._reply1||'')+(reply3||'')).match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
@@ -2807,6 +2854,30 @@ function renderChatReply(text){
   return wrap;
 }
 
+// Intent detection for smart chat routing
+function detectIntent(question){
+  var q = question.toLowerCase();
+  // TYPE 3 — Timing questions (need CALL3)
+  if(/when|how long|how soon|which year|which month|dasha|period|mahadasha|antardasha|transit|jupiter|saturn|promotion|marriage|abroad|foreign|settle|start earning|get rich|wealth arrive|window|timing/.test(q)) return 3;
+  // TYPE 2 — Career/yoga questions (need CALL2)
+  if(/career|job|business|work|profession|yoga|strength|talent|skill|role|field|industry|sector|suit me|good for me|best for|suited|competenc|entrepreneur|employ/.test(q)) return 2;
+  // TYPE 1 — Verdict/identity (CALL1 always available)
+  if(/verdict|business|job|mixed|personality|nature|lagna|moon|kaarkamsh|who am i|what am i/.test(q)) return 1;
+  // TYPE 4 — General (answer from chartSummary)
+  return 4;
+}
+
+async function waitForCall(callNum){
+  var key = '_call'+callNum+'Ready';
+  if(window[key]) return true;
+  // Wait up to 3 minutes
+  for(var i=0;i<180;i++){
+    await new Promise(function(r){setTimeout(r,1000);});
+    if(window[key]) return true;
+  }
+  return false;
+}
+
 async function sendChat(){
   var ui=document.getElementById('chat-ui');
   var btn=document.getElementById('chat-btn');
@@ -2843,7 +2914,33 @@ async function sendChat(){
   addLoader('Thinking...');
   setStat('ld','...');
   try{
-    var reply=await callClaude(txt,window._chartSummary,null,4);
+    // Detect intent and wait for relevant analysis if needed
+    var intent = detectIntent(txt);
+    var context = window._chartSummary || '';
+
+    if(intent === 3 && !window._call3Ready){
+      // Timing question — wait for CALL3
+      removeLoader();
+      addRow('agent', renderChatReply('Your timing analysis is still generating in the background — give me just a moment...'));
+      addLoader('Generating timing analysis...');
+      var ready = await waitForCall(3);
+      removeLoader();
+      if(!ready){ addRow('agent','Timing analysis is taking longer than expected. Please try again in a minute.','er'); btn.disabled=false; ui.focus(); return; }
+    } else if(intent === 2 && !window._call2Ready){
+      // Career question — wait for CALL2
+      removeLoader();
+      addRow('agent', renderChatReply('Your career analysis is still generating — one moment...'));
+      addLoader('Generating career analysis...');
+      var ready2 = await waitForCall(2);
+      removeLoader();
+      if(!ready2){ addRow('agent','Career analysis is taking longer than expected. Please try again in a minute.','er'); btn.disabled=false; ui.focus(); return; }
+    }
+
+    // Build context from available analysis
+    var fullAnalysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + (window._reply3||'');
+    var chatContext = fullAnalysis.length > 100 ? fullAnalysis : context;
+
+    var reply=await callClaude(txt, chatContext, null, 4);
     removeLoader();
     addRow('agent',renderChatReply(reply));
     setStat('ok','Ready');
