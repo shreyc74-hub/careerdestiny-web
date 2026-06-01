@@ -2271,9 +2271,8 @@ async function callClaude(userMsg,chartSummary,onChunk,callNum){
   var messages=hist.slice();
   var um=userMsg;
   var cs=chartSummary||window._chartSummary||null;
-  // Always include chart data in every call — use cs (summaryWithScores) not window._chartSummary
+  var isReportCall = callNum && callNum <= 3;
   if(cs&&hist.length===0){
-    var isReportCall = callNum && callNum <= 3;
     if(isReportCall){
       um+="\n\n[CHART DATA]\n"+cs+"\n[END CHART DATA]\n\nPlease analyze this chart.";
     } else {
