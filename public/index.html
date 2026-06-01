@@ -2216,7 +2216,7 @@ function makeStreamHandler(callNum){
     if(event === '__stream_chunk__' && el){
       // Remove cursor, append text, re-add cursor
       el.innerHTML = el.innerHTML.replace('<span class="stream-cursor">▋</span>','');
-      el.innerHTML += chunk.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      el.innerHTML += chunk;
       el.innerHTML += '<span class="stream-cursor">▋</span>';
       M.scrollTop=M.scrollHeight;
       return el;
