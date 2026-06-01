@@ -2199,30 +2199,73 @@ function renderReport2(text){
 
 
 // Streaming handler — creates a live-updating bubble
+// Returns the ROW element so we can replace it with teaser after completion
+var _streamRows = {};
 function makeStreamHandler(callNum){
   return function(event, chunk, el){
     if(event === '__stream_start__'){
       removeLoader();
-      // Create a streaming bubble
+      removeProg();
+      // Create streaming bubble
       var w=document.createElement('div');w.className='row agent';
+      w.setAttribute('data-stream-call', callNum);
       var av=document.createElement('div');av.className='av a';av.textContent='ज';
       var b=document.createElement('div');b.className='bub a';
-      b.style.cssText='white-space:pre-wrap;font-size:13px;color:#555;line-height:1.7;min-height:40px;';
-      b.innerHTML='<span class="stream-cursor">▋</span>';
+      b.style.cssText='font-size:12px;color:#666;line-height:1.7;min-height:20px;max-height:300px;overflow:hidden;position:relative;';
+      b.innerHTML='<div style="font-size:10px;color:#c9a96e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Analysing'+(callNum===1?' your chart...':(callNum===2?' career direction...':(callNum===3?' timing & next steps...':'')))+'</div><span class="stream-cursor" style="color:#c9a96e;">▋</span>';
       w.appendChild(av);w.appendChild(b);
       M.appendChild(w);M.scrollTop=M.scrollHeight;
+      _streamRows[callNum] = w;
       return b;
     }
     if(event === '__stream_chunk__' && el){
-      // Remove cursor, append text, re-add cursor
-      el.innerHTML = el.innerHTML.replace('<span class="stream-cursor">▋</span>','');
-      el.innerHTML += chunk;
-      el.innerHTML += '<span class="stream-cursor">▋</span>';
+      // Show only last 3 lines of streaming text to keep bubble compact
+      var cursor = '<span class="stream-cursor" style="color:#c9a96e;">&#x25AE;</span>';
+      el.innerHTML = el.innerHTML.replace(cursor,'');
+      // Append to a hidden buffer div, show last few lines
+      var buf = el.querySelector('.stream-buf');
+      if(!buf){
+        buf = document.createElement('div');
+        buf.className='stream-buf';
+        buf.style.cssText='font-size:12px;color:#555;line-height:1.6;';
+        el.appendChild(buf);
+      }
+      buf.textContent += chunk;
+      // Keep only last 200 chars visible
+      if(buf.textContent.length > 200){
+        buf.textContent = '...' + buf.textContent.slice(-180);
+      }
+      el.appendChild(document.createTextNode(''));
+      el.innerHTML = el.innerHTML + cursor;
       M.scrollTop=M.scrollHeight;
       return el;
     }
   };
 }
+
+// Replace streaming bubble with teaser after call completes
+function replaceStreamWithTeaser(callNum, teaserEl){
+  var row = _streamRows[callNum];
+  if(row && teaserEl){
+    var w=document.createElement('div');w.className='row agent';
+    var av=document.createElement('div');av.className='av a';av.textContent='ज';
+    var b=document.createElement('div');b.className='bub a';
+    b.appendChild(teaserEl);
+    w.appendChild(av);w.appendChild(b);
+    row.parentNode.replaceChild(w, row);
+    delete _streamRows[callNum];
+  } else if(teaserEl && !row){
+    // Fallback — just add row
+    var w=document.createElement('div');w.className='row agent';
+    var av=document.createElement('div');av.className='av a';av.textContent='ज';
+    var b=document.createElement('div');b.className='bub a';
+    b.appendChild(teaserEl);
+    w.appendChild(av);w.appendChild(b);
+    M.appendChild(w);
+  }
+  M.scrollTop=M.scrollHeight;
+}
+
 
 async function callClaude(userMsg,chartSummary,onChunk,callNum){
   var messages=hist.slice();
@@ -2596,13 +2639,13 @@ async function analyze(){
 
     // CALL 1 — Sections 1 and 3
     var reply1='';
-    addProg([['Generating your identity & verdict','act'],['Analysing strengths & career direction','wait'],['Calculating timeline & next steps','wait']]);
+    // Progress shown via streaming bubble
     try{
       reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,makeStreamHandler(1),1);
     }catch(e1){ reply1='Analysis error: '+e1.message;
       cdTrack('analysis_error', {error: e1.message, call: 1}); }
     removeProg();
-    if(reply1) addRow('agent',renderTeaser(reply1));
+    if(reply1) replaceStreamWithTeaser(1, renderTeaser(reply1));
     window._reply1=reply1;
     cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
 
@@ -2610,26 +2653,26 @@ async function analyze(){
     hist=[];
 
     // CALL 2 — Sections 4, 5, 6, 7
-    addProg([['Identity & verdict','done'],['Analysing strengths & career direction','act'],['Calculating timeline & next steps','wait']]);
+    // Progress shown via streaming bubble
     var reply2='';
     try{
       reply2=await callClaude('Now generate Sections 4, 5, 6 and 7 of the career destiny report.',summaryWithScores,makeStreamHandler(2),2);
     }catch(e2){ reply2=''; }
     removeProg();
-    if(reply2) addRow('agent',renderTeaser2(reply2));
+    if(reply2) replaceStreamWithTeaser(2, renderTeaser2(reply2));
     window._reply2=reply2;
     cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
 
     hist=[];
 
     // CALL 3 — Sections 8, 9, 10, 11
-    addProg([['Identity & verdict','done'],['Strengths & career direction','done'],['Calculating timeline & next steps','act']]);
+    // Progress shown via streaming bubble
     var reply3='';
     try{
       reply3=await callClaude('Now generate Sections 8, 9, 10 and 11 of the career destiny report. The chart data is in the first message of this conversation — read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates.',summaryWithScores,makeStreamHandler(3),3);
     }catch(e3){ reply3=''; }
     removeProg();
-    if(reply3) addRow('agent',renderTeaser3(reply3));
+    if(reply3) replaceStreamWithTeaser(3, renderTeaser3(reply3));
     // Store combined analysis for download
     window._analysis = (reply1||'') + '\n' + (reply2||'') + '\n' + (reply3||'');
     // Collect data
