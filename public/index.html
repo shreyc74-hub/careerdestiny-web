@@ -2254,7 +2254,6 @@ async function callClaude(userMsg,chartSummary,onChunk,callNum){
   } else if(hist.length>0&&cs){
     messages.unshift({role:"user",content:"[CHART DATA]\n"+cs+"\n[END CHART DATA]\n\nIMPORTANT: Use the CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS sections exactly. Entries marked [CURRENT] are the active periods. Do not recalculate dashas."},{role:"assistant",content:"Understood. I have the complete chart data. I will read the [CURRENT] marked entries directly for Section 8 and not recalculate any dasha periods."});
   }
-  messages.push({role:"user",content:um});
   // Use streaming for report calls (1,2,3), regular for chat (4)
   var useStream = isReportCall && callNum <= 3;
 
