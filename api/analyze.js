@@ -342,6 +342,84 @@ module.exports = async (req, res) => {
       system += '\n\nIMPORTANT: Respond entirely in Hindi (Devanagari script). Sanskrit terms are acceptable.';
     }
 
+    const useStream = body.stream === true;
+
+    // STREAMING PATH
+    if (useStream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+
+      const streamResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-beta': 'messages-2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1500,
+          temperature: 0,
+          stream: true,
+          system: system,
+          messages: body.messages
+        })
+      });
+
+      if (!streamResponse.ok) {
+        const err = await streamResponse.text();
+        res.write('data: ' + JSON.stringify({error: err}) + '\n\n');
+        return res.end();
+      }
+
+      let fullText = '';
+      const reader = streamResponse.body;
+      let buffer = '';
+
+      reader.on('data', (chunk) => {
+        buffer += chunk.toString();
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.type === 'content_block_delta' && parsed.delta && parsed.delta.text) {
+                const text = parsed.delta.text;
+                fullText += text;
+                res.write('data: ' + JSON.stringify({text}) + '\n\n');
+              } else if (parsed.type === 'message_stop') {
+                res.write('data: ' + JSON.stringify({done: true, full: fullText}) + '\n\n');
+                res.end();
+              }
+            } catch(e) {}
+          }
+        }
+      });
+
+      reader.on('end', () => {
+        if (!res.writableEnded) {
+          res.write('data: ' + JSON.stringify({done: true, full: fullText}) + '\n\n');
+          res.end();
+        }
+      });
+
+      reader.on('error', (err) => {
+        if (!res.writableEnded) {
+          res.write('data: ' + JSON.stringify({error: err.message}) + '\n\n');
+          res.end();
+        }
+      });
+
+      return;
+    }
+
+    // NON-STREAMING PATH (fallback)
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -351,7 +429,7 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
+        max_tokens: 1500,
         temperature: 0,
         system: system,
         messages: body.messages

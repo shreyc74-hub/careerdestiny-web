@@ -278,6 +278,9 @@ input:focus,select:focus{border-color:var(--gold);}
   body{padding:20px;display:flex;align-items:flex-start;justify-content:center;}
   .app{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.08);}
 }
+
+.stream-cursor{display:inline-block;animation:blink 0.8s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6EP70RFV5S"></script>
@@ -2194,6 +2197,33 @@ function renderReport2(text){
 }
 
 
+
+// Streaming handler — creates a live-updating bubble
+function makeStreamHandler(callNum){
+  return function(event, chunk, el){
+    if(event === '__stream_start__'){
+      removeLoader();
+      // Create a streaming bubble
+      var w=document.createElement('div');w.className='row agent';
+      var av=document.createElement('div');av.className='av a';av.textContent='ज';
+      var b=document.createElement('div');b.className='bub a';
+      b.style.cssText='white-space:pre-wrap;font-size:13px;color:#555;line-height:1.7;min-height:40px;';
+      b.innerHTML='<span class="stream-cursor">▋</span>';
+      w.appendChild(av);w.appendChild(b);
+      M.appendChild(w);M.scrollTop=M.scrollHeight;
+      return b;
+    }
+    if(event === '__stream_chunk__' && el){
+      // Remove cursor, append text, re-add cursor
+      el.innerHTML = el.innerHTML.replace('<span class="stream-cursor">▋</span>','');
+      el.innerHTML += chunk.replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      el.innerHTML += '<span class="stream-cursor">▋</span>';
+      M.scrollTop=M.scrollHeight;
+      return el;
+    }
+  };
+}
+
 async function callClaude(userMsg,chartSummary,onChunk,callNum){
   var messages=hist.slice();
   var um=userMsg;
@@ -2225,18 +2255,73 @@ async function callClaude(userMsg,chartSummary,onChunk,callNum){
     messages.unshift({role:"user",content:"[CHART DATA]\n"+cs+"\n[END CHART DATA]\n\nIMPORTANT: Use the CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS sections exactly. Entries marked [CURRENT] are the active periods. Do not recalculate dashas."},{role:"assistant",content:"Understood. I have the complete chart data. I will read the [CURRENT] marked entries directly for Section 8 and not recalculate any dasha periods."});
   }
   messages.push({role:"user",content:um});
-  var r=await fetch(API+"/api/analyze",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4000,temperature:0,messages:messages,lang:window._lang||"en",call:callNum||1})
-  });
-  if(!r.ok){var e=await r.text();throw new Error("Claude "+r.status+": "+e.slice(0,100));}
-  var data=await r.json();
-  if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
-  var reply=data.content&&data.content[0]&&data.content[0].text||"";
-  hist.push({role:"user",content:um});
-  hist.push({role:"assistant",content:reply});
-  return reply;
+  // Use streaming for report calls (1,2,3), regular for chat (4)
+  var useStream = isReportCall && callNum <= 3;
+
+  if(useStream){
+    // Streaming fetch
+    messages.push({role:"user",content:um});
+    var streamRes = await fetch(API+"/api/analyze",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:messages,lang:window._lang||"en",call:callNum||1,stream:true})
+    });
+    if(!streamRes.ok){var e=await streamRes.text();throw new Error("Claude "+streamRes.status+": "+e.slice(0,100));}
+
+    var reader = streamRes.body.getReader();
+    var decoder = new TextDecoder();
+    var fullText = '';
+    var buffer = '';
+    var streamEl = null; // element to stream into
+
+    // Create a streaming bubble in the UI
+    if(onChunk){
+      streamEl = onChunk('__stream_start__');
+    }
+
+    while(true){
+      var result = await reader.read();
+      if(result.done) break;
+      buffer += decoder.decode(result.value, {stream:true});
+      var lines = buffer.split('
+');
+      buffer = lines.pop();
+      for(var i=0;i<lines.length;i++){
+        var line = lines[i].trim();
+        if(!line.startsWith('data: ')) continue;
+        var data = line.slice(6);
+        try{
+          var parsed = JSON.parse(data);
+          if(parsed.text){
+            fullText += parsed.text;
+            if(onChunk) onChunk('__stream_chunk__', parsed.text, streamEl);
+          } else if(parsed.done){
+            fullText = parsed.full || fullText;
+          }
+        }catch(e){}
+      }
+    }
+
+    hist.push({role:"user",content:um});
+    hist.push({role:"assistant",content:fullText});
+    return fullText;
+
+  } else {
+    // Non-streaming (chat)
+    messages.push({role:"user",content:um});
+    var r=await fetch(API+"/api/analyze",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:messages,lang:window._lang||"en",call:callNum||1})
+    });
+    if(!r.ok){var e=await r.text();throw new Error("Claude "+r.status+": "+e.slice(0,100));}
+    var data=await r.json();
+    if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+    var reply=data.content&&data.content[0]&&data.content[0].text||"";
+    hist.push({role:"user",content:um});
+    hist.push({role:"assistant",content:reply});
+    return reply;
+  }
 }
 
 function formatDOB(inp){
@@ -2515,7 +2600,7 @@ async function analyze(){
     var reply1='';
     addProg([['Generating your identity & verdict','act'],['Analysing strengths & career direction','wait'],['Calculating timeline & next steps','wait']]);
     try{
-      reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,null,1);
+      reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,makeStreamHandler(1),1);
     }catch(e1){ reply1='Analysis error: '+e1.message;
       cdTrack('analysis_error', {error: e1.message, call: 1}); }
     removeProg();
@@ -2530,7 +2615,7 @@ async function analyze(){
     addProg([['Identity & verdict','done'],['Analysing strengths & career direction','act'],['Calculating timeline & next steps','wait']]);
     var reply2='';
     try{
-      reply2=await callClaude('Now generate Sections 4, 5, 6 and 7 of the career destiny report.',summaryWithScores,null,2);
+      reply2=await callClaude('Now generate Sections 4, 5, 6 and 7 of the career destiny report.',summaryWithScores,makeStreamHandler(2),2);
     }catch(e2){ reply2=''; }
     removeProg();
     if(reply2) addRow('agent',renderTeaser2(reply2));
@@ -2543,7 +2628,7 @@ async function analyze(){
     addProg([['Identity & verdict','done'],['Strengths & career direction','done'],['Calculating timeline & next steps','act']]);
     var reply3='';
     try{
-      reply3=await callClaude('Now generate Sections 8, 9, 10 and 11 of the career destiny report. The chart data is in the first message of this conversation — read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates.',summaryWithScores,null,3);
+      reply3=await callClaude('Now generate Sections 8, 9, 10 and 11 of the career destiny report. The chart data is in the first message of this conversation — read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates.',summaryWithScores,makeStreamHandler(3),3);
     }catch(e3){ reply3=''; }
     removeProg();
     if(reply3) addRow('agent',renderTeaser3(reply3));
