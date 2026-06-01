@@ -278,9 +278,6 @@ input:focus,select:focus{border-color:var(--gold);}
   body{padding:20px;display:flex;align-items:flex-start;justify-content:center;}
   .app{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.08);}
 }
-
-.stream-cursor{display:inline-block;animation:blink 0.8s step-end infinite;}
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6EP70RFV5S"></script>
@@ -2308,72 +2305,19 @@ async function callClaude(userMsg,chartSummary,onChunk,callNum){
   } else if(hist.length>0&&cs){
     messages.unshift({role:"user",content:"[CHART DATA]\n"+cs+"\n[END CHART DATA]\n\nIMPORTANT: Use the CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS sections exactly. Entries marked [CURRENT] are the active periods. Do not recalculate dashas."},{role:"assistant",content:"Understood. I have the complete chart data. I will read the [CURRENT] marked entries directly for Section 8 and not recalculate any dasha periods."});
   }
-  // Use streaming for report calls (1,2,3), regular for chat (4)
-  var useStream = isReportCall && callNum <= 3;
-
-  if(useStream){
-    // Streaming fetch
-    messages.push({role:"user",content:um});
-    var streamRes = await fetch(API+"/api/analyze",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({messages:messages,lang:window._lang||"en",call:callNum||1,stream:true})
-    });
-    if(!streamRes.ok){var e=await streamRes.text();throw new Error("Claude "+streamRes.status+": "+e.slice(0,100));}
-
-    var reader = streamRes.body.getReader();
-    var decoder = new TextDecoder();
-    var fullText = '';
-    var buffer = '';
-    var streamEl = null; // element to stream into
-
-    // Create a streaming bubble in the UI
-    if(onChunk){
-      streamEl = onChunk('__stream_start__');
-    }
-
-    while(true){
-      var result = await reader.read();
-      if(result.done) break;
-      buffer += decoder.decode(result.value, {stream:true});
-      var lines = buffer.split('\n');
-      buffer = lines.pop();
-      for(var i=0;i<lines.length;i++){
-        var line = lines[i].trim();
-        if(!line.startsWith('data: ')) continue;
-        var data = line.slice(6);
-        try{
-          var parsed = JSON.parse(data);
-          if(parsed.text){
-            fullText += parsed.text;
-            if(onChunk) onChunk('__stream_chunk__', parsed.text, streamEl);
-          } else if(parsed.done){
-            fullText = parsed.full || fullText;
-          }
-        }catch(e){}
-      }
-    }
-
-    hist.push({role:"user",content:um});
-    hist.push({role:"assistant",content:fullText});
-    return fullText;
-
-  } else {
-    // Non-streaming (chat)
-    messages.push({role:"user",content:um});
-    var r=await fetch(API+"/api/analyze",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({messages:messages,lang:window._lang||"en",call:callNum||1})
-    });
-    if(!r.ok){var e=await r.text();throw new Error("Claude "+r.status+": "+e.slice(0,100));}
-    var data=await r.json();
-    if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
-    var reply=data.content&&data.content[0]&&data.content[0].text||"";
-    hist.push({role:"user",content:um});
-    hist.push({role:"assistant",content:reply});
-    return reply;
-  }
+  messages.push({role:"user",content:um});
+  var r=await fetch(API+"/api/analyze",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({messages:messages,lang:window._lang||"en",call:callNum||1})
+  });
+  if(!r.ok){var e=await r.text();throw new Error("Claude "+r.status+": "+e.slice(0,100));}
+  var data=await r.json();
+  if(data.error)throw new Error(data.error.message||JSON.stringify(data.error));
+  var reply=data.content&&data.content[0]&&data.content[0].text||"";
+  hist.push({role:"user",content:um});
+  hist.push({role:"assistant",content:reply});
+  return reply;
 }
 
 function formatDOB(inp){
@@ -2652,11 +2596,11 @@ async function analyze(){
     var reply1='';
     // Progress shown via streaming bubble
     try{
-      reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,makeStreamHandler(1),1);
+      reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,null,1);
     }catch(e1){ reply1='Analysis error: '+e1.message;
       cdTrack('analysis_error', {error: e1.message, call: 1}); }
     removeProg();
-    if(reply1) replaceStreamWithTeaser(1, renderTeaser(reply1));
+    if(reply1) addRow('agent',renderTeaser(reply1));
     window._reply1=reply1;
     cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
 
