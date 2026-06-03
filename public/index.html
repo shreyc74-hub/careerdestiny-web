@@ -1729,6 +1729,166 @@ function preCompute(c){
       };
     } catch(e) { result.rule14 = { error: e.message }; }
 
+    // =================================================================
+    // RULE 6 — D10 Dashamsha Chart Analysis
+    // =================================================================
+    try {
+      var d10data = c.dashamsha && c.dashamsha.data;
+      if(d10data && d10data.planet_position) {
+        var d10planets = d10data.planet_position;
+        var d10Lagna = d10planets.find(function(p){ return p.name === 'Ascendant'; });
+        var d10LagnaSign = d10Lagna && d10Lagna.rasi ? d10Lagna.rasi.name : '?';
+        var d10LagnaSignIdx = _SIGNS_LIST.indexOf(d10LagnaSign);
+
+        function getD10House(planet){
+          if(!planet || !planet.rasi) return 1;
+          var pIdx = _SIGNS_LIST.indexOf(planet.rasi.name);
+          if(pIdx < 0) return 1;
+          return ((pIdx - d10LagnaSignIdx + 12) % 12) + 1;
+        }
+
+        // D10 Lagnesh
+        var d10LagneshName = getLordOfSign(d10LagnaSignIdx);
+        var d10LagneshPlanet = d10planets.find(function(p){ return p.name === d10LagneshName; });
+        var d10LagneshHouse = d10LagneshPlanet ? getD10House(d10LagneshPlanet) : '?';
+
+        // Dashmesha (D1 H10 lord) in D10
+        var dashmeshaInD10 = d10planets.find(function(p){ return p.name === dashmeshaName; });
+        var dashmeshaD10House = dashmeshaInD10 ? getD10House(dashmeshaInD10) : '?';
+
+        // Amatyakaraka in D10
+        var akInD10 = d10planets.find(function(p){ return p.name === result.amatyakaraka; });
+        var akD10House = akInD10 ? getD10House(akInD10) : '?';
+
+        // Planets in D10 H10
+        var d10H10Planets = d10planets.filter(function(p){
+          return p.name !== 'Ascendant' && getD10House(p) === 10;
+        }).map(function(p){ return p.name; });
+
+        var d10Strength = [];
+        if(d10LagneshHouse === 10) d10Strength.push('D10 Lagnesh '+d10LagneshName+' in D10 H10 — exceptional career chart');
+        if(dashmeshaD10House === 10) d10Strength.push('Dashmesha '+dashmeshaName+' in D10 H10 — very strong career confirmation');
+        if(akD10House === 10) d10Strength.push('Amatyakaraka '+result.amatyakaraka+' in D10 H10 — exceptional career success in AK field');
+        if(akD10House === 1) d10Strength.push('Amatyakaraka '+result.amatyakaraka+' in D10 H1 — career identity matches AK nature');
+
+        result.rule6 = {
+          d10Lagna: d10LagnaSign,
+          d10Lagnesh: d10LagneshName,
+          d10LagneshHouse: d10LagneshHouse,
+          dashmeshaInD10House: dashmeshaD10House,
+          akInD10House: akD10House,
+          d10H10Planets: d10H10Planets,
+          strengths: d10Strength,
+          detail: 'D10 Lagna='+d10LagnaSign+' | D10 Lagnesh '+d10LagneshName+' in H'+d10LagneshHouse+
+                  ' | Dashmesha '+dashmeshaName+' in D10 H'+dashmeshaD10House+
+                  ' | AK '+result.amatyakaraka+' in D10 H'+akD10House+
+                  (d10H10Planets.length ? ' | D10 H10 planets: '+d10H10Planets.join(',') : '')
+        };
+      }
+    } catch(e) { result.rule6 = { error: e.message }; }
+
+    // =================================================================
+    // RULE 7 — D9 Navamsha Confirmation
+    // D1 promise confirmed if planet strong in both D1 and D9
+    // =================================================================
+    try {
+      var d9data = c.navamsha && c.navamsha.data;
+      if(d9data && d9data.planet_position) {
+        var d9planetsList = d9data.planet_position;
+        var d9LagnaP = d9planetsList.find(function(p){ return p.name === 'Ascendant'; });
+        var d9LagnaSign = d9LagnaP && d9LagnaP.rasi ? d9LagnaP.rasi.name : '?';
+        var d9LagnaSignIdx = _SIGNS_LIST.indexOf(d9LagnaSign);
+
+        function getD9House(planet){
+          if(!planet || !planet.rasi) return 1;
+          var pIdx = _SIGNS_LIST.indexOf(planet.rasi.name);
+          if(pIdx < 0) return 1;
+          return ((pIdx - d9LagnaSignIdx + 12) % 12) + 1;
+        }
+
+        // Check key planets in D9
+        var keyPlanets = [dashmeshaName, result.amatyakaraka, lagneshName];
+        var d9Confirmations = [];
+        var d9Weaknesses = [];
+
+        keyPlanets.forEach(function(pname){
+          if(!pname || pname === '?') return;
+          var d9p = d9planetsList.find(function(p){ return p.name === pname; });
+          if(!d9p || !d9p.rasi) return;
+          var d9house = getD9House(d9p);
+          var d9sign = d9p.rasi.name;
+          var DIGNITY_OWN = {Sun:['Simha'],Moon:['Karka'],Mars:['Mesha','Vrischika'],Mercury:['Mithuna','Kanya'],Jupiter:['Dhanu','Meena'],Venus:['Vrishabha','Tula'],Saturn:['Makar','Kumbha']};
+          var DIGNITY_EXALT = {Sun:'Mesha',Moon:'Vrishabha',Mars:'Makar',Mercury:'Kanya',Jupiter:'Karka',Venus:'Meena',Saturn:'Tula'};
+          var DIGNITY_DEBIL = {Sun:'Tula',Moon:'Vrischika',Mars:'Karka',Mercury:'Meena',Jupiter:'Makar',Venus:'Kanya',Saturn:'Mesha'};
+          var isOwn = DIGNITY_OWN[pname] && DIGNITY_OWN[pname].indexOf(d9sign) > -1;
+          var isExalt = DIGNITY_EXALT[pname] === d9sign;
+          var isDebil = DIGNITY_DEBIL[pname] === d9sign;
+          var inKendra = [1,4,7,10].indexOf(d9house) > -1;
+          var inTrikona = [1,5,9].indexOf(d9house) > -1;
+          var inDusthana = [6,8,12].indexOf(d9house) > -1;
+          // Vargottama: same sign in D1 and D9
+          var d1p = planetsWithHouse.find(function(p){ return p.name === pname; });
+          var isVargottama = d1p && d1p.rasi && d1p.rasi.name === d9sign;
+
+          if(isVargottama) d9Confirmations.push(pname+' Vargottama (same sign D1+D9='+d9sign+') — exceptionally powerful');
+          else if(isOwn || isExalt) d9Confirmations.push(pname+' strong in D9 ('+d9sign+(isOwn?' own':' exalt')+') — D1 promise delivers');
+          else if(isDebil || inDusthana) d9Weaknesses.push(pname+' weak in D9 ('+d9sign+(isDebil?' debil':' H'+d9house)+') — D1 promise diluted');
+
+          // Special: Saturn exalted in D9 (Tula) = strongest business confirmation
+          if(pname === 'Saturn' && d9sign === 'Tula') d9Confirmations.push('Saturn exalted in D9 Tula — STRONGEST business confirmation, overrides D1 weakness');
+        });
+
+        result.rule7 = {
+          d9Lagna: d9LagnaSign,
+          confirmations: d9Confirmations,
+          weaknesses: d9Weaknesses,
+          detail: 'D9 Lagna='+d9LagnaSign+
+                  (d9Confirmations.length ? ' | Confirmations: '+d9Confirmations.join('; ') : '') +
+                  (d9Weaknesses.length ? ' | Weaknesses: '+d9Weaknesses.join('; ') : '')
+        };
+      }
+    } catch(e) { result.rule7 = { error: e.message }; }
+
+    // =================================================================
+    // RULE 8 — Kaarkamsh Lagna (Atmakarak in D9)
+    // Soul-level career inclination
+    // =================================================================
+    try {
+      var d9dataKK = c.navamsha && c.navamsha.data;
+      if(d9dataKK && d9dataKK.planet_position && result.atmakarak) {
+        var akInD9 = d9dataKK.planet_position.find(function(p){ return p.name === result.atmakarak; });
+        if(akInD9 && akInD9.rasi) {
+          var kaarkamshSign = akInD9.rasi.name;
+          var KAARKAMSH_MEANINGS = {
+            Sun:'Government, authority, leadership, politics — wants to lead and be recognized',
+            Moon:'Public service, healing, hospitality, nurturing masses — wants to serve',
+            Mars:'Technical, military, engineering, surgery — builder, warrior, or technician',
+            Mercury:'Business, communication, writing, trade — communicator and trader',
+            Jupiter:'Teaching, spiritual, advisory, law — teacher or guide',
+            Venus:'Arts, luxury, beauty, entertainment — creates beauty and value',
+            Saturn:'Service, discipline, labor, social work — servant of society',
+            Rahu:'Foreign, unconventional, technology, mass media — drawn to new and unfamiliar',
+            Ketu:'Spiritual, research, computers, past-life work — detached, drawn to hidden knowledge'
+          };
+
+          // Find what planets are in Kaarkamsh Lagna (D9 sign of Atmakarak)
+          var planetsInKaarkamsh = d9dataKK.planet_position.filter(function(p){
+            return p.name !== 'Ascendant' && p.rasi && p.rasi.name === kaarkamshSign;
+          }).map(function(p){ return p.name; });
+
+          result.rule8 = {
+            atmakarak: result.atmakarak,
+            kaarkamshSign: kaarkamshSign,
+            planetsInKaarkamsh: planetsInKaarkamsh,
+            soulInclination: KAARKAMSH_MEANINGS[result.atmakarak] || 'Cannot determine',
+            detail: 'Atmakarak='+result.atmakarak+' in D9 '+kaarkamshSign+' = Kaarkamsh Lagna | Soul inclination: '+
+                    (KAARKAMSH_MEANINGS[result.atmakarak]||'?')+
+                    (planetsInKaarkamsh.length ? ' | Planets in Kaarkamsh: '+planetsInKaarkamsh.join(',') : '')
+          };
+        }
+      }
+    } catch(e) { result.rule8 = { error: e.message }; }
+
     // CHANDRA-MANGAL YOGA
     try{
       var moonP=planetsWithHouse.find(function(p){return p.name==='Moon';});
@@ -3128,6 +3288,18 @@ async function analyze(){
 
     // Rule 14 — Gochar
     if(pre.rule14 && !pre.rule14.error) scoresBlock += 'RULE 14 (Gochar Transits): '+pre.rule14.detail+'\n';
+
+    // Rule 6 — D10 Analysis
+    if(pre.rule6 && !pre.rule6.error) scoresBlock += 'RULE 6 (D10 Dashamsha): '+pre.rule6.detail+'\n';
+    if(pre.rule6 && pre.rule6.strengths && pre.rule6.strengths.length > 0){
+      scoresBlock += 'D10 Key Strengths: '+pre.rule6.strengths.join(' | ')+'\n';
+    }
+
+    // Rule 7 — D9 Confirmation
+    if(pre.rule7 && !pre.rule7.error) scoresBlock += 'RULE 7 (D9 Navamsha): '+pre.rule7.detail+'\n';
+
+    // Rule 8 — Kaarkamsh
+    if(pre.rule8 && !pre.rule8.error) scoresBlock += 'RULE 8 (Kaarkamsh Lagna): '+pre.rule8.detail+'\n';
 
     var summaryWithScores = summary + scoresBlock; window._chartSummary = summaryWithScores;
     // Store lagna info for report
