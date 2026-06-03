@@ -2686,9 +2686,32 @@ async function analyze(){
     setStat('ld','Analyzing...');
     cdTrack('analysis_start', {place: place});
     var _analysisStartTime = Date.now();
-    // Call 1 - fast verdict + planet table
-    // Use summary directly — Claude reasons correctly from raw data
-    var summaryWithScores = summary;
+    // Append all pre-computed scores to summary so Claude receives facts not raw data
+    var pre = preCompute(chart);
+    var scoresBlock = '\n\nPRE-COMPUTED SAPTA SUTRI SCORES (calculated in JS — do not recalculate):\n';
+    if(pre.sutra1) scoresBlock += 'SUTRA 1 (Planet Count): '+pre.sutra1.detail+' → '+pre.sutra1.indicates+'\n';
+    if(pre.sutra2) scoresBlock += 'SUTRA 2 (Independence Planets): '+pre.sutra2.detail+' → '+pre.sutra2.indicates+'\n';
+    if(pre.sutra3) scoresBlock += 'SUTRA 3 (Saturn — MOST DECISIVE): '+pre.sutra3.detail+' → '+pre.sutra3.indicates+(pre.sutra3.indicates==='Job'?' [OVERRIDE FLAG]':'')+'\n';
+    if(pre.sutra4) scoresBlock += 'SUTRA 4 (Service vs Self): '+pre.sutra4.detail+' → '+pre.sutra4.indicates+'\n';
+    if(pre.sutra5) scoresBlock += 'SUTRA 5 (Dhan Yoga): '+pre.sutra5.detail+' → '+pre.sutra5.indicates+'\n';
+    if(pre.sutra6) scoresBlock += 'SUTRA 6 (Courage): '+pre.sutra6.detail+' → '+pre.sutra6.indicates+'\n';
+    if(pre.sutra7) scoresBlock += 'SUTRA 7 (Indu Lagna): '+pre.sutra7.detail+' → '+pre.sutra7.indicates+'\n';
+
+    // Count scores for final verdict
+    var bizScore=0, jobScore=0;
+    ['sutra1','sutra2','sutra3','sutra4','sutra5','sutra6','sutra7'].forEach(function(k){
+      if(pre[k]){ if(pre[k].indicates==='Business') bizScore++; else if(pre[k].indicates==='Job') jobScore++; }
+    });
+    var jsVerdict = bizScore>=6?'BUSINESS':jobScore>=6?'JOB':bizScore>jobScore?'MIXED (leaning Business)':jobScore>bizScore?'MIXED (leaning Job)':'MIXED';
+    scoresBlock += '\nSCORE: '+bizScore+' of 7 point toward Business. '+jobScore+' point toward Job.\n';
+    scoresBlock += 'JS VERDICT: '+jsVerdict+'\n';
+    scoresBlock += '\nOTHER PRE-COMPUTED VALUES:\n';
+    if(pre.amatyakaraka) scoresBlock += 'Amatyakaraka: '+pre.amatyakaraka+'\n';
+    if(pre.atmakarak) scoresBlock += 'Atmakarak: '+pre.atmakarak+'\n';
+    if(pre.arudhaLagna) scoresBlock += 'Arudha Lagna: H'+pre.arudhaLagna+'\n';
+    if(pre.induLagna) scoresBlock += 'Indu Lagna: '+pre.induLagna.sign+' (H'+pre.induLagna.houseFromLagna+' from Lagna)\n';
+
+    var summaryWithScores = summary + scoresBlock;
     window._chartSummary = summary;
     // Store lagna info for report
     var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
