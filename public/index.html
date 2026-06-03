@@ -1293,20 +1293,26 @@ function preCompute(c){
     // Sutra 5: Dhan Yoga — lords of H2/H5/H9/H11 connected
     var wealthHouses=[2,5,9,11];
     var wealthLordNames=wealthHouses.map(function(h){
-      var signIdx=(signs.indexOf(lagnaSign)+h-1)%12;
-      return getLordOfSign?getLordOfSign(signIdx):'?';
+      var signIdx=(lagnaSignIdx+h-1)%12;
+      return getLordOfSign(signIdx);
     });
-    var wealthLordPlanets=wealthLordNames.map(function(n){return planets.find(function(p){return p.name===n;});});
+    // Deduplicate — one planet can lord multiple wealth houses
+    var seenLords={};
+    var uniqueWealthLords=[];
+    wealthLordNames.forEach(function(n){ if(!seenLords[n]){ seenLords[n]=true; uniqueWealthLords.push(n); }});
+    var wealthLordPlanets=uniqueWealthLords.map(function(n){return planetsWithHouse.find(function(p){return p.name===n;});});
     var dhanYogaConnections=[];
     for(var wi=0;wi<wealthLordPlanets.length;wi++){
       for(var wj=wi+1;wj<wealthLordPlanets.length;wj++){
         var pa=wealthLordPlanets[wi], pb=wealthLordPlanets[wj];
         if(!pa||!pb) continue;
-        if(pa.position===pb.position){ dhanYogaConnections.push(wealthLordNames[wi]+'+'+wealthLordNames[wj]+' conjunct H'+pa.position); }
+        var haH=pa.house||getHouse(pa);
+        var hbH=pb.house||getHouse(pb);
+        if(haH===hbH){ dhanYogaConnections.push(uniqueWealthLords[wi]+'+'+uniqueWealthLords[wj]+' conjunct H'+haH); }
       }
     }
     result.sutra5={
-      wealthLords:wealthLordNames.join(', '),
+      wealthLords:uniqueWealthLords.join(', '),
       connections:dhanYogaConnections.length,
       indicates:dhanYogaConnections.length>=1?'Business':'Job',
       detail:dhanYogaConnections.length+' Dhan Yoga(s): '+(dhanYogaConnections.join('; ')||'none found')
