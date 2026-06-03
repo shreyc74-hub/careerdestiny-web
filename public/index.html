@@ -1210,6 +1210,105 @@ function preCompute(c){
       };
     }
 
+    // Sutra 2: Independence planets (Sun/Moon/Mars/Rahu in H1/H10 or aspects H1/H10 or conjoins Lagnesh/Dashmesha)
+    var dashmesha=null;
+    var h10sign=((lagnaHouse-1+9)%12); // 0-indexed sign of H10
+    var dashmeshaName=getLordOfSign?getLordOfSign(h10sign):'?';
+    var lagneshPlanet=planets.find(function(p){return p.name===getLordOfSign(signs.indexOf(lagnaSign));});
+    var indepPlanets=['Sun','Moon','Mars','Rahu'];
+    var sutra2count=0;
+    var sutra2details=[];
+    indepPlanets.forEach(function(pname){
+      var pl=planets.find(function(p){return p.name===pname;});
+      if(!pl) return;
+      var ph=pl.position;
+      // Sits in H1 or H10
+      if(ph===1||ph===10){ sutra2count++; sutra2details.push(pname+' in H'+ph); return; }
+      // Aspects H1 (7th from planet) or H10
+      var aspects=[ph+6,ph+2,ph+3,ph+9,ph+4,ph+7].map(function(x){return((x-1)%12)+1;});
+      if(pname==='Mars'){ if(aspects[1]===1||aspects[1]===10||aspects[3]===1||aspects[3]===10){ sutra2count++; sutra2details.push(pname+' aspects H1/H10'); return; } }
+      if(pname==='Saturn'){ if(aspects[1]===1||aspects[1]===10||aspects[3]===1||aspects[3]===10||aspects[5]===1||aspects[5]===10){ sutra2count++; sutra2details.push(pname+' aspects H1/H10'); return; } }
+      var opp=((ph+5)%12)+1;
+      if(opp===1||opp===10){ sutra2count++; sutra2details.push(pname+' opposite H1/H10'); }
+    });
+    result.sutra2={
+      count:sutra2count,
+      indicates:sutra2count>=1?'Business':'Job',
+      detail:sutra2count+' independence planet(s) qualify: '+(sutra2details.join(', ')||'none')
+    };
+
+    // Sutra 4: H6 strength vs H1 strength
+    var h6signIdx=(signs.indexOf(lagnaSign)+5)%12;
+    var h6lord=getLordOfSign?getLordOfSign(h6signIdx):'?';
+    var h1lord=getLordOfSign?getLordOfSign(signs.indexOf(lagnaSign)):'?';
+    var h6lordPlanet=planets.find(function(p){return p.name===h6lord;});
+    var h1lordPlanet=planets.find(function(p){return p.name===h1lord;});
+    var kendraHouses=[1,4,7,10];
+    var trikonaHouses=[1,5,9];
+    var dusthanaHouses=[6,8,12];
+    function houseStrength(pl){
+      if(!pl) return 0;
+      var s=0;
+      if(kendraHouses.indexOf(pl.position)>-1) s+=3;
+      else if(trikonaHouses.indexOf(pl.position)>-1) s+=3;
+      else if(dusthanaHouses.indexOf(pl.position)>-1) s-=2;
+      else s+=1;
+      return s;
+    }
+    var h6strength=houseStrength(h6lordPlanet);
+    var h1strength=houseStrength(h1lordPlanet);
+    result.sutra4={
+      h6lord:h6lord, h6strength:h6strength,
+      h1lord:h1lord, h1strength:h1strength,
+      indicates:h1strength>=h6strength?'Business':'Job',
+      detail:'H1 lord '+h1lord+' strength='+h1strength+' vs H6 lord '+h6lord+' strength='+h6strength
+    };
+
+    // Sutra 5: Dhan Yoga — lords of H2/H5/H9/H11 connected
+    var wealthHouses=[2,5,9,11];
+    var wealthLordNames=wealthHouses.map(function(h){
+      var signIdx=(signs.indexOf(lagnaSign)+h-1)%12;
+      return getLordOfSign?getLordOfSign(signIdx):'?';
+    });
+    var wealthLordPlanets=wealthLordNames.map(function(n){return planets.find(function(p){return p.name===n;});});
+    var dhanYogaConnections=[];
+    for(var wi=0;wi<wealthLordPlanets.length;wi++){
+      for(var wj=wi+1;wj<wealthLordPlanets.length;wj++){
+        var pa=wealthLordPlanets[wi], pb=wealthLordPlanets[wj];
+        if(!pa||!pb) continue;
+        if(pa.position===pb.position){ dhanYogaConnections.push(wealthLordNames[wi]+'+'+wealthLordNames[wj]+' conjunct H'+pa.position); }
+      }
+    }
+    result.sutra5={
+      wealthLords:wealthLordNames.join(', '),
+      connections:dhanYogaConnections.length,
+      indicates:dhanYogaConnections.length>=1?'Business':'Job',
+      detail:dhanYogaConnections.length+' Dhan Yoga(s): '+(dhanYogaConnections.join('; ')||'none found')
+    };
+
+    // Sutra 6: H3 lord (Tritiyesh) connected to H9/H10 or their lords
+    var h3signIdx=(signs.indexOf(lagnaSign)+2)%12;
+    var h3lord=getLordOfSign?getLordOfSign(h3signIdx):'?';
+    var h9signIdx=(signs.indexOf(lagnaSign)+8)%12;
+    var h9lord=getLordOfSign?getLordOfSign(h9signIdx):'?';
+    var h10signIdx2=(signs.indexOf(lagnaSign)+9)%12;
+    var h10lord=getLordOfSign?getLordOfSign(h10signIdx2):'?';
+    var h3lordPlanet=planets.find(function(p){return p.name===h3lord;});
+    var h9lordPlanet=planets.find(function(p){return p.name===h9lord;});
+    var h10lordPlanet=planets.find(function(p){return p.name===h10lord;});
+    var sutra6connected=false;
+    var sutra6detail='';
+    if(h3lordPlanet){
+      if(h3lordPlanet.position===9||h3lordPlanet.position===10){ sutra6connected=true; sutra6detail=h3lord+' sits in H'+h3lordPlanet.position; }
+      else if(h9lordPlanet&&h3lordPlanet.position===h9lordPlanet.position){ sutra6connected=true; sutra6detail=h3lord+' conjunct '+h9lord+' (H9 lord) in H'+h3lordPlanet.position; }
+      else if(h10lordPlanet&&h3lordPlanet.position===h10lordPlanet.position){ sutra6connected=true; sutra6detail=h3lord+' conjunct '+h10lord+' (Dashmesha) in H'+h3lordPlanet.position; }
+    }
+    result.sutra6={
+      h3lord:h3lord,
+      indicates:sutra6connected?'Business':'Job',
+      detail:sutra6connected?sutra6detail:'H3 lord '+h3lord+' not connected to H9/H10 or their lords'
+    };
+
     // Indu Lagna calculation
     var kala={Sun:30,Moon:16,Mars:6,Mercury:8,Jupiter:10,Venus:12,Saturn:1};
     var signs=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makar','Kumbha','Meena'];
@@ -1234,11 +1333,17 @@ function preCompute(c){
         var trikHouses2=[6,8,12];
         var strong=kendras.indexOf(induHouseFromLagna)>-1||trikonas.indexOf(induHouseFromLagna)>-1;
         var weak=trikHouses2.indexOf(induHouseFromLagna)>-1;
+        var induIndicates = strong?'Business':weak?'Job':'Neutral';
         result.induLagna={
           sign:induSign,houseFromLagna:induHouseFromLagna,
           kalaLagna:kalaLagna,kalaMoon:kalaMoon,total:total,remainder:remainder,
-          indicates:strong?'Business':weak?'Job':'Neutral',
+          indicates:induIndicates,
           detail:'9th lord from Lagna Kala='+kalaLagna+' + 9th lord from Moon Kala='+kalaMoon+'='+total+', remainder '+remainder+', Indu Lagna='+induSign+' (House '+induHouseFromLagna+')'
+        };
+        // Sutra 7 — Wealth Ascendant (Indu Lagna)
+        result.sutra7={
+          indicates:induIndicates,
+          detail:'Indu Lagna='+induSign+' in House '+induHouseFromLagna+' from Lagna — '+(strong?'kendra/trikona = Business':weak?'dusthana = Job':'neutral house')
         };
       }
     }
