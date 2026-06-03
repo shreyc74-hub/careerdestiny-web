@@ -1378,7 +1378,7 @@ function preCompute(c){
       if(psign===d.debil) return 'Debilitated';
       if(d.moolTrikona&&psign===d.moolTrikona&&pdeg>=d.moolDeg[0]&&pdeg<=d.moolDeg[1]) return 'Mool Trikona';
       var enemies=ENEMY[pname]||[];
-      var lords2=LORDS||[];
+      var lords2=_LORDS_MAP||[];
       // Check if sign lord is enemy/friend
       var signLord=getLordOfSign?getLordOfSign(signs.indexOf(psign)):'?';
       if(enemies.indexOf(signLord)>-1) return 'Enemy Sign';
