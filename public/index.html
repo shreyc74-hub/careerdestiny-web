@@ -1309,6 +1309,160 @@ function preCompute(c){
       detail:sutra6connected?sutra6detail:'H3 lord '+h3lord+' not connected to H9/H10 or their lords'
     };
 
+    // =================================================================
+    // PLANET DIGNITY LOOKUP TABLE (Rule 3, 4, 9 support)
+    // =================================================================
+    var DIGNITY={
+      Sun:     {own:['Simha'],exalt:'Mesha',exaltDeg:10,debil:'Tula',debilDeg:10,moolTrikona:'Simha',moolDeg:[0,20]},
+      Moon:    {own:['Karka'],exalt:'Vrishabha',exaltDeg:3,debil:'Vrischika',debilDeg:3,moolTrikona:'Vrishabha',moolDeg:[3,30]},
+      Mars:    {own:['Mesha','Vrischika'],exalt:'Makar',exaltDeg:28,debil:'Karka',debilDeg:28,moolTrikona:'Mesha',moolDeg:[0,12]},
+      Mercury: {own:['Mithuna','Kanya'],exalt:'Kanya',exaltDeg:15,debil:'Meena',debilDeg:15,moolTrikona:'Kanya',moolDeg:[15,20]},
+      Jupiter: {own:['Dhanu','Meena'],exalt:'Karka',exaltDeg:5,debil:'Makar',debilDeg:5,moolTrikona:'Dhanu',moolDeg:[0,10]},
+      Venus:   {own:['Vrishabha','Tula'],exalt:'Meena',exaltDeg:27,debil:'Kanya',debilDeg:27,moolTrikona:'Tula',moolDeg:[0,15]},
+      Saturn:  {own:['Makar','Kumbha'],exalt:'Tula',exaltDeg:20,debil:'Mesha',debilDeg:20,moolTrikona:'Kumbha',moolDeg:[0,20]},
+      Rahu:    {own:[],exalt:'Mithuna',exaltDeg:0,debil:'Dhanu',debilDeg:0,moolTrikona:null,moolDeg:[]},
+      Ketu:    {own:[],exalt:'Dhanu',exaltDeg:0,debil:'Mithuna',debilDeg:0,moolTrikona:null,moolDeg:[]}
+    };
+    var ENEMY={
+      Sun:['Venus','Saturn'],Moon:['Mercury'],Mars:['Mercury','Jupiter'],
+      Mercury:['Moon'],Jupiter:['Mercury','Venus'],Venus:['Sun','Moon'],Saturn:['Sun','Moon','Mars']
+    };
+    var FRIEND={
+      Sun:['Moon','Mars','Jupiter'],Moon:['Sun','Mercury'],Mars:['Sun','Moon','Jupiter'],
+      Mercury:['Sun','Venus'],Jupiter:['Sun','Moon','Mars'],Venus:['Mercury','Saturn'],
+      Saturn:['Mercury','Venus']
+    };
+    function getPlanetDignity(pname, psign, pdeg){
+      var d=DIGNITY[pname];
+      if(!d) return 'Unknown';
+      if(d.own.indexOf(psign)>-1) return 'Own Sign';
+      if(psign===d.exalt){
+        if(Math.abs(pdeg-d.exaltDeg)<=3) return 'Exact Exaltation';
+        return 'Exalted';
+      }
+      if(psign===d.debil) return 'Debilitated';
+      if(d.moolTrikona&&psign===d.moolTrikona&&pdeg>=d.moolDeg[0]&&pdeg<=d.moolDeg[1]) return 'Mool Trikona';
+      var enemies=ENEMY[pname]||[];
+      var lords2=LORDS||[];
+      // Check if sign lord is enemy/friend
+      var signLord=getLordOfSign?getLordOfSign(signs.indexOf(psign)):'?';
+      if(enemies.indexOf(signLord)>-1) return 'Enemy Sign';
+      var friends=FRIEND[pname]||[];
+      if(friends.indexOf(signLord)>-1) return 'Friend Sign';
+      return 'Neutral Sign';
+    }
+    result.planetDignity={};
+    planets.forEach(function(p){
+      if(p.name==='Ascendant') return;
+      result.planetDignity[p.name]=getPlanetDignity(p.name, p.rasi&&p.rasi.name||'', p.degree||0);
+    });
+
+    // =================================================================
+    // YOGA DETECTION (Rule 12 — 2-6-10-11 Formula + Classical Yogas)
+    // =================================================================
+    var yogas=[];
+    var sunP=planets.find(function(p){return p.name==='Sun';});
+    var mercP=planets.find(function(p){return p.name==='Mercury';});
+    var jupP=planets.find(function(p){return p.name==='Jupiter';});
+    var moonP=planets.find(function(p){return p.name==='Moon';});
+    var marsP=planets.find(function(p){return p.name==='Mars';});
+    var venP=planets.find(function(p){return p.name==='Venus';});
+
+    // Budha-Aditya Yoga: Sun + Mercury same sign
+    if(sunP&&mercP&&sunP.rasi&&mercP.rasi&&sunP.rasi.name===mercP.rasi.name){
+      yogas.push({name:'Budha-Aditya Yoga',detail:'Sun+Mercury in '+sunP.rasi.name,effect:'Sharp intelligence, communication ability'});
+    }
+    // Gajakesari Yoga: Jupiter in kendra from Moon
+    if(jupP&&moonP){
+      var jupFromMoon=((jupP.position-moonP.position+12)%12)+1;
+      if([1,4,7,10].indexOf(jupFromMoon)>-1){
+        yogas.push({name:'Gajakesari Yoga',detail:'Jupiter in H'+jupFromMoon+' from Moon',effect:'Authority, recognition, wisdom in career'});
+      }
+    }
+    // Chandra-Mangal Yoga: Moon + Mars conjunction
+    if(moonP&&marsP&&moonP.position===marsP.position){
+      yogas.push({name:'Chandra-Mangal Yoga',detail:'Moon+Mars in H'+moonP.position,effect:'Commercial drive, income through enterprise'});
+    }
+    // Dhan Yoga: H2/H5/H9/H11 lords connected (conjunction)
+    var dhanLordHouses=[2,5,9,11];
+    var dhanLords=dhanLordHouses.map(function(h){
+      var idx=(signs.indexOf(lagnaSign)+h-1)%12;
+      return {house:h,lord:getLordOfSign?getLordOfSign(idx):'?',planet:planets.find(function(p){return p.name===(getLordOfSign?getLordOfSign(idx):'?');})};
+    });
+    for(var di=0;di<dhanLords.length;di++){
+      for(var dj=di+1;dj<dhanLords.length;dj++){
+        if(dhanLords[di].planet&&dhanLords[dj].planet&&dhanLords[di].planet.position===dhanLords[dj].planet.position){
+          yogas.push({name:'Dhan Yoga',detail:'H'+dhanLords[di].house+' lord '+dhanLords[di].lord+' + H'+dhanLords[dj].house+' lord '+dhanLords[dj].lord+' conjunct H'+dhanLords[di].planet.position,effect:'Independent wealth potential'});
+        }
+      }
+    }
+    // Raj Yoga: Kendra lord + Trikona lord conjunction
+    var kendraH=[1,4,7,10]; var trikonaH=[1,5,9];
+    var kendraLords=kendraH.map(function(h){var idx=(signs.indexOf(lagnaSign)+h-1)%12;return getLordOfSign?getLordOfSign(idx):'?';});
+    var trikonaLords=trikonaH.map(function(h){var idx=(signs.indexOf(lagnaSign)+h-1)%12;return getLordOfSign?getLordOfSign(idx):'?';});
+    kendraLords.forEach(function(kl){
+      trikonaLords.forEach(function(tl){
+        if(kl===tl) return; // Same planet — skip
+        var kp=planets.find(function(p){return p.name===kl;});
+        var tp=planets.find(function(p){return p.name===tl;});
+        if(kp&&tp&&kp.position===tp.position){
+          yogas.push({name:'Raj Yoga',detail:'Kendra lord '+kl+' + Trikona lord '+tl+' conjunct H'+kp.position,effect:'Authority, recognition, professional prominence'});
+        }
+      });
+    });
+    // Neecha Bhanga: Debilitated planet + dispositor in kendra
+    planets.forEach(function(p){
+      if(p.name==='Ascendant') return;
+      var d=DIGNITY[p.name];
+      if(!d||p.rasi.name!==d.debil) return;
+      // Find dispositor (lord of the sign planet is in)
+      var dispositorName=getLordOfSign?getLordOfSign(signs.indexOf(p.rasi.name)):'?';
+      var dispositor=planets.find(function(x){return x.name===dispositorName;});
+      if(dispositor&&kendraH.indexOf(dispositor.position)>-1){
+        yogas.push({name:'Neecha Bhanga Raja Yoga',detail:p.name+' debilitated in '+p.rasi.name+', dispositor '+dispositorName+' in H'+dispositor.position+' (kendra)',effect:'Cancellation of debility — difficult start then strong rise'});
+      }
+    });
+    // 2-6-10-11 Formula (Rule 12)
+    var h2idx=(signs.indexOf(lagnaSign)+1)%12; var h6idx=(signs.indexOf(lagnaSign)+5)%12;
+    var h10idx=(signs.indexOf(lagnaSign)+9)%12; var h11idx=(signs.indexOf(lagnaSign)+10)%12;
+    var h2l=getLordOfSign?getLordOfSign(h2idx):'?'; var h6l=getLordOfSign?getLordOfSign(h6idx):'?';
+    var h10l=getLordOfSign?getLordOfSign(h10idx):'?'; var h11l=getLordOfSign?getLordOfSign(h11idx):'?';
+    var h2p=planets.find(function(p){return p.name===h2l;}); var h6p=planets.find(function(p){return p.name===h6l;});
+    var h10p=planets.find(function(p){return p.name===h10l;}); var h11p=planets.find(function(p){return p.name===h11l;});
+    var formulaConnections=[];
+    [[h2l,h2p,'H2'],[h6l,h6p,'H6'],[h10l,h10p,'H10'],[h11l,h11p,'H11']].forEach(function(a){
+      [[h2l,h2p,'H2'],[h6l,h6p,'H6'],[h10l,h10p,'H10'],[h11l,h11p,'H11']].forEach(function(b){
+        if(a[2]>=b[2]) return;
+        if(a[1]&&b[1]&&a[1].position===b[1].position) formulaConnections.push(a[2]+' lord '+a[0]+' + '+b[2]+' lord '+b[0]+' conjunct H'+a[1].position);
+      });
+    });
+    result.formulaConnections=formulaConnections;
+    result.yogas=yogas;
+
+    // =================================================================
+    // CAREER FIELD MAP by Amatyakaraka + H10 planets (Rule 2, 5)
+    // =================================================================
+    var CAREER_FIELDS={
+      Sun:    ['Government','Administration','Politics','Medicine','Gold/Jewellery','Corporate Authority'],
+      Moon:   ['Food & Hospitality','Nursing/Healthcare','Public Relations','Real Estate','Textiles','Travel'],
+      Mars:   ['Engineering','Military/Defence','Surgery','Real Estate','Sports','Energy/Fire industry'],
+      Mercury:['Software/IT','Accounting/Finance','Writing/Media','Teaching','Trade/Commerce','Communication'],
+      Jupiter:['Finance/Banking','Law/Advisory','Education','Philosophy','Religion','Consulting'],
+      Venus:  ['Luxury Goods','Arts/Entertainment','Beauty/Fashion','Hospitality','Design','Creative Commerce'],
+      Saturn: ['Mass Workforce','Iron/Steel/Mining','Agriculture','Real Estate (land)','Judiciary','Discipline roles'],
+      Rahu:   ['Technology','Foreign Work','Unconventional fields','Mass Media','Chemicals','Aviation'],
+      Ketu:   ['Spirituality','Research','Occult/Healing','Software (with Mercury)','Past-life skills']
+    };
+    var akFields=result.amatyakaraka&&CAREER_FIELDS[result.amatyakaraka]?CAREER_FIELDS[result.amatyakaraka]:[];
+    var h10planets=planets.filter(function(p){return p.name!=='Ascendant'&&p.position===10;});
+    var h10fields=[];
+    h10planets.forEach(function(p){if(CAREER_FIELDS[p.name])h10fields=h10fields.concat(CAREER_FIELDS[p.name].slice(0,3));});
+    result.careerFields={
+      byAmatyakaraka:{planet:result.amatyakaraka,fields:akFields.slice(0,4)},
+      byH10Planets:{planets:h10planets.map(function(p){return p.name;}).join('+'),fields:h10fields.slice(0,6)},
+      combined:[].concat(akFields.slice(0,3),h10fields.slice(0,3)).filter(function(v,i,a){return a.indexOf(v)===i;}).slice(0,6)
+    };
+
     // Indu Lagna calculation
     var kala={Sun:30,Moon:16,Mars:6,Mercury:8,Jupiter:10,Venus:12,Saturn:1};
     var signs=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makar','Kumbha','Meena'];
@@ -2710,6 +2864,40 @@ async function analyze(){
     if(pre.atmakarak) scoresBlock += 'Atmakarak: '+pre.atmakarak+'\n';
     if(pre.arudhaLagna) scoresBlock += 'Arudha Lagna: H'+pre.arudhaLagna+'\n';
     if(pre.induLagna) scoresBlock += 'Indu Lagna: '+pre.induLagna.sign+' (H'+pre.induLagna.houseFromLagna+' from Lagna)\n';
+
+    // Planet dignity
+    if(pre.planetDignity){
+      scoresBlock += '\nPLANET DIGNITY (pre-computed — do not recalculate):\n';
+      Object.keys(pre.planetDignity).forEach(function(pname){
+        scoresBlock += pname+': '+pre.planetDignity[pname]+'\n';
+      });
+    }
+
+    // Yogas
+    if(pre.yogas&&pre.yogas.length>0){
+      scoresBlock += '\nDETECTED YOGAS (pre-computed — describe each, do not invent new ones):\n';
+      pre.yogas.forEach(function(y){
+        scoresBlock += '- '+y.name+': '+y.detail+' → '+y.effect+'\n';
+      });
+    } else {
+      scoresBlock += '\nDETECTED YOGAS: None detected by rule engine\n';
+    }
+
+    // 2-6-10-11 Formula
+    if(pre.formulaConnections&&pre.formulaConnections.length>0){
+      scoresBlock += '\n2-6-10-11 FORMULA CONNECTIONS (Rule 12):\n';
+      pre.formulaConnections.forEach(function(f){ scoresBlock += '- '+f+'\n'; });
+    }
+
+    // Career fields
+    if(pre.careerFields){
+      scoresBlock += '\nCAREER FIELD MAP (pre-computed from methodology):\n';
+      scoresBlock += 'By Amatyakaraka ('+pre.careerFields.byAmatyakaraka.planet+'): '+pre.careerFields.byAmatyakaraka.fields.join(', ')+'\n';
+      if(pre.careerFields.byH10Planets.planets){
+        scoresBlock += 'By H10 planets ('+pre.careerFields.byH10Planets.planets+'): '+pre.careerFields.byH10Planets.fields.join(', ')+'\n';
+      }
+      scoresBlock += 'Combined career directions: '+pre.careerFields.combined.join(', ')+'\n';
+    }
 
     var summaryWithScores = summary + scoresBlock;
     window._chartSummary = summary;
