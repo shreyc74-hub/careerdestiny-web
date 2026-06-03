@@ -1659,7 +1659,7 @@ function preCompute(c){
     // =================================================================
     // RULE 13 — Dasha Timing Classification
     // =================================================================
-    var CAREER_ACTIVATING_PLANETS = [lagneshName, dashmeshaName, result.amatyakaraka];
+    var CAREER_ACTIVATING_PLANETS = [lagneshName, dashmeshaName, result.amatyakaraka, getLordOfSign((lagnaSignIdx+1)%12), getLordOfSign((lagnaSignIdx+10)%12)];
     var currentDashaName = result.mahadasha ? result.mahadasha.name : '';
     var currentAntarName = result.antardasha ? result.antardasha.name : '';
     var dashaClassification = 'Neutral';
