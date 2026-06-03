@@ -2890,7 +2890,8 @@ async function analyze(){
     ['sutra1','sutra2','sutra3','sutra4','sutra5','sutra6','sutra7'].forEach(function(k){
       if(pre[k]){ if(pre[k].indicates==='Business') bizScore++; else if(pre[k].indicates==='Job') jobScore++; }
     });
-    var jsVerdict = bizScore>=6?'BUSINESS':jobScore>=6?'JOB':bizScore>jobScore?'MIXED (leaning Business)':jobScore>bizScore?'MIXED (leaning Job)':'MIXED';
+    var saturnOverride = pre.sutra3 && pre.sutra3.indicates==='Job';
+    var jsVerdict = saturnOverride && bizScore<7 ? (bizScore>=5?'MIXED (leaning Business)':'MIXED (leaning Job)') : bizScore>=6?'BUSINESS':jobScore>=6?'JOB':bizScore>jobScore?'MIXED (leaning Business)':jobScore>bizScore?'MIXED (leaning Job)':'MIXED';
     scoresBlock += '\nSCORE: '+bizScore+' of 7 point toward Business. '+jobScore+' point toward Job.\n';
     scoresBlock += 'JS VERDICT: '+jsVerdict+'\n';
     scoresBlock += '\nOTHER PRE-COMPUTED VALUES:\n';
