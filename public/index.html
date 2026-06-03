@@ -1501,10 +1501,8 @@ function preCompute(c){
 
     // Indu Lagna calculation
     var kala={Sun:30,Moon:16,Mars:6,Mercury:8,Jupiter:10,Venus:12,Saturn:1};
-    var signs=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makar','Kumbha','Meena'];
     var moon=planetsWithHouse.find(function(p){return p.name==='Moon';}) || planets.find(function(p){return p.name==='Moon';});
     if(moon&&lagna){
-      var lagnaSignIdx=signs.indexOf(lagnaSign);
       var moonSignIdx=signs.indexOf(moon.rasi?moon.rasi.name:'');
       if(lagnaSignIdx>-1&&moonSignIdx>-1){
         var ninthFromLagna=(lagnaSignIdx+8)%12;
