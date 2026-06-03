@@ -1175,6 +1175,16 @@ function preCompute(c){
     var lagnaHouse=lagna?lagna.position:1;
     var lagnaSign=lagna&&lagna.rasi?lagna.rasi.name:'?';
 
+    // House lord lookup — defined here so all of preCompute can use it
+    var _LORDS_MAP=['Mars','Venus','Mercury','Moon','Sun','Mercury','Venus','Mars','Jupiter','Saturn','Saturn','Jupiter'];
+    var _SIGNS_LIST=['Mesha','Vrishabha','Mithuna','Karka','Simha','Kanya','Tula','Vrischika','Dhanu','Makar','Kumbha','Meena'];
+    function getLordOfSign(signIdx){
+      if(typeof signIdx === 'string') signIdx = _SIGNS_LIST.indexOf(signIdx);
+      if(signIdx < 0 || signIdx > 11) return '?';
+      return _LORDS_MAP[signIdx];
+    }
+    var signs = _SIGNS_LIST;
+
     // Amatyakaraka: 2nd highest degree planet (excluding Rahu/Ketu/Ascendant)
     var sorted=planets.filter(function(p){return p.name!=='Ascendant'&&p.name!=='Rahu'&&p.name!=='Ketu';})
       .sort(function(a,b){return b.degree-a.degree;});
