@@ -1552,6 +1552,183 @@ function preCompute(c){
 
 
 
+    // =================================================================
+    // RULE 1 — Lagnesh (Lord of Lagna) house position
+    // =================================================================
+    var lagneshName = getLordOfSign(lagnaSignIdx);
+    var lagneshPlanet = planetsWithHouse.find(function(p){ return p.name === lagneshName; });
+    var lagneshHouse = lagneshPlanet ? lagneshPlanet.house : 1;
+    var LAGNESH_MEANINGS = {
+      1:'Self-driven, identity merged with career. Best for entrepreneurship.',
+      2:'Wealth-generating career, family business.',
+      3:'Communication-based, self-employment, media.',
+      4:'Home-based, real estate, education.',
+      5:'Creative, education, speculation.',
+      6:'Service sector, health, competition. Obstacles through enemies.',
+      7:'Partnership-based, public-facing.',
+      8:'Research, hidden work, transformation. Multiple career reinventions.',
+      9:'Advisory, international. Rises through mentors and education.',
+      10:'Public life, authority. Strongest placement.',
+      11:'Networks, income from multiple sources.',
+      12:'Foreign lands, spiritual. Better recognition abroad.'
+    };
+    result.rule1 = {
+      lagnesh: lagneshName,
+      house: lagneshHouse,
+      meaning: LAGNESH_MEANINGS[lagneshHouse] || '',
+      detail: lagneshName + ' (Lagnesh) in H' + lagneshHouse
+    };
+
+    // =================================================================
+    // RULE 2 — H10 Sign (Dashama Bhav) career field
+    // =================================================================
+    var h10SignIdx = (lagnaSignIdx + 9) % 12;
+    var h10Sign = _SIGNS_LIST[h10SignIdx];
+    var H10_CAREER_MAP = {
+      'Mesha':'Technical, engineering, military, surgery, police, sports',
+      'Vrischika':'Technical, engineering, military, surgery, police, sports',
+      'Vrishabha':'Finance, luxury, arts, beauty, diplomacy, design, hospitality',
+      'Tula':'Finance, luxury, arts, beauty, diplomacy, design, hospitality',
+      'Mithuna':'Communication, writing, accounts, IT, analysis, trade, media',
+      'Kanya':'Communication, writing, accounts, IT, analysis, trade, media',
+      'Karka':'Public dealing, hospitality, government welfare, food, nursing',
+      'Simha':'Government, authority, politics, corporate leadership, administration',
+      'Dhanu':'Teaching, law, religion, philosophy, medicine, international work',
+      'Meena':'Teaching, law, religion, philosophy, medicine, international work',
+      'Makar':'Business, technology, service industry, long-term projects',
+      'Kumbha':'Business, technology, social work, service industry'
+    };
+    result.rule2 = {
+      h10Sign: h10Sign,
+      careerField: H10_CAREER_MAP[h10Sign] || 'General career',
+      detail: 'H10 sign is ' + h10Sign + ' — ' + (H10_CAREER_MAP[h10Sign] || 'General career')
+    };
+
+    // =================================================================
+    // RULE 3 — Dashmesha (Lord of H10)
+    // =================================================================
+    var dashmeshaName = getLordOfSign(h10SignIdx);
+    var dashmeshaPlanet = planetsWithHouse.find(function(p){ return p.name === dashmeshaName; });
+    var dashmeshaHouse = dashmeshaPlanet ? dashmeshaPlanet.house : 1;
+    var dashmeshaSign = dashmeshaPlanet && dashmeshaPlanet.rasi ? dashmeshaPlanet.rasi.name : '?';
+    var dashmeshaDignity = result.planetDignity ? result.planetDignity[dashmeshaName] : '?';
+    var DASHMESHA_MEANINGS = {
+      1:'Self-driven career, identity and work merged. Entrepreneurship.',
+      2:'Wealth-generating career, family business.',
+      3:'Communication-based, self-employed.',
+      4:'Home-based, real estate, education.',
+      5:'Creative, educational, speculative.',
+      6:'Service sector, health. Obstacles through competition.',
+      7:'Partnership-based, client work.',
+      8:'Research, hidden work. Career reinvents multiple times.',
+      9:'Advisory, international. Highly fortunate.',
+      10:'Public life, authority. Strongest possible placement.',
+      11:'Network-driven, income-focused.',
+      12:'Foreign lands, behind-the-scenes.'
+    };
+    result.rule3 = {
+      dashmesha: dashmeshaName,
+      house: dashmeshaHouse,
+      sign: dashmeshaSign,
+      dignity: dashmeshaDignity,
+      meaning: DASHMESHA_MEANINGS[dashmeshaHouse] || '',
+      detail: dashmeshaName + ' (Dashmesha) in H' + dashmeshaHouse + ' (' + dashmeshaSign + ') — ' + (dashmeshaDignity||'')
+    };
+
+    // =================================================================
+    // RULE 10 — H2, H7, H11 Lords (Wealth, Partnership, Income)
+    // =================================================================
+    var h2SignIdx = (lagnaSignIdx + 1) % 12;
+    var h7SignIdx = (lagnaSignIdx + 6) % 12;
+    var h11SignIdx = (lagnaSignIdx + 10) % 12;
+    var h2LordName = getLordOfSign(h2SignIdx);
+    var h7LordName = getLordOfSign(h7SignIdx);
+    var h11LordName = getLordOfSign(h11SignIdx);
+    var h2LordPlanet = planetsWithHouse.find(function(p){ return p.name === h2LordName; });
+    var h7LordPlanet = planetsWithHouse.find(function(p){ return p.name === h7LordName; });
+    var h11LordPlanet = planetsWithHouse.find(function(p){ return p.name === h11LordName; });
+    result.rule10 = {
+      h2lord: { name: h2LordName, house: h2LordPlanet ? h2LordPlanet.house : '?' },
+      h7lord: { name: h7LordName, house: h7LordPlanet ? h7LordPlanet.house : '?' },
+      h11lord: { name: h11LordName, house: h11LordPlanet ? h11LordPlanet.house : '?' },
+      detail: 'H2 lord ' + h2LordName + ' in H' + (h2LordPlanet ? h2LordPlanet.house : '?') +
+              ' | H7 lord ' + h7LordName + ' in H' + (h7LordPlanet ? h7LordPlanet.house : '?') +
+              ' | H11 lord ' + h11LordName + ' in H' + (h11LordPlanet ? h11LordPlanet.house : '?')
+    };
+
+    // =================================================================
+    // RULE 13 — Dasha Timing Classification
+    // =================================================================
+    var CAREER_ACTIVATING_PLANETS = [lagneshName, dashmeshaName, result.amatyakaraka];
+    var currentDashaName = result.mahadasha ? result.mahadasha.name : '';
+    var currentAntarName = result.antardasha ? result.antardasha.name : '';
+    var dashaClassification = 'Neutral';
+    var dashaReason = '';
+    if(CAREER_ACTIVATING_PLANETS.indexOf(currentDashaName) > -1) {
+      dashaClassification = 'Career-Active';
+      dashaReason = currentDashaName + ' is ' + (currentDashaName === lagneshName ? 'Lagnesh' : currentDashaName === dashmeshaName ? 'Dashmesha' : 'Amatyakaraka');
+    } else if(currentDashaName === getLordOfSign((lagnaSignIdx + 5) % 12)) {
+      dashaClassification = 'Service-Active';
+      dashaReason = currentDashaName + ' is H6 lord — employment/service period';
+    }
+    var antarClassification = 'Neutral';
+    if(CAREER_ACTIVATING_PLANETS.indexOf(currentAntarName) > -1) {
+      antarClassification = 'Career-Active';
+    }
+    result.rule13 = {
+      mahadasha: currentDashaName,
+      antardasha: currentAntarName,
+      classification: dashaClassification,
+      antarClassification: antarClassification,
+      reason: dashaReason,
+      detail: 'Mahadasha: ' + currentDashaName + ' (' + dashaClassification + ')' +
+              (currentAntarName ? ' | Antardasha: ' + currentAntarName + ' (' + antarClassification + ')' : '')
+    };
+
+    // =================================================================
+    // RULE 14 — Gochar (Current Transits)
+    // Jupiter and Saturn transit houses from natal Moon
+    // =================================================================
+    try {
+      var gocharPlanets = c.gochar && c.gochar.data && c.gochar.data.planet_position || [];
+      var moonNatal = planetsWithHouse.find(function(p){ return p.name === 'Moon'; });
+      var moonNatalHouse = moonNatal ? moonNatal.house : 1;
+      var moonNatalSignIdx = moonNatal && moonNatal.rasi ? _SIGNS_LIST.indexOf(moonNatal.rasi.name) : lagnaSignIdx;
+
+      var JUPITER_FAVORABLE = [1,2,5,7,9,10,11];
+      var SATURN_FAVORABLE = [3,6,11];
+
+      var gocharJupiter = gocharPlanets.find(function(p){ return p.name === 'Jupiter'; });
+      var gocharSaturn = gocharPlanets.find(function(p){ return p.name === 'Saturn'; });
+
+      var jupTransitHouseFromMoon = 1, satTransitHouseFromMoon = 1;
+      if(gocharJupiter && gocharJupiter.rasi) {
+        var gJupSignIdx = _SIGNS_LIST.indexOf(gocharJupiter.rasi.name);
+        jupTransitHouseFromMoon = ((gJupSignIdx - moonNatalSignIdx + 12) % 12) + 1;
+      }
+      if(gocharSaturn && gocharSaturn.rasi) {
+        var gSatSignIdx = _SIGNS_LIST.indexOf(gocharSaturn.rasi.name);
+        satTransitHouseFromMoon = ((gSatSignIdx - moonNatalSignIdx + 12) % 12) + 1;
+      }
+
+      var jupFavorable = JUPITER_FAVORABLE.indexOf(jupTransitHouseFromMoon) > -1;
+      var satFavorable = SATURN_FAVORABLE.indexOf(satTransitHouseFromMoon) > -1;
+      var overallTransit = jupFavorable && satFavorable ? 'Highly Favorable' :
+                           jupFavorable && !satFavorable ? 'Favorable (Jupiter supports)' :
+                           !jupFavorable && satFavorable ? 'Mixed (Saturn supports)' : 'Challenging';
+
+      result.rule14 = {
+        jupiterTransitHouseFromMoon: jupTransitHouseFromMoon,
+        jupiterFavorable: jupFavorable,
+        saturnTransitHouseFromMoon: satTransitHouseFromMoon,
+        saturnFavorable: satFavorable,
+        overall: overallTransit,
+        detail: 'Jupiter in H' + jupTransitHouseFromMoon + ' from Moon (' + (jupFavorable?'Favorable':'Unfavorable') + ')' +
+                ' | Saturn in H' + satTransitHouseFromMoon + ' from Moon (' + (satFavorable?'Favorable':'Unfavorable') + ')' +
+                ' → ' + overallTransit
+      };
+    } catch(e) { result.rule14 = { error: e.message }; }
+
     // CHANDRA-MANGAL YOGA
     try{
       var moonP=planetsWithHouse.find(function(p){return p.name==='Moon';});
@@ -2933,6 +3110,24 @@ async function analyze(){
       }
       scoresBlock += 'Combined career directions: '+pre.careerFields.combined.join(', ')+'\n';
     }
+
+    // Rule 1 — Lagnesh
+    if(pre.rule1) scoresBlock += '\nRULE 1 (Lagnesh): '+pre.rule1.detail+' — '+pre.rule1.meaning+'\n';
+
+    // Rule 2 — H10 Sign
+    if(pre.rule2) scoresBlock += 'RULE 2 (H10 Sign): '+pre.rule2.detail+'\n';
+
+    // Rule 3 — Dashmesha
+    if(pre.rule3) scoresBlock += 'RULE 3 (Dashmesha): '+pre.rule3.detail+' — '+pre.rule3.meaning+'\n';
+
+    // Rule 10 — H2/H7/H11 Lords
+    if(pre.rule10) scoresBlock += 'RULE 10 (H2/H7/H11 Lords): '+pre.rule10.detail+'\n';
+
+    // Rule 13 — Dasha Classification
+    if(pre.rule13) scoresBlock += 'RULE 13 (Dasha Timing): '+pre.rule13.detail+'\n';
+
+    // Rule 14 — Gochar
+    if(pre.rule14 && !pre.rule14.error) scoresBlock += 'RULE 14 (Gochar Transits): '+pre.rule14.detail+'\n';
 
     var summaryWithScores = summary + scoresBlock; window._chartSummary = summaryWithScores;
     // Store lagna info for report
