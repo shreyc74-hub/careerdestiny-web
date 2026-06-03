@@ -2910,7 +2910,6 @@ async function analyze(){
     }
 
     var summaryWithScores = summary + scoresBlock; window._chartSummary = summaryWithScores;
-    window._chartSummary = summary;
     // Store lagna info for report
     var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
     window._d1Lagna = d1LagnaSign ? (d1LagnaSign.rasi&&d1LagnaSign.rasi.name||'?') : '?';
