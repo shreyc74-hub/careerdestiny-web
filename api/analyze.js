@@ -185,8 +185,7 @@ SECTION 11 — YOUR NEXT STEP
 ---
 One focused paragraph — the single most important action right now. Specific and actionable. Based on RULE 13 dasha classification + strongest pre-computed chart signal + RULE 14 transit window.
 
-End with exactly: "Your report is complete. Feel free to ask me any follow-up question about your chart, career timing, or specific planetary influences."\`;
-
+End with exactly: "Your report is complete. Feel free to ask me any follow-up question about your chart, career timing, or specific planetary influences."`;
 const CHAT_SYSTEM = BASE + `
 The user has received their full Career Destiny Report. Answer follow-up questions about their chart, career timing, planetary influences, yogas, or any aspect of the analysis. Use the chart data in the conversation history. Be conversational but precise. Answer first, caveats last. Never ask for data already in the chart.
 
