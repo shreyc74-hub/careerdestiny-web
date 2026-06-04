@@ -3346,7 +3346,7 @@ async function analyze(){
             call:2
           })
         });
-        if(bgRes2.ok){
+        console.log('BG CALL2 status:', bgRes2.status); if(bgRes2.ok){
           var bgData2 = await bgRes2.json();
           window._reply2 = bgData2.content&&bgData2.content[0]&&bgData2.content[0].text||'';
           window._call2Ready = true;
@@ -3364,7 +3364,7 @@ async function analyze(){
             call:3
           })
         });
-        if(bgRes3.ok){
+        console.log('BG CALL3 status:', bgRes3.status); if(bgRes3.ok){
           var bgData3 = await bgRes3.json();
           window._reply3 = bgData3.content&&bgData3.content[0]&&bgData3.content[0].text||'';
           window._call3Ready = true;
