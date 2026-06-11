@@ -80,7 +80,7 @@ If BUSINESS: what kind of business, what conditions are ripe, what to act on imm
 If JOB: what kind of employment, what skills to build, what to avoid.
 If MIXED: what to do in employment now AND when the window for independence opens.
 
-If MIXED only: add "Your independence window:" paragraph — when the best period begins/ends (month/year only), what type of work this chart is built for in plain terms, what to do between now and that window, one specific caution. 4-5 sentences, no jargon.\`;
+If MIXED only: add "Your independence window:" paragraph — when the best period begins/ends (month/year only), what type of work this chart is built for in plain terms, what to do between now and that window, one specific caution. 4-5 sentences, no jargon.`;
 
 
 const CALL2 = BASE + `
@@ -133,7 +133,7 @@ Always bold the title. Always use em dash. Always number sequentially.
 SECTION 7 — YOUR STRENGTHS AND HIDDEN TALENTS
 ---
 Active strengths: From PLANET DIGNITY section — own sign and exalted planets first. What is already working and visible.
-Hidden talents: From retrograde planets and D9 NAVAMSHA confirmations (RULE 7 pre-computed) — what is latent and when it emerges.\`;
+Hidden talents: From retrograde planets and D9 NAVAMSHA confirmations (RULE 7 pre-computed) — what is latent and when it emerges.`;
 
 
 const CALL3 = BASE + `
