@@ -3343,6 +3343,7 @@ async function analyze(){
     addProg([['Location found: '+coords.name.split(',')[0],'done'],['Fetching D1, D9, D10 charts','act'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
 
     var chart=await fetchChart(dt,coords);
+    console.log("CHART RESULT:", chart ? Object.keys(chart).join(",") : "NULL");
     chartData=chart;
     window._meta={name:name,dob:dob,time:time,place:place,email:email,coords:coords};
     var summary=buildSummary(chart,{name:name,dob:dob,time:time,place:place,email:email,coords:coords});
