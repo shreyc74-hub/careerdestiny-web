@@ -352,6 +352,85 @@ input:focus,select:focus{border-color:var(--gold);}
 .rpt-card-title{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:5px;}
 .rpt-card-content{font-size:11px;color:#666;line-height:1.6;}
 /* ──────────────────────────────────────────────────────────────────── */
+
+/* ── Screen Navigation UX ────────────────────────────────────────── */
+
+/* Fixed result layout */
+#result-section{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);}
+
+/* Fixed compact header */
+.result-header-bar{flex-shrink:0;background:#fff;border-bottom:1px solid #ece9e0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.result-header-name{font-size:13px;font-weight:600;color:#1a1a1a;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.result-verdict-pill{display:flex;align-items:center;gap:6px;background:#1a1025;border-radius:20px;padding:4px 12px;flex-shrink:0;}
+.result-verdict-text{font-size:11px;font-weight:700;letter-spacing:0.08em;}
+.result-verdict-score{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:0.05em;}
+
+/* Sticky pill switcher */
+.screen-switcher{flex-shrink:0;background:#fff;padding:10px 20px;border-bottom:1px solid #ece9e0;}
+.screen-pills{display:flex;background:#f5f4f0;border-radius:10px;padding:3px;gap:3px;}
+.screen-pill{flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:13px;font-weight:500;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.18s;}
+.screen-pill.active{background:#fff;color:#1a1a1a;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+
+/* Scrollable content area */
+.screen-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* Hook screen */
+.hook-wrap{padding:20px;}
+.hook-hi{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
+.hook-sub{font-size:12px;color:#888;margin-bottom:18px;}
+.hook-trait{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;background:#fff;border:1px solid #ece9e0;border-radius:10px;margin-bottom:8px;opacity:0;transform:translateY(8px);transition:opacity 0.35s ease,transform 0.35s ease;}
+.hook-trait.show{opacity:1;transform:translateY(0);}
+.hook-trait-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
+.hook-trait-body{}
+.hook-trait-headline{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}
+.hook-trait-detail{font-size:11px;color:#888;line-height:1.5;}
+.hook-loading{display:flex;align-items:center;gap:8px;padding:14px 0;opacity:0;transition:opacity 0.4s ease 1.2s;}
+.hook-loading.show{opacity:1;}
+.hook-spinner{width:13px;height:13px;border:2px solid #ece9e0;border-top-color:#c9a96e;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+.hook-loading-text{font-size:12px;color:#aaa;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Chat screen */
+.chat-screen{display:flex;flex-direction:column;height:100%;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px 20px 8px;-webkit-overflow-scrolling:touch;}
+.chat-quick{padding:0 20px 12px;}
+.chat-quick-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
+.chat-chips{display:flex;flex-direction:column;gap:6px;}
+.chat-chip{display:flex;align-items:center;gap:9px;padding:10px 13px;border:1px solid #ece9e0;background:#fff;border-radius:8px;font-size:12px;color:#444;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-align:left;}
+.chat-chip:hover{border-color:#c9a96e;background:#fdf8f0;}
+.chat-chip-icon{font-size:14px;flex-shrink:0;}
+
+/* Fixed chat input at bottom */
+.chat-input-bar{flex-shrink:0;background:#fff;border-top:1px solid #ece9e0;padding:10px 16px;padding-bottom:max(10px, env(safe-area-inset-bottom));}
+.chat-input-row{display:flex;gap:8px;align-items:center;}
+.chat-input-field{flex:1;padding:10px 14px;border:1.5px solid #ece9e0;border-radius:22px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:#f9f9f7;transition:border-color 0.15s;}
+.chat-input-field:focus{border-color:#c9a96e;background:#fff;}
+.chat-send-btn{width:38px;height:38px;background:#534AB7;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s;}
+.chat-send-btn:hover{opacity:0.85;}
+.chat-send-icon{color:#fff;font-size:16px;line-height:1;}
+
+/* Report screen */
+.report-screen{padding:16px 20px 24px;overflow-y:auto;}
+.report-email-card{background:#f8f8f5;border:1px solid #ece9e0;border-radius:10px;padding:16px;margin-bottom:18px;}
+.report-email-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
+.report-email-sub{font-size:12px;color:#888;margin-bottom:12px;line-height:1.5;}
+.report-email-row{display:flex;gap:8px;}
+.report-email-inp{flex:1;padding:10px 13px;border:1.5px solid #ece9e0;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;}
+.report-email-inp:focus{border-color:#c9a96e;}
+.report-send-btn{padding:10px 16px;background:#534AB7;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.report-send-btn:hover{opacity:0.9;}
+.report-send-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.report-preview-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.report-cards{display:flex;flex-direction:column;gap:8px;}
+.rpt-card{border:1px solid #ece9e0;border-radius:9px;padding:13px 15px;background:#fff;}
+.rpt-card-num{font-size:10px;color:#c9a96e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;}
+.rpt-card-title{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:5px;}
+.rpt-card-content{font-size:11px;color:#777;line-height:1.6;}
+
+/* Override old bottom-bar styles in result section */
+#result-section .bottom-bar{display:none!important;}
+#result-section .msgs{padding:0!important;}
+/* ───────────────────────────────────────────────────────────────── */
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6EP70RFV5S"></script>
@@ -374,13 +453,9 @@ input:focus,select:focus{border-color:var(--gold);}
   <!-- Birth Details Form -->
   <div class="hero">
     <div class="hero-badge">Vedic Jyotish · Sapta Sutri Siddhant</div>
-    <div class="hero-title">Discover Your<br><span>Career Destiny</span></div>
-    <div class="hero-sub">Your birth chart holds the answer — Job or Business, when to leap, what work fulfills you.</div>
-    <div class="hero-pills">
-      <span class="hero-pill">D1 · D9 · D10</span>
-      <span class="hero-pill">Vimshottari Dasha</span>
-      <span class="hero-pill">Gochar Transits</span>
-    </div>
+    <div class="hero-title" id="hero-title">Discover your career destiny<br><span id="hero-span">with Vedic Jyotish</span></div>
+    <div class="hero-sub" id="hero-sub-text">Your birth chart holds the answer — Job or Business, when to leap, what work fulfills you.</div>
+
   </div>
   
   <div class="form-section" id="form-section">
@@ -3955,6 +4030,263 @@ function sendReportFromPath(){
   });
 }
 
+
+// ── Personality trait mappings for hook screen ───────────────────
+var LAGNA_TRAITS = {
+  'Mesha':    {icon:'🔥', headline:'You act first, think later — and it works', detail:'Aries rising gives you raw initiative. You don't wait for permission.'},
+  'Vrishabha':{icon:'🌿', headline:'You build slow, but you build to last', detail:'Taurus rising means your career is built on patience and quality.'},
+  'Mithuna':  {icon:'⚡', headline:'Your mind is your most valuable asset', detail:'Gemini rising means you communicate, connect, and adapt faster than most.'},
+  'Karka':    {icon:'🌊', headline:'You sense things others miss', detail:'Cancer rising gives you deep intuition — your gut is usually right.'},
+  'Simha':    {icon:'🦁', headline:'You lead, not follow — you need a stage', detail:'Leo rising means you're built for visibility, authority, and recognition.'},
+  'Kanya':    {icon:'🔍', headline:'You see what others overlook', detail:'Virgo rising gives you precision and a standard for excellence others can't match.'},
+  'Tula':     {icon:'⚖️', headline:'You build bridges between people', detail:'Libra rising means partnerships, diplomacy, and design come naturally.'},
+  'Vrischika':{icon:'🦅', headline:'You transform everything you touch', detail:'Scorpio rising gives you intensity, research ability, and depth others fear.'},
+  'Dhanu':    {icon:'🏹', headline:'You see the big picture', detail:'Sagittarius rising means philosophy, teaching, and expansion are your natural terrain.'},
+  'Makar':    {icon:'🏔️', headline:'You climb steadily — and you always reach the top', detail:'Capricorn rising means discipline and long-term thinking are your superpowers.'},
+  'Kumbha':   {icon:'🌐', headline:'You think differently — and that's your edge', detail:'Aquarius rising means innovation, networks, and unconventional thinking define you.'},
+  'Meena':    {icon:'🌙', headline:'You feel deeply and create beautifully', detail:'Pisces rising means intuition, creativity, and empathy are your career fuel.'}
+};
+var MOON_TRAITS = {
+  'Mesha':    {icon:'⚡', headline:'Your emotions move fast — so does your best thinking', detail:'Aries Moon means you work best in fast-moving environments with clear goals.'},
+  'Vrishabha':{icon:'🌿', headline:'Stability fuels you — chaos drains you', detail:'Taurus Moon means you need security and comfort to do your best work.'},
+  'Mithuna':  {icon:'💬', headline:'Your mind never stops — variety is oxygen', detail:'Gemini Moon means routine kills your motivation. You need mental stimulation.'},
+  'Karka':    {icon:'🤝', headline:'You care deeply about the people you work with', detail:'Cancer Moon means team culture and emotional safety matter more than salary.'},
+  'Simha':    {icon:'🌟', headline:'You need recognition to stay motivated', detail:'Leo Moon means appreciation and visibility keep you energised and loyal.'},
+  'Kanya':    {icon:'📋', headline:'You're hardest on yourself — and that drives results', detail:'Virgo Moon means your internal standards push you to deliver exceptional work.'},
+  'Tula':     {icon:'🎨', headline:'Beauty and harmony in your environment matter', detail:'Libra Moon means aesthetic surroundings and fair relationships fuel your best work.'},
+  'Vrischika':{icon:'🔮', headline:'You read people accurately — always', detail:'Scorpio Moon means you sense what's unsaid. That's a career superpower.'},
+  'Dhanu':    {icon:'🌍', headline:'You need purpose, not just a paycheck', detail:'Sagittarius Moon means meaningful work drives you more than money.'},
+  'Makar':    {icon:'🏆', headline:'Achieving goals is how you feel secure', detail:'Capricorn Moon means achievement and progress are your emotional fuel.'},
+  'Kumbha':   {icon:'🌐', headline:'You work best when you're changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
+  'Meena':    {icon:'💫', headline:'Your intuition about people is almost always right', detail:'Pisces Moon means empathy and creativity flow naturally in your work.'}
+};
+var AK_TRAITS = {
+  'Sun':     {icon:'👑', headline:'You're drawn to authority — and authority is drawn to you', detail:'Your career significator points toward leadership, governance, and public recognition.'},
+  'Moon':    {icon:'🌊', headline:'Serving and connecting with people is your calling', detail:'Your career significator points toward public-facing work, hospitality, and nurturing roles.'},
+  'Mars':    {icon:'⚔️', headline:'You're built for action, not planning', detail:'Your career significator points toward technical, physical, or competitive fields.'},
+  'Mercury': {icon:'💡', headline:'Communication and trade are your natural domain', detail:'Your career significator points toward business, writing, technology, and exchange.'},
+  'Jupiter': {icon:'📚', headline:'Teaching and guiding others is your deepest purpose', detail:'Your career significator points toward advisory, educational, and wisdom-based work.'},
+  'Venus':   {icon:'✨', headline:'Your career is your creative expression', detail:'Your career significator points toward arts, luxury, beauty, and creative commerce.'},
+  'Saturn':  {icon:'🏛️', headline:'You build things that outlast you', detail:'Your career significator points toward disciplined, systematic, long-term building.'}
+};
+var YOGA_TRAIT = {icon:'🔮', headline:'You carry a rare planetary combination', detail:'Classical yogas in your chart indicate a capacity for authority and independent wealth.'};
+var DASHA_TRAIT = {icon:'⏰', headline:'You're in your primary earning decade right now', detail:'The planetary period currently running is career-active — this is your window.'};
+var SATURN_WARNING = {icon:'⚠️', headline:'One planet is creating friction — but it's temporary', detail:'Saturn's placement is the single factor adding challenge. It doesn't cancel the rest — it just asks for patience.'};
+// Hindi trait translations
+var LAGNA_TRAITS_HI = {
+  'Simha': {icon:'🦁', headline:'आप नेतृत्व करते हैं, अनुसरण नहीं — आपको मंच चाहिए', detail:'सिंह लग्न का अर्थ है आप दृश्यता, अधिकार और पहचान के लिए बने हैं।'}
+};
+
+// ── Screen navigation ────────────────────────────────────────────
+var _currentScreen = 'hook';
+
+function switchScreen(screen){
+  cdTrack('screen_switch', {screen: screen});
+  _currentScreen = screen;
+  var chatScreen = document.getElementById('chat-screen');
+  var reportScreen = document.getElementById('report-screen');
+  var chatBar = document.getElementById('chat-input-bar');
+  var pillChat = document.getElementById('pill-chat');
+  var pillReport = document.getElementById('pill-report');
+
+  if(screen === 'chat'){
+    if(chatScreen) chatScreen.style.display = 'flex';
+    if(reportScreen) reportScreen.style.display = 'none';
+    if(chatBar) chatBar.style.display = 'block';
+    if(pillChat) pillChat.classList.add('active');
+    if(pillReport) pillReport.classList.remove('active');
+    setTimeout(function(){ var el=document.getElementById('chat-ui'); if(el)el.focus(); }, 150);
+  } else {
+    if(reportScreen) reportScreen.style.display = 'block';
+    if(chatScreen) chatScreen.style.display = 'none';
+    if(chatBar) chatBar.style.display = 'none';
+    if(pillReport) pillReport.classList.add('active');
+    if(pillChat) pillChat.classList.remove('active');
+    // Pre-fill email
+    var emailMeta = window._meta && window._meta.email;
+    if(emailMeta){ var inp=document.getElementById('report-email-inp'); if(inp&&!inp.value)inp.value=emailMeta; }
+    updateReportPreview();
+  }
+}
+
+function showHookScreen(pre, name){
+  var firstName = name.split(' ')[0];
+  var hi = document.getElementById('hook-hi');
+  var sub = document.getElementById('hook-sub');
+  if(hi) hi.textContent = 'Hi ' + firstName + '!';
+  if(sub) sub.textContent = (_lang==='hi') ? 'आपकी जन्म कुंडली आपके बारे में यह बताती है...' : 'Here's what your chart reveals about you...';
+
+  var traits = [];
+
+  // Lagna trait
+  if(pre.rule1 && pre.rule1.lagnesh){
+    var lagnaSign = window._d1LagnaSign || 'Simha';
+    var lt = (_lang==='hi' && LAGNA_TRAITS_HI[lagnaSign]) ? LAGNA_TRAITS_HI[lagnaSign] : LAGNA_TRAITS[lagnaSign];
+    if(lt) traits.push(lt);
+  }
+
+  // Moon trait
+  var moonSign = window._moonRashi || '';
+  if(moonSign && MOON_TRAITS[moonSign]) traits.push(MOON_TRAITS[moonSign]);
+
+  // Amatyakaraka trait
+  if(pre.amatyakaraka && AK_TRAITS[pre.amatyakaraka]) traits.push(AK_TRAITS[pre.amatyakaraka]);
+
+  // Yoga trait
+  if(pre.yogas && pre.yogas.length >= 2) traits.push(YOGA_TRAIT);
+
+  // Dasha trait
+  if(pre.rule13 && pre.rule13.classification === 'Career-Active') traits.push(DASHA_TRAIT);
+
+  // Saturn warning (if Job indicator)
+  if(pre.sutra3 && pre.sutra3.indicates === 'Job') traits.push(SATURN_WARNING);
+
+  // Limit to 4 traits
+  traits = traits.slice(0, 4);
+
+  var container = document.getElementById('hook-traits');
+  if(container){
+    container.innerHTML = traits.map(function(t){
+      return '<div class="hook-trait">'
+        + '<div class="hook-trait-icon">'+t.icon+'</div>'
+        + '<div class="hook-trait-body">'
+        + '<div class="hook-trait-headline">'+t.headline+'</div>'
+        + '<div class="hook-trait-detail">'+t.detail+'</div>'
+        + '</div></div>';
+    }).join('');
+  }
+
+  // Show verdict pill in header
+  var biz=0, job=0;
+  ['sutra1','sutra2','sutra3','sutra4','sutra5','sutra6','sutra7'].forEach(function(k){
+    if(pre[k]) pre[k].indicates==='Business'?biz++:pre[k].indicates==='Job'?job++:null;
+  });
+  var verdictColors = {BUSINESS:'#1D9E75', JOB:'#e05050', MIXED:'#c9a96e'};
+  var jsVerdict = pre.sutra3 && pre.sutra3.indicates==='Job' && biz<7 ? (biz>=5?'MIXED':'MIXED') : biz>=6?'BUSINESS':job>=6?'JOB':'MIXED';
+  var vpill = document.getElementById('result-verdict-pill');
+  var vtext = document.getElementById('result-verdict-text');
+  var vscore = document.getElementById('result-verdict-score');
+  if(vpill){ vpill.style.display='flex'; }
+  if(vtext){ vtext.textContent=jsVerdict; vtext.style.color=verdictColors[jsVerdict]||'#c9a96e'; }
+  if(vscore){ vscore.textContent=biz+':'+job; }
+
+  // Animate traits in with stagger
+  setTimeout(function(){
+    var els = document.querySelectorAll('.hook-trait');
+    els.forEach(function(el, i){
+      setTimeout(function(){ el.classList.add('show'); }, i * 350);
+    });
+  }, 200);
+
+  // Show loading indicator
+  setTimeout(function(){
+    var ld = document.getElementById('hook-loading');
+    if(ld) ld.classList.add('show');
+  }, 1000);
+}
+
+function hideHookScreen(){
+  var hook = document.getElementById('hook-screen');
+  if(hook){
+    hook.style.transition = 'opacity 0.3s';
+    hook.style.opacity = '0';
+    setTimeout(function(){
+      hook.style.display = 'none';
+      // Show switcher and default to chat
+      var sw = document.getElementById('screen-switcher');
+      if(sw) sw.style.display = 'block';
+      switchScreen('chat');
+    }, 300);
+  }
+}
+
+function showPathButtons(reply1){
+  window._reply1Teaser = reply1;
+  hideHookScreen();
+  // Fire CALL2 + CALL3 in parallel
+  window._reply2=''; window._reply3='';
+  window._call2Ready=false; window._call3Ready=false;
+  Promise.all([
+    fetch(API+'/api/analyze',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:'[CHART DATA]\n'+window._chartSummary+'\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.'}],lang:window._lang||'en',call:2})
+    }).then(function(r){return r.json();}).then(function(d){
+      window._reply2=d.content&&d.content[0]&&d.content[0].text||'';
+      window._call2Ready=true;
+      cdTrack('analysis_call2_complete');
+      updateReportPreview();
+    }).catch(function(e){console.warn('CALL2:',e.message);}),
+    fetch(API+'/api/analyze',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'user',content:'[CHART DATA]\n'+window._chartSummary+'\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11. Read CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS [CURRENT] markers.'}],lang:window._lang||'en',call:3})
+    }).then(function(r){return r.json();}).then(function(d){
+      window._reply3=d.content&&d.content[0]&&d.content[0].text||'';
+      window._call3Ready=true;
+      cdTrack('analysis_call3_complete');
+      window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
+      updateReportPreview();
+    }).catch(function(e){console.warn('CALL3:',e.message);})
+  ]);
+}
+
+function askQuestion(question){
+  cdTrack('quick_question', {q: question.slice(0,30)});
+  if(_currentScreen !== 'chat') switchScreen('chat');
+  // Hide quick chips after first question
+  var qsec = document.getElementById('chat-quick');
+  if(qsec) qsec.style.display = 'none';
+  document.getElementById('chat-ui').value = question;
+  sendChat();
+}
+
+function updateReportPreview(){
+  if(window._reply1){
+    var vm=window._reply1.match(/VERDICT:\s*(BUSINESS|JOB|MIXED[^—\n]*)/i);
+    if(vm){ var el=document.getElementById('rpt-c1'); if(el) el.textContent=vm[1].trim()+' — 7-factor Sapta Sutri analysis'; }
+  }
+  if(window._reply2){
+    var careers=[];
+    window._reply2.split('\n').forEach(function(l){
+      var m=l.match(/^\d+\.\s+\*\*([^*]+)\*\*/);
+      if(m&&careers.length<3) careers.push(m[1].trim());
+    });
+    if(careers.length){ var el=document.getElementById('rpt-c2'); if(el) el.textContent=careers.join(' · '); }
+  }
+  if(window._reply3){
+    var w=window._reply3.match(/Window 1[^:]*:[\s\S]*?([A-Z][a-z]+ \d{4})/i);
+    if(w){ var el=document.getElementById('rpt-c3'); if(el) el.textContent='Starting '+w[1]+' — see full dates in report'; }
+    var ns=window._reply3.match(/SECTION 11[\s\S]{0,30}\n([^\n]{20,})/i);
+    if(ns){ var el=document.getElementById('rpt-c4'); if(el) el.textContent=ns[1].trim().slice(0,90)+'...'; }
+  }
+}
+
+function sendReportFromPath(){
+  var inp=document.getElementById('report-email-inp');
+  var email=inp?inp.value.trim():'';
+  var btn=document.getElementById('report-send-btn');
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(inp){inp.style.borderColor='#e05050';setTimeout(function(){inp.style.borderColor='';},2000);}
+    return;
+  }
+  if(window._meta) window._meta.email=email;
+  btn.textContent='⏳'; btn.disabled=true;
+  if(!window._analysis) window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
+  var reportHtml=buildReportHtml(window._meta,window._analysis,window._svgs);
+  if(!reportHtml){btn.textContent='Send';btn.disabled=false;return;}
+  var vm=(window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
+  fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({html:reportHtml,email:email,name:window._meta&&window._meta.name||'',verdict:vm?vm[1]:'MIXED'})
+  }).then(function(r){return r.json();}).then(function(d){
+    if(d.error) throw new Error(d.error);
+    btn.textContent='✓ Sent!';btn.style.background='#1D9E75';
+    cdTrack('email_sent_success');
+    setTimeout(function(){btn.textContent='Send';btn.style.background='';btn.disabled=false;},4000);
+  }).catch(function(e){btn.textContent='Send';btn.disabled=false;});
+}
+
+function reset(){
+  cdTrack('analyze_another');
+  _currentScreen='hook';
 function reset(){
   cdTrack('analyze_another');
   _currentPath=null;
@@ -4017,7 +4349,20 @@ var _strings={
     genderF:"Female",
     analyzeBtn:"Analyze My Career Destiny",
     langBtn:"हिंदी",
-    chatPlaceholder:"Ask a follow-up question..."
+    chatPlaceholder:"Ask a follow-up question...",
+    chatInputPlaceholder:"Ask anything about your chart...",
+    chatQuickLabel:"Quick questions",
+    q1:"When will it happen?",
+    q2:"What career suits me?",
+    q3:"What are my strengths?",
+    q4:"Explain my Saturn",
+    q5:"What should I do right now?",
+    reportEmailTitle:"📧 Get your full report by email",
+    reportEmailSub:"Complete 12-section Career Destiny Report as a PDF — in your inbox within 1 minute.",
+    reportPreviewLabel:"What's inside",
+    heroTitle:"Discover your career destiny",
+    heroSpan:"with Vedic Jyotish",
+    heroSub:"Your birth chart holds the answer — Job or Business, when to leap, what work fulfills you."
   },
   hi:{
     appTitle:"करियर भविष्य",
@@ -4036,7 +4381,20 @@ var _strings={
     genderF:"महिला",
     analyzeBtn:"मेरे करियर भविष्य का विश्लेषण करें",
     langBtn:"English",
-    chatPlaceholder:"अपना प्रश्न पूछें..."
+    chatPlaceholder:"अपना प्रश्न पूछें...",
+    chatInputPlaceholder:"अपना कोई भी प्रश्न पूछें...",
+    chatQuickLabel:"त्वरित प्रश्न",
+    q1:"यह कब होगा?",
+    q2:"मेरे लिए कौन सा करियर उचित है?",
+    q3:"मेरी शक्तियाँ क्या हैं?",
+    q4:"मेरे शनि को समझाएं",
+    q5:"अभी मुझे क्या करना चाहिए?",
+    reportEmailTitle:"📧 अपनी पूरी रिपोर्ट ईमेल पर पाएं",
+    reportEmailSub:"पूर्ण 12-खंड करियर भविष्य रिपोर्ट PDF के रूप में — 1 मिनट में आपके इनबॉक्स में।",
+    reportPreviewLabel:"रिपोर्ट में क्या है",
+    heroTitle:"वैदिक ज्योतिष से जानें अपना करियर भविष्य",
+    heroSpan:"",
+    heroSub:"आपकी जन्म कुंडली में उत्तर है — नौकरी या व्यवसाय, कब छलांग लगाएं, कौन सा काम संतुष्टि देगा।"
   }
 };
 function toggleLang(){
@@ -4076,7 +4434,38 @@ function applyLang(){
   }
   if(ab)ab.textContent=s.analyzeBtn;
   if(ci)ci.placeholder=s.chatPlaceholder;
-  // Also update system prompt language instruction
+
+  // New UI elements
+  var chatInpField=document.getElementById('chat-ui');
+  if(chatInpField&&s.chatInputPlaceholder) chatInpField.placeholder=s.chatInputPlaceholder;
+  var qlabel=document.getElementById('chat-quick-label');
+  if(qlabel&&s.chatQuickLabel) qlabel.textContent=s.chatQuickLabel;
+  // Quick question chips
+  var keys=['q1','q2','q3','q4','q5'];
+  keys.forEach(function(k){
+    var els=document.querySelectorAll('[data-key="'+k+'"]');
+    els.forEach(function(el){ if(s[k]) el.textContent=s[k]; });
+  });
+  // Report screen
+  var ret=document.getElementById('rpt-email-title');
+  if(ret&&s.reportEmailTitle) ret.textContent=s.reportEmailTitle;
+  var res=document.getElementById('rpt-email-sub');
+  if(res&&s.reportEmailSub) res.textContent=s.reportEmailSub;
+  var rpl=document.getElementById('rpt-preview-label');
+  if(rpl&&s.reportPreviewLabel) rpl.textContent=s.reportPreviewLabel;
+  // Hero
+  var ht=document.getElementById('hero-title');
+  if(ht&&s.heroTitle){ ht.childNodes[0].textContent=s.heroTitle; }
+  var hs=document.getElementById('hero-span');
+  if(hs&&s.heroSpan!==undefined) hs.textContent=s.heroSpan;
+  var hsub=document.getElementById('hero-sub-text');
+  if(hsub&&s.heroSub) hsub.textContent=s.heroSub;
+  // Pill labels
+  var pc=document.getElementById('pill-chat');
+  if(pc) pc.textContent=(_lang==='hi'?'💬 चैट':'💬 Chat');
+  var pr=document.getElementById('pill-report');
+  if(pr) pr.textContent=(_lang==='hi'?'📄 रिपोर्ट':'📄 Report');
+
   window._lang=_lang;
 }
 </script>
