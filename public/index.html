@@ -279,80 +279,6 @@ input:focus,select:focus{border-color:var(--gold);}
   .app{border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 4px 24px rgba(0,0,0,0.08);}
 }
 
-/* ── New UX Design ─────────────────────────────────────────────────── */
-
-/* Hook screen */
-.hook-screen{padding:20px;max-width:520px;margin:0 auto;}
-.hook-greeting{font-size:17px;font-weight:600;color:#1a1a1a;margin-bottom:16px;}
-.hook-verdict-badge{display:flex;align-items:center;justify-content:space-between;background:#1a1025;border-radius:12px;padding:16px 20px;margin-bottom:14px;opacity:0;transform:translateY(8px);transition:all 0.4s ease;}
-.hook-verdict-badge.show{opacity:1;transform:translateY(0);}
-.hook-verdict-label{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:4px;}
-.hook-verdict-value{font-size:26px;font-weight:700;letter-spacing:0.05em;}
-.hook-ratio{text-align:right;}
-.hook-ratio-value{font-size:18px;font-weight:700;color:#c9a96e;}
-.hook-ratio-label{font-size:10px;color:rgba(255,255,255,0.4);letter-spacing:0.08em;text-transform:uppercase;}
-
-.hook-saturn{background:#fffdf5;border-left:3px solid #c9a96e;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:14px;opacity:0;transform:translateY(8px);transition:all 0.4s ease 0.3s;}
-.hook-saturn.show{opacity:1;transform:translateY(0);}
-.hook-saturn-label{font-size:10px;font-weight:600;color:#c9a96e;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
-.hook-saturn-text{font-size:12px;color:#555;line-height:1.6;}
-
-.hook-facts{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
-.hook-fact{display:flex;align-items:center;gap:8px;font-size:12px;color:#444;opacity:0;transform:translateX(-6px);transition:all 0.3s ease;}
-.hook-fact.show{opacity:1;transform:translateX(0);}
-.hook-fact-dot{width:6px;height:6px;border-radius:50%;background:#c9a96e;flex-shrink:0;}
-
-.hook-building{display:flex;align-items:center;gap:8px;font-size:12px;color:#888;padding:10px 0;opacity:0;transition:all 0.4s ease 1s;}
-.hook-building.show{opacity:1;}
-.hook-spinner{width:14px;height:14px;border:2px solid #e8e8e4;border-top-color:#c9a96e;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* Path buttons */
-.path-buttons{display:none;flex-direction:column;gap:10px;padding:0 20px 20px;max-width:520px;margin:0 auto;animation:fadeUp 0.4s ease forwards;}
-.path-buttons.show{display:flex;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.path-btn{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:12px;cursor:pointer;border:1.5px solid #e8e8e4;background:#fff;transition:all 0.18s;text-align:left;width:100%;font-family:'DM Sans',sans-serif;}
-.path-btn:hover{border-color:#c9a96e;background:#fdf8f0;transform:translateY(-1px);}
-.path-btn.active{border-color:#c9a96e;background:#fdf8f0;}
-.path-btn-icon{font-size:22px;flex-shrink:0;}
-.path-btn-body{flex:1;}
-.path-btn-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}
-.path-btn-desc{font-size:12px;color:#888;line-height:1.4;}
-.path-btn-arrow{font-size:18px;color:#c9a96e;flex-shrink:0;transition:transform 0.18s;}
-.path-btn.active .path-btn-arrow{transform:rotate(90deg);}
-
-/* Chat path */
-.chat-path{display:none;padding:0 20px 20px;max-width:520px;margin:0 auto;}
-.chat-path.open{display:block;}
-.q-section-label{font-size:10px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;padding-top:4px;}
-.q-chips{display:flex;flex-direction:column;gap:7px;margin-bottom:12px;}
-.q-chip{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #e8e8e4;background:#fff;border-radius:8px;font-size:13px;color:#1a1a1a;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-align:left;}
-.q-chip:hover{border-color:#c9a96e;background:#fdf8f0;}
-.q-chip-icon{font-size:15px;flex-shrink:0;}
-.q-or{text-align:center;font-size:11px;color:#aaa;margin:10px 0;position:relative;}
-.q-or::before,.q-or::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:#eee;}
-.q-or::before{left:0;}.q-or::after{right:0;}
-
-/* Report path */
-.report-path{display:none;padding:0 20px 20px;max-width:520px;margin:0 auto;}
-.report-path.open{display:block;}
-.report-email-card{background:#f8f8f5;border:1px solid #e8e8e4;border-radius:10px;padding:16px;margin-bottom:14px;}
-.report-email-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
-.report-email-sub{font-size:12px;color:#888;margin-bottom:12px;line-height:1.5;}
-.report-email-row{display:flex;gap:8px;}
-.report-email-inp{flex:1;padding:10px 12px;border:1.5px solid #e8e8e4;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;}
-.report-email-inp:focus{border-color:#c9a96e;}
-.report-send-btn{padding:10px 16px;background:#534AB7;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity 0.15s;}
-.report-send-btn:hover{opacity:0.9;}
-.report-send-btn:disabled{opacity:0.6;cursor:not-allowed;}
-.report-preview-label{font-size:10px;color:#888;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
-.report-preview-cards{display:flex;flex-direction:column;gap:8px;}
-.rpt-card{border:1px solid #e8e8e4;border-radius:8px;padding:12px 14px;background:#fff;}
-.rpt-card-num{font-size:10px;color:#c9a96e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;}
-.rpt-card-title{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:5px;}
-.rpt-card-content{font-size:11px;color:#666;line-height:1.6;}
-/* ──────────────────────────────────────────────────────────────────── */
-
 /* ── Screen Navigation UX ────────────────────────────────────────── */
 
 /* Fixed result layout */
@@ -499,85 +425,12 @@ input:focus,select:focus{border-color:var(--gold);}
       <span class="name" id="result-name"></span>
       <button class="reset-btn" onclick="reset()">← Analyze another</button>
     </div>
-
-    <!-- Hook Screen — shown while CALL1 runs -->
-    <div class="hook-screen" id="hook-screen" style="display:none">
-      <div class="hook-greeting" id="hook-greeting"></div>
-      <div class="hook-verdict-badge" id="hook-verdict-badge">
-        <div>
-          <div class="hook-verdict-label">Career Destiny</div>
-          <div class="hook-verdict-value" id="hook-verdict-value">—</div>
-        </div>
-        <div class="hook-ratio">
-          <div class="hook-ratio-value" id="hook-ratio-value">—</div>
-          <div class="hook-ratio-label">Business : Job</div>
-        </div>
-      </div>
-      <div class="hook-saturn" id="hook-saturn">
-        <div class="hook-saturn-label" id="hook-saturn-label">Key factor</div>
-        <div class="hook-saturn-text" id="hook-saturn-text"></div>
-      </div>
-      <div class="hook-facts" id="hook-facts"></div>
-      <div class="hook-building" id="hook-building">
-        <div class="hook-spinner"></div>
-        <span id="hook-building-text">Building your full analysis...</span>
-      </div>
-    </div>
-
-    <!-- Path buttons — shown after CALL1 completes -->
-    <div class="path-buttons" id="path-buttons">
-      <button class="path-btn" id="chat-path-btn" onclick="openPath('chat')">
-        <span class="path-btn-icon">💬</span>
-        <div class="path-btn-body">
-          <div class="path-btn-title">Chat with your chart</div>
-          <div class="path-btn-desc">Ask questions about your career, timing, and destiny</div>
-        </div>
-        <span class="path-btn-arrow">›</span>
-      </button>
-      <button class="path-btn" id="report-path-btn" onclick="openPath('report')">
-        <span class="path-btn-icon">📄</span>
-        <div class="path-btn-body">
-          <div class="path-btn-title">Get your full report</div>
-          <div class="path-btn-desc">Complete 12-section PDF delivered to your email in 1 min</div>
-        </div>
-        <span class="path-btn-arrow">›</span>
-      </button>
-    </div>
-
-    <!-- Chat path -->
-    <div class="chat-path" id="chat-path">
-      <div class="q-section-label">Quick questions</div>
-      <div class="q-chips">
-        <button class="q-chip" onclick="askQuestion('When will I get my career breakthrough?')"><span class="q-chip-icon">⏰</span>When will it happen?</button>
-        <button class="q-chip" onclick="askQuestion('What career or business suits me best based on my chart?')"><span class="q-chip-icon">🎯</span>What career suits me?</button>
-        <button class="q-chip" onclick="askQuestion('What are my core strengths and hidden talents?')"><span class="q-chip-icon">⚡</span>What are my strengths?</button>
-        <button class="q-chip" onclick="askQuestion('What does my Saturn placement mean for my career?')"><span class="q-chip-icon">🪐</span>Explain my Saturn</button>
-        <button class="q-chip" onclick="askQuestion('What is the single most important thing I should do right now?')"><span class="q-chip-icon">🚀</span>What should I do right now?</button>
-      </div>
-      <div class="q-or">or</div>
+    <div class="msgs" id="msgs"></div>
+    <div class="bottom-bar" id="bottom-bar" style="display:none">
+      <button class="dl-btn" id="dl-report-btn" onclick="triggerDownload()">📧 Email My Report</button>
       <div class="chat-inp" id="chat-inp">
-        <input type="text" id="chat-ui" placeholder="Ask anything about your chart..."/>
+        <input type="text" id="chat-ui" placeholder="Ask a follow-up question..."/>
         <button class="chat-btn" id="chat-btn" onclick="sendChat()">Send</button>
-      </div>
-      <div class="msgs" id="msgs" style="margin-top:12px;"></div>
-    </div>
-
-    <!-- Report path -->
-    <div class="report-path" id="report-path">
-      <div class="report-email-card">
-        <div class="report-email-title">📧 Get your full report by email</div>
-        <div class="report-email-sub">Complete 12-section Career Destiny Report as a PDF — in your inbox within 1 minute.</div>
-        <div class="report-email-row">
-          <input type="email" class="report-email-inp" id="report-email-inp" placeholder="your@email.com"/>
-          <button class="report-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send Report</button>
-        </div>
-      </div>
-      <div class="report-preview-label">What's inside</div>
-      <div class="report-preview-cards">
-        <div class="rpt-card"><div class="rpt-card-num">01 — Verdict</div><div class="rpt-card-title">Job vs Business with 7-factor scorecard</div><div class="rpt-card-content" id="rpt-c1">Your Sapta Sutri analysis with score and Saturn override flag.</div></div>
-        <div class="rpt-card"><div class="rpt-card-num">06 — Career Direction</div><div class="rpt-card-title">Specific roles and business types for your chart</div><div class="rpt-card-content" id="rpt-c2">Backed by minimum 5 of 14 rules — never generic.</div></div>
-        <div class="rpt-card"><div class="rpt-card-num">09 — Timing Windows</div><div class="rpt-card-title">Your next 2 positive windows + caution period</div><div class="rpt-card-content" id="rpt-c3">Exact dates from your Vimshottari Dasha timeline.</div></div>
-        <div class="rpt-card"><div class="rpt-card-num">12 — Next Step</div><div class="rpt-card-title">Single most important action right now</div><div class="rpt-card-content" id="rpt-c4">Based on current dasha, chart signal, and transit window.</div></div>
       </div>
     </div>
   </div>
@@ -2906,8 +2759,16 @@ var SITUATION_QUESTIONS = {
 };
 
 function showSituationSelector(){
-  // Replaced by showPathButtons() in new UX
-  showPathButtons(window._reply1||'');
+  showPathButtons(window._reply1||''); return;
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'max-width:480px;';
+  var situations = ['Still Studying','Working a Job','Running Business','Between Jobs','Just Exploring'];
+  var btnsHtml = situations.map(function(s){
+    return '<button onclick="selectSituation(this.textContent.trim())" style="padding:10px 14px;border:1px solid #c9a96e;background:#fff;color:#1a1a1a;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;text-align:left;display:block;width:100%;margin-bottom:2px;">'+s+'</button>';
+  }).join('');
+  wrap.innerHTML = '<div style="font-size:13px;font-weight:500;color:#1a1a1a;margin-bottom:12px;">Analysis ready. What is your current situation? Your full report is generating in the background:</div>'
+    + '<div id="situation-btns">' + btnsHtml + '</div>';
+  addRow('agent', wrap);
 }
 
 function selectSituation(situation){
@@ -3384,31 +3245,30 @@ async function analyze(){
   var btn=document.getElementById('analyze-btn');
   btn.disabled=true;
 
-  // PHASE 1 — Instant screen transition
   document.getElementById('form-section').style.display='none';
   document.getElementById('result-section').style.display='block';
-  document.getElementById('result-name').textContent=name+' · '+dob+' · '+place;
-  document.getElementById('hook-screen').style.display='block';
-  document.getElementById('hook-greeting').textContent='Hi '+name.split(' ')[0]+'!';
-
-  // Scroll depth tracking
-  (function(){
-    var depths={25:false,50:false,75:false,100:false};
-    window.addEventListener('scroll',function(){
-      var el=document.getElementById('result-section');
-      if(!el)return;
-      var rect=el.getBoundingClientRect();
-      var total=el.offsetHeight;
-      var scrolled=Math.max(0,-rect.top);
-      var pct=Math.min(100,Math.round((scrolled/total)*100));
-      [25,50,75,100].forEach(function(d){
-        if(pct>=d&&!depths[d]){depths[d]=true;cdTrack('report_scroll_depth',{depth:d+'%'});}
-      });
+    // Report scroll depth tracking
+(function(){
+  var depths = {25:false, 50:false, 75:false, 100:false};
+  window.addEventListener('scroll', function(){
+    var el = document.getElementById('result-section');
+    if(!el) return;
+    var rect = el.getBoundingClientRect();
+    var total = el.offsetHeight;
+    var scrolled = Math.max(0, -rect.top);
+    var pct = Math.min(100, Math.round((scrolled / total) * 100));
+    [25,50,75,100].forEach(function(d){
+      if(pct >= d && !depths[d]){
+        depths[d] = true;
+        cdTrack('report_scroll_depth', {depth: d+'%'});
+      }
     });
-  })();
+  });
+})();
+  document.getElementById('result-name').textContent=name+' · '+dob+' · '+place;
 
   setStat('ld','Fetching chart...');
-  document.getElementById('hook-building-text').textContent='Fetching your birth chart...';
+  addProg([['Locating '+place,'act'],['Fetching D1, D9, D10 charts','wait'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
 
   try{
     var coords=await geocode(place);
@@ -3418,7 +3278,6 @@ async function analyze(){
     addProg([['Location found: '+coords.name.split(',')[0],'done'],['Fetching D1, D9, D10 charts','act'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
 
     var chart=await fetchChart(dt,coords);
-    console.log("CHART RESULT:", chart ? Object.keys(chart).join(",") : "NULL");
     chartData=chart;
     window._meta={name:name,dob:dob,time:time,place:place,email:email,coords:coords};
     var summary=buildSummary(chart,{name:name,dob:dob,time:time,place:place,email:email,coords:coords});
@@ -3426,6 +3285,8 @@ async function analyze(){
     removeProg();
     addProg([['Location found','done'],['Charts ready','done'],['Dasha ready','done'],['Analyzing','act']]);
     setStat('ld','Analyzing...');
+    cdTrack('analysis_start', {place: place});
+    var _analysisStartTime = Date.now();
     // Append all pre-computed scores to summary so Claude receives facts not raw data
     var pre = preCompute(chart);
     var scoresBlock = '\n\nPRE-COMPUTED SAPTA SUTRI SCORES (calculated in JS — do not recalculate):\n';
@@ -3517,14 +3378,6 @@ async function analyze(){
     if(pre.rule8 && !pre.rule8.error) scoresBlock += 'RULE 8 (Kaarkamsh Lagna): '+pre.rule8.detail+'\n';
 
     var summaryWithScores = summary + scoresBlock; window._chartSummary = summaryWithScores;
-
-    // PHASE 2 — Show hook screen from pre-computed JS data (no Claude needed)
-    showHookScreen(pre, name);
-
-    // Fire CALL1 in background while user reads hook screen
-    cdTrack('analysis_start', {place: place});
-    var _analysisStartTime = Date.now();
-    document.getElementById('hook-building-text').textContent = 'Building your full analysis...';
     // Store lagna info for report
     var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
     window._d1Lagna = d1LagnaSign ? (d1LagnaSign.rasi&&d1LagnaSign.rasi.name||'?') : '?';
@@ -3546,7 +3399,7 @@ async function analyze(){
 
     // Unlock chat immediately after CALL1
     window._call1Ready = true;
-    // bottom-bar removed in new UX — path buttons shown via showPathButtons()
+    document.getElementById('bottom-bar').style.display='block';
     showSituationSelector();
 
     // Run CALL2 and CALL3 silently in background — no UI updates
@@ -3610,7 +3463,7 @@ async function analyze(){
     var verdictVal = verdictMatch ? verdictMatch[1] : 'MIXED';
     collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictVal, window._analysis);
     window._meta = {name:name,dob:dob,time:time,place:place};
-    // path buttons shown via showPathButtons()
+    // bottom-bar already shown after CALL1
     
     window._reply3=reply3;
     var _verdictM = ((window._reply1||'')+(reply3||'')).match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
@@ -3643,10 +3496,10 @@ async function analyze(){
     removeLoader();
   }catch(e){
     removeProg();removeLoader();
-    console.error('ANALYZE ERROR:', e.message, e.stack); addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
+    addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
     document.getElementById('form-section').style.display='block';
     document.getElementById('result-section').style.display='none';
-  var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
+  document.getElementById('bottom-bar').style.display='none';
     setStat('er','Error');
   }
   document.getElementById('analyze-btn').disabled=false;
@@ -3836,208 +3689,14 @@ async function sendChat(){
   ui.focus();
 }
 
-// ── New UX Functions ─────────────────────────────────────────────────
-
-function showHookScreen(pre, name){
-  var verdictColors = {BUSINESS:'#1D9E75', JOB:'#534AB7', MIXED:'#c9a96e'};
-  var verdict = pre.sutra3 ? (function(){
-    var biz=0,job=0;
-    ['sutra1','sutra2','sutra3','sutra4','sutra5','sutra6','sutra7'].forEach(function(k){
-      if(pre[k]) pre[k].indicates==='Business'?biz++:pre[k].indicates==='Job'?job++:null;
-    });
-    return biz>=6?'BUSINESS':job>=6?'JOB':biz>job?'MIXED':'MIXED';
-  })() : 'MIXED';
-
-  var biz=0,job=0;
-  ['sutra1','sutra2','sutra3','sutra4','sutra5','sutra6','sutra7'].forEach(function(k){
-    if(pre[k]) pre[k].indicates==='Business'?biz++:pre[k].indicates==='Job'?job++:null;
-  });
-
-  var color = verdictColors[verdict] || '#c9a96e';
-
-  // Set verdict badge
-  var vEl = document.getElementById('hook-verdict-value');
-  if(vEl){ vEl.textContent = verdict; vEl.style.color = color; }
-  var rEl = document.getElementById('hook-ratio-value');
-  if(rEl) rEl.textContent = biz + ' : ' + job;
-
-  // Set Saturn hook
-  if(pre.sutra3){
-    var satEl = document.getElementById('hook-saturn-text');
-    var satLabel = document.getElementById('hook-saturn-label');
-    if(pre.sutra3.indicates === 'Job'){
-      if(satLabel) satLabel.textContent = 'Saturn — the decisive factor';
-      if(satEl) satEl.textContent = 'Saturn in ' + pre.sutra3.sign + ' (House ' + pre.sutra3.house + ') is the single factor holding back a full Business verdict. If Saturn were in own sign or exalted, this would be confirmed Business.';
-    } else {
-      if(satLabel) satLabel.textContent = 'Saturn — supporting factor';
-      if(satEl) satEl.textContent = 'Saturn is well-placed, adding structural support to your Business tendency.';
-    }
-  }
-
-  // Build key facts
-  var facts = [];
-  if(pre.amatyakaraka) facts.push('Amatyakaraka: ' + pre.amatyakaraka + ' — primary career significator');
-  if(pre.rule3 && pre.rule3.dignity) facts.push('Dashmesha ' + pre.rule3.dashmesha + ': ' + pre.rule3.dignity);
-  if(pre.yogas && pre.yogas.length > 0) facts.push(pre.yogas.length + ' classical yoga' + (pre.yogas.length > 1 ? 's' : '') + ' detected: ' + pre.yogas.map(function(y){return y.name.replace(' Yoga','');}).slice(0,2).join(', '));
-  if(pre.rule13 && pre.rule13.classification === 'Career-Active') facts.push('Current Mahadasha (' + pre.rule13.mahadasha + '): Career-Active period');
-
-  var factsEl = document.getElementById('hook-facts');
-  if(factsEl){
-    factsEl.innerHTML = facts.map(function(f){
-      return '<div class="hook-fact"><div class="hook-fact-dot"></div>' + f + '</div>';
-    }).join('');
-  }
-
-  // Animate elements in sequence
-  setTimeout(function(){ var el=document.getElementById('hook-verdict-badge'); if(el)el.classList.add('show'); }, 100);
-  setTimeout(function(){ var el=document.getElementById('hook-saturn'); if(el)el.classList.add('show'); }, 400);
-  setTimeout(function(){
-    document.querySelectorAll('.hook-fact').forEach(function(el,i){
-      setTimeout(function(){ el.classList.add('show'); }, i*150);
-    });
-  }, 700);
-  setTimeout(function(){ var el=document.getElementById('hook-building'); if(el)el.classList.add('show'); }, 1100);
-}
-
-function hideHookScreen(){
-  var hook = document.getElementById('hook-screen');
-  if(hook){ hook.style.opacity='0'; hook.style.transition='opacity 0.3s'; setTimeout(function(){ hook.style.display='none'; }, 300); }
-}
-
-function showPathButtons(reply1){
-  // Show path buttons
-  var pb = document.getElementById('path-buttons');
-  if(pb) pb.classList.add('show');
-
-  // Store reply1 teaser for display when chat opens
-  window._reply1Teaser = reply1;
-
-  // Start CALL2 + CALL3 in PARALLEL
-  window._reply2 = ''; window._reply3 = '';
-  window._call2Ready = false; window._call3Ready = false;
-
-  Promise.all([
-    fetch(API+'/api/analyze',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:[{role:'user',content:'[CHART DATA]\n'+window._chartSummary+'\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.'}],lang:window._lang||'en',call:2})
-    }).then(function(r){return r.json();}).then(function(d){
-      window._reply2=d.content&&d.content[0]&&d.content[0].text||'';
-      window._call2Ready=true;
-      cdTrack('analysis_call2_complete');
-      updateReportPreview();
-    }).catch(function(e){console.warn('CALL2 error:',e.message);}),
-
-    fetch(API+'/api/analyze',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({messages:[{role:'user',content:'[CHART DATA]\n'+window._chartSummary+'\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11. Read CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS [CURRENT] markers for Section 8 dates.'}],lang:window._lang||'en',call:3})
-    }).then(function(r){return r.json();}).then(function(d){
-      window._reply3=d.content&&d.content[0]&&d.content[0].text||'';
-      window._call3Ready=true;
-      cdTrack('analysis_call3_complete');
-      window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
-      updateReportPreview();
-    }).catch(function(e){console.warn('CALL3 error:',e.message);})
-  ]);
-}
-
-// Path management
-var _currentPath = null;
-
-function openPath(path){
-  cdTrack('path_selected', {path:path});
-  var chatBtn=document.getElementById('chat-path-btn');
-  var reportBtn=document.getElementById('report-path-btn');
-  var chatPath=document.getElementById('chat-path');
-  var reportPath=document.getElementById('report-path');
-
-  if(_currentPath===path){
-    chatBtn.classList.remove('active'); reportBtn.classList.remove('active');
-    chatPath.classList.remove('open'); reportPath.classList.remove('open');
-    _currentPath=null; return;
-  }
-  _currentPath=path;
-
-  if(path==='chat'){
-    chatBtn.classList.add('active'); reportBtn.classList.remove('active');
-    chatPath.classList.add('open'); reportPath.classList.remove('open');
-    // Show reply1 teaser in chat
-    if(window._reply1Teaser && document.getElementById('msgs').children.length===0){
-      addRow('agent', renderTeaser(window._reply1Teaser));
-    }
-    setTimeout(function(){ var el=document.getElementById('chat-ui'); if(el)el.focus(); }, 200);
-  } else {
-    reportBtn.classList.add('active'); chatBtn.classList.remove('active');
-    reportPath.classList.add('open'); chatPath.classList.remove('open');
-    var emailMeta=window._meta&&window._meta.email;
-    if(emailMeta){ var inp=document.getElementById('report-email-inp'); if(inp)inp.value=emailMeta; }
-    updateReportPreview();
-  }
-}
-
-function askQuestion(question){
-  cdTrack('quick_question_clicked', {question:question});
-  if(_currentPath !== 'chat') openPath('chat');
-  document.getElementById('chat-ui').value = question;
-  sendChat();
-}
-
-function updateReportPreview(){
-  if(window._reply1){
-    var vm=window._reply1.match(/VERDICT:\s*(BUSINESS|JOB|MIXED[^—\n]*)/i);
-    if(vm){ var el=document.getElementById('rpt-c1'); if(el) el.textContent=vm[1].trim()+' — based on 7-factor Sapta Sutri analysis'; }
-  }
-  if(window._reply2){
-    var careers=[];
-    window._reply2.split('\n').forEach(function(l){
-      var m=l.match(/^\d+\.\s+\*\*([^*]+)\*\*/);
-      if(m&&careers.length<3) careers.push(m[1].trim());
-    });
-    if(careers.length>0){ var el=document.getElementById('rpt-c2'); if(el) el.textContent=careers.join(' · '); }
-  }
-  if(window._reply3){
-    var w1=window._reply3.match(/Window 1[^:]*:[\s\S]*?([A-Z][a-z]+ \d{4})/i);
-    if(w1){ var el=document.getElementById('rpt-c3'); if(el) el.textContent='Starting '+w1[1]+' — see full dates and description in report'; }
-    var ns=window._reply3.match(/SECTION 11[\s\S]*?\n([^\n]{20,})/i);
-    if(ns){ var el=document.getElementById('rpt-c4'); if(el) el.textContent=ns[1].trim().slice(0,100)+'...'; }
-  }
-}
-
-function sendReportFromPath(){
-  var inp=document.getElementById('report-email-inp');
-  var email=inp?inp.value.trim():'';
-  var btn=document.getElementById('report-send-btn');
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    if(inp){inp.style.borderColor='#e05050'; setTimeout(function(){inp.style.borderColor='';},2000);}
-    return;
-  }
-  if(window._meta) window._meta.email=email;
-  btn.textContent='⏳ Sending...'; btn.disabled=true;
-  if(!window._analysis) window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
-  var reportHtml=buildReportHtml(window._meta,window._analysis,window._svgs);
-  if(!reportHtml){ btn.textContent='Try Again'; btn.disabled=false; return; }
-  var verdictM=(window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
-  fetch('/api/email',{
-    method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({html:reportHtml,email:email,name:window._meta&&window._meta.name||'',verdict:verdictM?verdictM[1]:'MIXED'})
-  }).then(function(r){return r.json();}).then(function(d){
-    if(d.error) throw new Error(d.error);
-    btn.textContent='✓ Sent!'; btn.style.background='#1D9E75';
-    cdTrack('email_sent_success');
-    setTimeout(function(){ btn.textContent='Send Report'; btn.style.background=''; btn.disabled=false; },4000);
-  }).catch(function(e){
-    btn.textContent='Try Again'; btn.disabled=false;
-    cdTrack('email_sent_error',{error:e.message});
-  });
-}
-
 
 // ── Personality trait mappings for hook screen ───────────────────
 var LAGNA_TRAITS = {
   'Mesha':    {icon:'🔥', headline:'You act first, think later — and it works', detail:'Aries rising gives you raw initiative. You don't wait for permission.'},
   'Vrishabha':{icon:'🌿', headline:'You build slow, but you build to last', detail:'Taurus rising means your career is built on patience and quality.'},
-  'Mithuna':  {icon:'⚡', headline:'Your mind is your most valuable asset', detail:'Gemini rising means you communicate, connect and adapt faster than most.'},
-  'Karka':    {icon:'🌊', headline:'You sense things others miss', detail:'Cancer rising gives you deep intuition — your gut is almost always right.'},
-  'Simha':    {icon:'🦁', headline:'You lead, not follow — you need a stage', detail:'Leo rising means you are built for visibility, authority, and recognition.'},
+  'Mithuna':  {icon:'⚡', headline:'Your mind is your most valuable asset', detail:'Gemini rising means you communicate, connect, and adapt faster than most.'},
+  'Karka':    {icon:'🌊', headline:'You sense things others miss', detail:'Cancer rising gives you deep intuition — your gut is usually right.'},
+  'Simha':    {icon:'🦁', headline:'You lead, not follow — you need a stage', detail:'Leo rising means you're built for visibility, authority, and recognition.'},
   'Kanya':    {icon:'🔍', headline:'You see what others overlook', detail:'Virgo rising gives you precision and a standard for excellence others can't match.'},
   'Tula':     {icon:'⚖️', headline:'You build bridges between people', detail:'Libra rising means partnerships, diplomacy, and design come naturally.'},
   'Vrischika':{icon:'🦅', headline:'You transform everything you touch', detail:'Scorpio rising gives you intensity, research ability, and depth others fear.'},
@@ -4057,7 +3716,7 @@ var MOON_TRAITS = {
   'Vrischika':{icon:'🔮', headline:'You read people accurately — always', detail:'Scorpio Moon means you sense what's unsaid. That's a career superpower.'},
   'Dhanu':    {icon:'🌍', headline:'You need purpose, not just a paycheck', detail:'Sagittarius Moon means meaningful work drives you more than money.'},
   'Makar':    {icon:'🏆', headline:'Achieving goals is how you feel secure', detail:'Capricorn Moon means achievement and progress are your emotional fuel.'},
-  'Kumbha':   {icon:'🌐', headline:'You work best when you are changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
+  'Kumbha':   {icon:'🌐', headline:'You work best when you're changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
   'Meena':    {icon:'💫', headline:'Your intuition about people is almost always right', detail:'Pisces Moon means empathy and creativity flow naturally in your work.'}
 };
 var AK_TRAITS = {
@@ -4287,40 +3946,7 @@ function sendReportFromPath(){
 function reset(){
   cdTrack('analyze_another');
   _currentScreen='hook';
-function reset(){
-  cdTrack('analyze_another');
-  _currentPath=null;
-  // Clear all cached data
-  hist=[];
-  chartData=null;
-  window._chartSummary=null;
-  window._analysis=null;
-  window._svgs=null;
-  window._meta=null;
-  window._reply1=null;
-  window._reply2=null;
-  window._reply3=null;
-  window._d1LagnaSign=null;
-  window._d9LagnaSign=null;
-  window._moonRashi=null;
-  window._lang=window._lang||'en';
-  // Reset UI
-  M.innerHTML='';
-  document.getElementById('result-section').style.display='none';
-  var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
-  document.getElementById('form-section').style.display='block';
-  var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
-  
-  var dlBtn=document.getElementById('dl-report-btn');
-  if(dlBtn) dlBtn.style.display='none';
-  document.getElementById('analyze-btn').disabled=false;
-  // Clear form
-  document.getElementById('f-name').value='';
-  document.getElementById('f-dob').value='';
-  document.getElementById('f-time').value='';
-  document.getElementById('f-place').value='';
-  setStat('ok','');
-}
+
 
 document.getElementById('chat-ui').addEventListener('keydown',function(e){
   if(e.key==='Enter')sendChat();
