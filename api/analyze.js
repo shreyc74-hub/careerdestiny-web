@@ -83,7 +83,7 @@ If MIXED: what to do in employment now AND when the window for independence open
 If MIXED only: add "Your independence window:" paragraph — when the best period begins/ends (month/year only), what type of work this chart is built for in plain terms, what to do between now and that window, one specific caution. 4-5 sentences, no jargon.\`;
 
 
-const CALL2 = BASE + `
+const CALL2 = BASE + \`
 Generate ONLY Sections 4, 5, 6, and 7. No other sections. Under 900 words total.
 
 IMPORTANT: The chart data contains DETECTED YOGAS (pre-computed), CAREER FIELD MAP (pre-computed), and RULE 1-14 pre-computed values. Use these directly — do not detect yogas yourself, do not invent new ones. Only describe the yogas listed in DETECTED YOGAS section.
@@ -136,7 +136,7 @@ Active strengths: From PLANET DIGNITY section — own sign and exalted planets f
 Hidden talents: From retrograde planets and D9 NAVAMSHA confirmations (RULE 7 pre-computed) — what is latent and when it emerges.\`;
 
 
-const CALL3 = BASE + `
+const CALL3 = BASE + \`
 Generate ONLY Sections 8, 9, 10, and 11. No other sections. Under 900 words total. Verdict and earlier sections already given.
 
 IMPORTANT: Chart data has CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS with [CURRENT] markers. Use ONLY those marked entries. Also use RULE 13 (Dasha Timing) and RULE 14 (Gochar Transits) pre-computed values.
