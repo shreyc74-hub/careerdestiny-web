@@ -3879,7 +3879,19 @@ function sendReportFromPath(){
 function reset(){
   cdTrack('analyze_another');
   _currentScreen='hook';
-
+  var sw=document.getElementById('screen-switcher'); if(sw) sw.style.display='none';
+  var hs=document.getElementById('hook-screen'); if(hs){hs.style.display='block';hs.style.opacity='1';}
+  var cs=document.getElementById('chat-screen'); if(cs) cs.style.display='none';
+  var rs=document.getElementById('report-screen'); if(rs) rs.style.display='none';
+  var cib=document.getElementById('chat-input-bar'); if(cib) cib.style.display='none';
+  var vp=document.getElementById('result-verdict-pill'); if(vp) vp.style.display='none';
+  hist=[];
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('result-section').style.display='none';
+  document.getElementById('analyze-btn').disabled=false;
+  window._reply1=null; window._reply2=null; window._reply3=null;
+  window._analysis=null; window._chartData=null; chartData=null;
+}
 
 document.getElementById('chat-ui').addEventListener('keydown',function(e){
   if(e.key==='Enter')sendChat();
