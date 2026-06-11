@@ -368,73 +368,6 @@ input:focus,select:focus{border-color:var(--gold);}
 </script>
 </head>
 <body>
-<div class="app">
-  <div class="hdr">
-    <div class="dot" id="dot"></div>
-    <span class="htitle" id="app-title">Career Destiny</span>
-    <span class="hsub" id="hsub">Vedic Analysis · Sapta Sutri Siddhant</span>
-    <button id="lang-btn" onclick="toggleLang()" style="margin-left:auto;padding:5px 12px;border:1px solid #ddd;border-radius:20px;background:#f5f5f0;font-size:12px;font-weight:500;cursor:pointer;color:#555;flex-shrink:0;">हिंदी</button>
-  </div>
-
-  <!-- Birth Details Form -->
-  <div class="hero">
-    
-    <div class="hero-title" id="hero-title">Discover your career destiny<br><span id="hero-span">with Vedic Jyotish</span></div>
-    <div class="hero-sub" id="hero-sub-text">Your birth chart holds the answer — Job or Business, when to leap, what work fulfills you.</div>
-
-  </div>
-  
-  <div class="form-section" id="form-section">
-  <div class="form-card">
-  <div class="form-card">
-    <div class="form-title" onclick="cdTrack('form_start')">Enter Birth Details</div>
-    <div class="form-sub">All fields required for accurate analysis</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label for="f-name">Your Name (optional)</label>
-        <input type="text" id="f-name" placeholder="e.g. Rahul Sharma"/>
-      </div>
-      <div class="form-group">
-        <label for="f-dob">Date of Birth</label>
-        <input type="text" id="f-dob" placeholder="DD/MM/YYYY" onfocus="cdTrack('field_focus',{field:'dob'})" maxlength="10" required
-          oninput="formatDOB(this)"
-          onkeydown="handleDOBKey(event,this)"/>
-      </div>
-      <div class="form-group">
-        <label for="f-time">Time of Birth</label>
-        <input type="time" id="f-time" required onfocus="cdTrack('field_focus',{field:'time'})"/>
-      </div>
-      <div class="form-group">
-        <label for="f-place">Place of Birth</label>
-        <input type="text" id="f-place" onfocus="cdTrack('field_focus',{field:'place'})" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
-      </div>
-      <div class="form-group full">
-        <label for="f-email">Email Address <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
-        <input type="email" id="f-email" placeholder="your@email.com" onfocus="cdTrack('field_focus',{field:'email'})"/>
-        <div style="font-size:11px;color:#aaa;margin-top:4px;">📧 Email required to receive your report as PDF</div>
-      </div>
-    </div>
-    <button class="analyze-btn" id="analyze-btn" onclick="analyze()">Analyze My Career Destiny</button>
-  </div></div></div>
-
-  <div class="divider"></div>
-
-  <!-- Results Section -->
-  <div id="result-section" style="display:none">
-    <div class="result-header">
-      <span class="name" id="result-name"></span>
-      <button class="reset-btn" onclick="reset()">← Analyze another</button>
-    </div>
-    <div class="msgs" id="msgs"></div>
-    <div class="bottom-bar" id="bottom-bar" style="display:none">
-      <button class="dl-btn" id="dl-report-btn" onclick="triggerDownload()">📧 Email My Report</button>
-      <div class="chat-inp" id="chat-inp">
-        <input type="text" id="chat-ui" placeholder="Ask a follow-up question..."/>
-        <button class="chat-btn" id="chat-btn" onclick="sendChat()">Send</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script>
 
@@ -456,7 +389,7 @@ const API='';
 let hist=[];
 let chartData=null;
 
-const M=document.getElementById('msgs');
+var M=null; function getM(){ if(!M) M=document.getElementById('msgs'); return M; }
 
 function setStat(s,t){
   document.getElementById('dot').className='dot'+(s==='er'?' er':s==='ld'?' ld':'');
@@ -472,7 +405,7 @@ function addRow(role,content,type){
   if(typeof content==='string')b.innerHTML=content.replace(/\n/g,'<br>');
   else b.appendChild(content);
   w.appendChild(av);w.appendChild(b);
-  M.appendChild(w);M.scrollTop=M.scrollHeight;
+  getM().appendChild(w);getM().scrollTop=getM().scrollHeight;
   return w;
 }
 
@@ -482,7 +415,7 @@ function addLoader(txt){
   const av=document.createElement('div');av.className='av a';av.textContent='ज';
   const b=document.createElement('div');b.className='bub a';
   b.innerHTML='<div class="ldot"><span></span><span></span><span></span></div>'+(txt?'<div style="font-size:12px;color:#888;margin-top:4px">'+txt+'</div>':'');
-  w.appendChild(av);w.appendChild(b);M.appendChild(w);M.scrollTop=M.scrollHeight;
+  w.appendChild(av);w.appendChild(b);getM().appendChild(w);getM().scrollTop=getM().scrollHeight;
 }
 function removeLoader(){const l=document.getElementById('lrow');if(l)l.remove();}
 
@@ -500,7 +433,7 @@ function addProg(steps){
     const t=document.createElement('span');t.textContent=s[0];
     r.appendChild(t);p.appendChild(r);
   });
-  b.appendChild(p);w.appendChild(av);w.appendChild(b);M.appendChild(w);M.scrollTop=M.scrollHeight;
+  b.appendChild(p);w.appendChild(av);w.appendChild(b);getM().appendChild(w);getM().scrollTop=getM().scrollHeight;
 }
 function removeProg(){const p=document.getElementById('prow');if(p)p.remove();}
 
@@ -518,7 +451,7 @@ function addQuick(opts){
     };
     q.appendChild(btn);
   });
-  b.appendChild(q);w.appendChild(av);w.appendChild(b);M.appendChild(w);M.scrollTop=M.scrollHeight;
+  b.appendChild(q);w.appendChild(av);w.appendChild(b);getM().appendChild(w);getM().scrollTop=getM().scrollHeight;
 }
 
 async function geocode(place){
@@ -2929,7 +2862,7 @@ function makeStreamHandler(callNum){
       b.style.cssText='font-size:12px;color:#666;line-height:1.7;min-height:20px;max-height:300px;overflow:hidden;position:relative;';
       b.innerHTML='<div style="font-size:10px;color:#c9a96e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Analysing'+(callNum===1?' your chart...':(callNum===2?' career direction...':(callNum===3?' timing & next steps...':'')))+'</div><span class="stream-cursor" style="color:#c9a96e;">▋</span>';
       w.appendChild(av);w.appendChild(b);
-      M.appendChild(w);M.scrollTop=M.scrollHeight;
+      getM().appendChild(w);getM().scrollTop=getM().scrollHeight;
       _streamRows[callNum] = w;
       return b;
     }
@@ -2952,7 +2885,7 @@ function makeStreamHandler(callNum){
       }
       el.appendChild(document.createTextNode(''));
       el.innerHTML = el.innerHTML + cursor;
-      M.scrollTop=M.scrollHeight;
+      getM().scrollTop=getM().scrollHeight;
       return el;
     }
   };
@@ -2976,9 +2909,9 @@ function replaceStreamWithTeaser(callNum, teaserEl){
     var b=document.createElement('div');b.className='bub a';
     b.appendChild(teaserEl);
     w.appendChild(av);w.appendChild(b);
-    M.appendChild(w);
+    getM().appendChild(w);
   }
-  M.scrollTop=M.scrollHeight;
+  getM().scrollTop=getM().scrollHeight;
 }
 
 
@@ -4095,5 +4028,73 @@ function applyLang(){
   window._lang=_lang;
 }
 </script>
+<div class="app">
+  <div class="hdr">
+    <div class="dot" id="dot"></div>
+    <span class="htitle" id="app-title">Career Destiny</span>
+    <span class="hsub" id="hsub">Vedic Analysis · Sapta Sutri Siddhant</span>
+    <button id="lang-btn" onclick="toggleLang()" style="margin-left:auto;padding:5px 12px;border:1px solid #ddd;border-radius:20px;background:#f5f5f0;font-size:12px;font-weight:500;cursor:pointer;color:#555;flex-shrink:0;">हिंदी</button>
+  </div>
+
+  <!-- Birth Details Form -->
+  <div class="hero">
+    
+    <div class="hero-title" id="hero-title">Discover your career destiny<br><span id="hero-span">with Vedic Jyotish</span></div>
+    <div class="hero-sub" id="hero-sub-text">Your birth chart holds the answer — Job or Business, when to leap, what work fulfills you.</div>
+
+  </div>
+  
+  <div class="form-section" id="form-section">
+  <div class="form-card">
+  <div class="form-card">
+    <div class="form-title" onclick="cdTrack('form_start')">Enter Birth Details</div>
+    <div class="form-sub">All fields required for accurate analysis</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="f-name">Your Name (optional)</label>
+        <input type="text" id="f-name" placeholder="e.g. Rahul Sharma"/>
+      </div>
+      <div class="form-group">
+        <label for="f-dob">Date of Birth</label>
+        <input type="text" id="f-dob" placeholder="DD/MM/YYYY" onfocus="cdTrack('field_focus',{field:'dob'})" maxlength="10" required
+          oninput="formatDOB(this)"
+          onkeydown="handleDOBKey(event,this)"/>
+      </div>
+      <div class="form-group">
+        <label for="f-time">Time of Birth</label>
+        <input type="time" id="f-time" required onfocus="cdTrack('field_focus',{field:'time'})"/>
+      </div>
+      <div class="form-group">
+        <label for="f-place">Place of Birth</label>
+        <input type="text" id="f-place" onfocus="cdTrack('field_focus',{field:'place'})" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+      </div>
+      <div class="form-group full">
+        <label for="f-email">Email Address <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
+        <input type="email" id="f-email" placeholder="your@email.com" onfocus="cdTrack('field_focus',{field:'email'})"/>
+        <div style="font-size:11px;color:#aaa;margin-top:4px;">📧 Email required to receive your report as PDF</div>
+      </div>
+    </div>
+    <button class="analyze-btn" id="analyze-btn" onclick="analyze()">Analyze My Career Destiny</button>
+  </div></div></div>
+
+  <div class="divider"></div>
+
+  <!-- Results Section -->
+  <div id="result-section" style="display:none">
+    <div class="result-header">
+      <span class="name" id="result-name"></span>
+      <button class="reset-btn" onclick="reset()">← Analyze another</button>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="bottom-bar" id="bottom-bar" style="display:none">
+      <button class="dl-btn" id="dl-report-btn" onclick="triggerDownload()">📧 Email My Report</button>
+      <div class="chat-inp" id="chat-inp">
+        <input type="text" id="chat-ui" placeholder="Ask a follow-up question..."/>
+        <button class="chat-btn" id="chat-btn" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
