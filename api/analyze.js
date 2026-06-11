@@ -243,7 +243,7 @@ module.exports = async (req, res) => {
     // Use Haiku for CALL2+CALL3 (faster), Sonnet for CALL1 (accuracy)
     const model = (callNum === 1 || callNum === 4) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
     // Reduce max_tokens per call type
-    const maxTokens = callNum === 1 ? 1200 : callNum === 4 ? 800 : 1000;
+    const maxTokens = callNum === 1 ? 1500 : callNum === 4 ? 800 : 1200;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
