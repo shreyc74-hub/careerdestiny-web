@@ -3452,7 +3452,7 @@ async function analyze(){
       }catch(e){ console.log('BG CALL3 error:', e.message); }
     }
 
-    // Fire background calls — don't await, let them run while user chats
+    // Fire background calls — do not await, let them run while user chats
     runBackgroundCalls();
 
     var reply2 = '', reply3 = '';
@@ -3627,7 +3627,7 @@ async function sendChat(){
     // Basic email validation
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)){
       addRow('user', emailInput);
-      addRow('agent', renderChatReply("That doesn't look like a valid email address. Please try again — for example: yourname@gmail.com"));
+      addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"));
       btn.disabled=false;
       ui.placeholder='Enter your email address...';
       ui.focus();
@@ -3692,17 +3692,17 @@ async function sendChat(){
 
 // ── Personality trait mappings for hook screen ───────────────────
 var LAGNA_TRAITS = {
-  'Mesha':    {icon:'🔥', headline:'You act first, think later — and it works', detail:'Aries rising gives you raw initiative. You don't wait for permission.'},
+  'Mesha':    {icon:'🔥', headline:'You act first, think later — and it works', detail:'Aries rising gives you raw initiative. You act without waiting for permission.'},
   'Vrishabha':{icon:'🌿', headline:'You build slow, but you build to last', detail:'Taurus rising means your career is built on patience and quality.'},
   'Mithuna':  {icon:'⚡', headline:'Your mind is your most valuable asset', detail:'Gemini rising means you communicate, connect, and adapt faster than most.'},
-  'Karka':    {icon:'🌊', headline:'You sense things others miss', detail:'Cancer rising gives you deep intuition — your gut is usually right.'},
-  'Simha':    {icon:'🦁', headline:'You lead, not follow — you need a stage', detail:'Leo rising means you're built for visibility, authority, and recognition.'},
-  'Kanya':    {icon:'🔍', headline:'You see what others overlook', detail:'Virgo rising gives you precision and a standard for excellence others can't match.'},
+  'Karka':    {icon:'🌊', headline:'You sense things others miss', detail:'Cancer rising gives you deep intuition — your gut is almost always right.'},
+  'Simha':    {icon:'🦁', headline:'You lead, not follow — you need a stage', detail:'Leo rising means you are built for visibility, authority, and recognition.'},
+  'Kanya':    {icon:'🔍', headline:'You see what others overlook', detail:'Virgo rising gives you precision and a standard for excellence others cannot match.'},
   'Tula':     {icon:'⚖️', headline:'You build bridges between people', detail:'Libra rising means partnerships, diplomacy, and design come naturally.'},
   'Vrischika':{icon:'🦅', headline:'You transform everything you touch', detail:'Scorpio rising gives you intensity, research ability, and depth others fear.'},
   'Dhanu':    {icon:'🏹', headline:'You see the big picture', detail:'Sagittarius rising means philosophy, teaching, and expansion are your natural terrain.'},
   'Makar':    {icon:'🏔️', headline:'You climb steadily — and you always reach the top', detail:'Capricorn rising means discipline and long-term thinking are your superpowers.'},
-  'Kumbha':   {icon:'🌐', headline:'You think differently — and that's your edge', detail:'Aquarius rising means innovation, networks, and unconventional thinking define you.'},
+  'Kumbha':   {icon:'🌐', headline:'You think differently — and that is your edge', detail:'Aquarius rising means innovation, networks, and unconventional thinking define you.'},
   'Meena':    {icon:'🌙', headline:'You feel deeply and create beautifully', detail:'Pisces rising means intuition, creativity, and empathy are your career fuel.'}
 };
 var MOON_TRAITS = {
@@ -3716,7 +3716,7 @@ var MOON_TRAITS = {
   'Vrischika':{icon:'🔮', headline:'You read people accurately — always', detail:'Scorpio Moon means you sense what's unsaid. That's a career superpower.'},
   'Dhanu':    {icon:'🌍', headline:'You need purpose, not just a paycheck', detail:'Sagittarius Moon means meaningful work drives you more than money.'},
   'Makar':    {icon:'🏆', headline:'Achieving goals is how you feel secure', detail:'Capricorn Moon means achievement and progress are your emotional fuel.'},
-  'Kumbha':   {icon:'🌐', headline:'You work best when you're changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
+  'Kumbha':   {icon:'🌐', headline:'You work best when you are changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
   'Meena':    {icon:'💫', headline:'Your intuition about people is almost always right', detail:'Pisces Moon means empathy and creativity flow naturally in your work.'}
 };
 var AK_TRAITS = {
@@ -3730,7 +3730,7 @@ var AK_TRAITS = {
 };
 var YOGA_TRAIT = {icon:'🔮', headline:'You carry a rare planetary combination', detail:'Classical yogas in your chart indicate a capacity for authority and independent wealth.'};
 var DASHA_TRAIT = {icon:'⏰', headline:'You're in your primary earning decade right now', detail:'The planetary period currently running is career-active — this is your window.'};
-var SATURN_WARNING = {icon:'⚠️', headline:'One planet is creating friction — but it's temporary', detail:'Saturn's placement is the single factor adding challenge. It doesn't cancel the rest — it just asks for patience.'};
+var SATURN_WARNING = {icon:'⚠️', headline:'One planet is creating friction — but it is temporary', detail:'Saturn's placement is the single factor adding challenge. It does not cancel the rest — it just asks for patience.'};
 // Hindi trait translations
 var LAGNA_TRAITS_HI = {
   'Simha': {icon:'🦁', headline:'आप नेतृत्व करते हैं, अनुसरण नहीं — आपको मंच चाहिए', detail:'सिंह लग्न का अर्थ है आप दृश्यता, अधिकार और पहचान के लिए बने हैं।'}
