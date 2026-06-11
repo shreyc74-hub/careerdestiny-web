@@ -3570,7 +3570,7 @@ async function analyze(){
     addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
     document.getElementById('form-section').style.display='block';
     document.getElementById('result-section').style.display='none';
-  document.getElementById('bottom-bar').style.display='none';
+  var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
     setStat('er','Error');
   }
   document.getElementById('analyze-btn').disabled=false;
@@ -3974,9 +3974,9 @@ function reset(){
   // Reset UI
   M.innerHTML='';
   document.getElementById('result-section').style.display='none';
-  document.getElementById('bottom-bar').style.display='none';
+  var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
   document.getElementById('form-section').style.display='block';
-  document.getElementById('bottom-bar').style.display='none';
+  var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
   
   var dlBtn=document.getElementById('dl-report-btn');
   if(dlBtn) dlBtn.style.display='none';
