@@ -3568,7 +3568,7 @@ async function analyze(){
     removeLoader();
   }catch(e){
     removeProg();removeLoader();
-    addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
+    console.error('ANALYZE ERROR:', e.message, e.stack); addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
     document.getElementById('form-section').style.display='block';
     document.getElementById('result-section').style.display='none';
   var bb=document.getElementById('bottom-bar'); if(bb) bb.style.display='none';
