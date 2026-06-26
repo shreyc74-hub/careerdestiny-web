@@ -298,7 +298,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .screen-pill.active{background:#fff;color:#1a1a1a;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
 
 /* Scrollable content area */
-.screen-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.screen-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
 
 /* Hook screen */
 .hook-wrap{padding:20px;}
@@ -317,8 +317,8 @@ input:focus,select:focus{border-color:var(--gold);}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* Chat screen */
-.chat-screen{display:flex;flex-direction:column;height:100%;}
-.chat-messages{flex:1;overflow-y:auto;padding:16px 20px 8px;-webkit-overflow-scrolling:touch;}
+.chat-screen{display:flex;flex-direction:column;min-height:100%;}
+.chat-messages{padding:16px 20px 120px;-webkit-overflow-scrolling:touch;}
 .chat-quick{padding:0 20px 12px;}
 .chat-quick-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
 .chat-chips{display:flex;flex-direction:column;gap:6px;}
@@ -3179,44 +3179,28 @@ async function analyze(){
   btn.disabled=true;
 
   document.getElementById('form-section').style.display='none';
-  document.getElementById('result-section').style.display='block';
-    // Report scroll depth tracking
-(function(){
-  var depths = {25:false, 50:false, 75:false, 100:false};
-  window.addEventListener('scroll', function(){
-    var el = document.getElementById('result-section');
-    if(!el) return;
-    var rect = el.getBoundingClientRect();
-    var total = el.offsetHeight;
-    var scrolled = Math.max(0, -rect.top);
-    var pct = Math.min(100, Math.round((scrolled / total) * 100));
-    [25,50,75,100].forEach(function(d){
-      if(pct >= d && !depths[d]){
-        depths[d] = true;
-        cdTrack('report_scroll_depth', {depth: d+'%'});
-      }
-    });
-  });
-})();
+  document.getElementById('result-section').style.display='flex';
   document.getElementById('result-name').textContent=name+' · '+dob+' · '+place;
-
+  // Show hook screen immediately — traits will populate after preCompute
+  var hookHi = document.getElementById('hook-hi');
+  var hookSub = document.getElementById('hook-sub');
+  if(hookHi) hookHi.textContent = name.split(' ')[0] ? 'Hi '+name.split(' ')[0]+'!' : 'Reading your chart...';
+  if(hookSub) hookSub.textContent = 'Fetching your birth chart data...';
   setStat('ld','Fetching chart...');
-  addProg([['Locating '+place,'act'],['Fetching D1, D9, D10 charts','wait'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
 
   try{
     var coords=await geocode(place);
     var dt=parseDT(parseDOBToISO(dob),time);
-
-    removeProg();
-    addProg([['Location found: '+coords.name.split(',')[0],'done'],['Fetching D1, D9, D10 charts','act'],['Fetching dasha & transits','wait'],['Analyzing with Sapta Sutri','wait']]);
+    var hl=document.getElementById('hook-loading-text');
+    if(hl) hl.textContent='Locating '+place.split(',')[0]+'...';
 
     var chart=await fetchChart(dt,coords);
     chartData=chart;
     window._meta={name:name,dob:dob,time:time,place:place,email:email,coords:coords};
+    if(hl) hl.textContent='Charts ready. Running rule engine...';
     var summary=buildSummary(chart,{name:name,dob:dob,time:time,place:place,email:email,coords:coords});
     window._chartSummary=summary;
-    removeProg();
-    addProg([['Location found','done'],['Charts ready','done'],['Dasha ready','done'],['Analyzing','act']]);
+    if(hl) hl.textContent='Reading your Sapta Sutri...';
     setStat('ld','Analyzing...');
     cdTrack('analysis_start', {place: place});
     var _analysisStartTime = Date.now();
@@ -3319,7 +3303,13 @@ async function analyze(){
 
     // ── STEP 1: Show hook screen immediately from preCompute data ──
     removeProg(); removeLoader();
+    // Show hook screen with real trait data now that preCompute is done
     showHookScreen(pre, name);
+    // Start loading indicator after short delay
+    setTimeout(function(){
+      var ld=document.getElementById('hook-loading');
+      if(ld) ld.classList.add('show');
+    }, 800);
 
     // ── STEP 2: Fire ALL 3 calls in parallel immediately ──
     window._reply1=''; window._reply2=''; window._reply3='';
@@ -3337,6 +3327,7 @@ async function analyze(){
       cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
       // ── STEP 3: CALL1 done — transition hook → chat screen ──
       hideHookScreen();
+      setStat('ok','Ready');
       // Add teaser to chat messages
       if(window._reply1){
         var el = document.getElementById('msgs');
