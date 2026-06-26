@@ -282,7 +282,7 @@ input:focus,select:focus{border-color:var(--gold);}
 /* ── Screen Navigation UX ────────────────────────────────────────── */
 
 /* Fixed result layout */
-#result-section{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);}
+#result-section{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);max-width:480px;margin:0 auto;}
 
 /* Fixed compact header */
 .result-header-bar{flex-shrink:0;background:#fff;border-bottom:1px solid #ece9e0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
@@ -3314,119 +3314,83 @@ async function analyze(){
     // Store lagna info for report
     var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
     window._d1Lagna = d1LagnaSign ? (d1LagnaSign.rasi&&d1LagnaSign.rasi.name||'?') : '?';
-    // D9 Lagna extracted from summary
     var d9LagnaMatch = summary.match(/NAVAMSHA D9 LAGNA: (\S+)/);
     window._d9Lagna = d9LagnaMatch ? d9LagnaMatch[1] : '?';
 
-    // CALL 1 — Sections 1 and 3
-    var reply1='';
-    // Progress shown via streaming bubble
-    try{
-      reply1=await callClaude('Please analyze this birth chart for career destiny.',summaryWithScores,null,1);
-    }catch(e1){ reply1='Analysis error: '+e1.message;
-      cdTrack('analysis_error', {error: e1.message, call: 1}); }
-    removeProg();
-    if(reply1) addRow('agent',renderTeaser(reply1));
-    window._reply1=reply1;
-    cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+    // ── STEP 1: Show hook screen immediately from preCompute data ──
+    removeProg(); removeLoader();
+    showHookScreen(pre, name);
 
-    // Unlock chat immediately after CALL1
-    window._call1Ready = true;
-    document.getElementById('bottom-bar').style.display='block';
-    showSituationSelector();
+    // ── STEP 2: Fire ALL 3 calls in parallel immediately ──
+    window._reply1=''; window._reply2=''; window._reply3='';
+    window._call1Ready=false; window._call2Ready=false; window._call3Ready=false;
 
-    // Run CALL2 and CALL3 silently in background — no UI updates
-    window._reply2 = '';
-    window._reply3 = '';
-    window._call2Ready = false;
-    window._call3Ready = false;
+    var call1Promise = fetch(API+'/api/analyze',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nPlease analyze this birth chart for career destiny.'}],
+        lang:window._lang||'en', call:1
+      })
+    }).then(function(r){return r.json();}).then(function(d){
+      window._reply1 = d.content&&d.content[0]&&d.content[0].text||'';
+      window._call1Ready = true;
+      cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+      // ── STEP 3: CALL1 done — transition hook → chat screen ──
+      hideHookScreen();
+      // Add teaser to chat messages
+      if(window._reply1){
+        var el = document.getElementById('msgs');
+        if(el){ var row=document.createElement('div');row.className='row agent';
+          var av=document.createElement('div');av.className='av a';av.textContent='ज';
+          var b=document.createElement('div');b.className='bub a';
+          b.appendChild(renderTeaser(window._reply1));
+          row.appendChild(av);row.appendChild(b);el.appendChild(row); }
+      }
+      updateReportPreview();
+    }).catch(function(e){ console.log('CALL1 error:',e.message);
+      window._call1Ready=true; hideHookScreen();
+      cdTrack('analysis_error', {error:e.message, call:1}); });
 
-    // Background function — silent, no streaming UI
-    async function runBackgroundCalls(){
-      try{
-        var bgHist1 = [];
-        var bgMsg2 = summaryWithScores + "\n\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.";
-        var bgRes2 = await fetch(API+"/api/analyze",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({
-            messages:[{role:"user",content:"[CHART DATA]\n"+summaryWithScores+"\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report."}],
-            lang:window._lang||"en",
-            call:2
-          })
-        });
-        console.log('BG CALL2 status:', bgRes2.status); if(bgRes2.ok){
-          var bgData2 = await bgRes2.json();
-          window._reply2 = bgData2.content&&bgData2.content[0]&&bgData2.content[0].text||'';
-          window._call2Ready = true;
-          cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-        }
-      }catch(e){ console.log('BG CALL2 error:', e.message); }
+    var call2Promise = fetch(API+'/api/analyze',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.'}],
+        lang:window._lang||'en', call:2
+      })
+    }).then(function(r){return r.json();}).then(function(d){
+      window._reply2 = d.content&&d.content[0]&&d.content[0].text||'';
+      window._call2Ready = true;
+      cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+      updateReportPreview();
+    }).catch(function(e){ console.log('CALL2 error:',e.message); });
 
-      try{
-        var bgRes3 = await fetch(API+"/api/analyze",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({
-            messages:[{role:"user",content:"[CHART DATA]\n"+summaryWithScores+"\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11 of the career destiny report. Read the CURRENT MAHADASHA, ANTARDASHA SUB-PERIODS, and PRATYANTAR DASHA sections with [CURRENT] markers for Section 8 dates."}],
-            lang:window._lang||"en",
-            call:3
-          })
-        });
-        console.log('BG CALL3 status:', bgRes3.status); if(bgRes3.ok){
-          var bgData3 = await bgRes3.json();
-          window._reply3 = bgData3.content&&bgData3.content[0]&&bgData3.content[0].text||'';
-          window._call3Ready = true;
-          cdTrack('analysis_call3_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-          // Now full analysis is ready — store it
-          window._analysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + (window._reply3||'');
-          cdTrack('analysis_complete', {verdict: (window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
-        }
-      }catch(e){ console.log('BG CALL3 error:', e.message); }
-    }
+    var call3Promise = fetch(API+'/api/analyze',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11. Read CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS [CURRENT] markers.'}],
+        lang:window._lang||'en', call:3
+      })
+    }).then(function(r){return r.json();}).then(function(d){
+      window._reply3 = d.content&&d.content[0]&&d.content[0].text||'';
+      window._call3Ready = true;
+      cdTrack('analysis_call3_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+      window._analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
+      cdTrack('analysis_complete', {verdict:(window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
+      updateReportPreview();
+    }).catch(function(e){ console.log('CALL3 error:',e.message); });
 
-    // Fire background calls — do not await, let them run while user chats
-    runBackgroundCalls();
-
-    var reply2 = '', reply3 = '';
-    // Store combined analysis for download
-    window._analysis = (reply1||'') + '\n' + (reply2||'') + '\n' + (reply3||'');
-    // Collect data
-    var verdictMatch = window._analysis.match(/VERDICT:\s*([A-Z]+)/i);
-    var verdictVal = verdictMatch ? verdictMatch[1] : 'MIXED';
-    collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictVal, window._analysis);
-    window._meta = {name:name,dob:dob,time:time,place:place};
-    // bottom-bar already shown after CALL1
-    
-    window._reply3=reply3;
-    var _verdictM = ((window._reply1||'')+(reply3||'')).match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
-    var _verdict = _verdictM ? _verdictM[1].toUpperCase() : 'MIXED';
-    var _scoreM = ((window._reply1||'')).match(/(\d)\s+of\s+7/i);
-    var _score = _scoreM ? _scoreM[1]+'/7' : '';
-    cdTrack('analysis_complete', {
-      verdict: _verdict,
-      score: _score,
-      total_duration_ms: Date.now()-(_analysisStartTime||Date.now()),
-      has_email: (window._meta&&window._meta.email) ? 'yes' : 'no'
+    // Collect data and store meta — calls running in parallel
+    window._meta = {name:name,dob:dob,time:time,place:place,email:email};
+    window._analysis = '';
+    // Collect data once CALL1 resolves
+    call1Promise.then(function(){
+      var verdictMatch = (window._reply1||'').match(/VERDICT:\s*([A-Z]+)/i);
+      var verdictVal = verdictMatch ? verdictMatch[1] : 'MIXED';
+      collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictVal, window._reply1||'');
     });
-    // Store full analysis for PDF report
-    window._analysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + reply3;
-    // Show download button
-    var dlBtn = document.getElementById('dl-report-btn');
-    if(dlBtn) dlBtn.style.display='inline-block';
-    // Store full analysis for PDF report
-    window._analysis = (window._reply1||'') + '\n' + (window._reply2||'') + '\n' + reply3;
-    // Show download button
-    var dlBtn = document.getElementById('dl-report-btn');
-    if(dlBtn) dlBtn.style.display='inline-block';
-
-    // Combine all for PDF
-    window._analysis=reply1+(reply2?'\n\n'+reply2:'')+(reply3?'\n\n'+reply3:'');
-    showDownloadButton();
-    setStat('ld','Fetching charts for PDF...');
-    addLoader('Preparing your report...');
-    try{ var svgs=await fetchChartSVGs(dt,coords); window._svgs=svgs; }catch(e){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; }
-    removeLoader();
+    
+    // Fetch SVGs in background for PDF/email
+    fetchChartSVGs(dt,coords).then(function(svgs){ window._svgs=svgs; }).catch(function(){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; });
   }catch(e){
     removeProg();removeLoader();
     addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
@@ -4091,20 +4055,121 @@ function applyLang(){
 
   <div class="divider"></div>
 
-  <!-- Results Section -->
+  <!-- Results Section — full screen layout -->
   <div id="result-section" style="display:none">
-    <div class="result-header">
-      <span class="name" id="result-name"></span>
-      <button class="reset-btn" onclick="reset()">← Analyze another</button>
+
+    <!-- Fixed compact header -->
+    <div class="result-header-bar">
+      <div class="result-header-name" id="result-name"></div>
+      <div class="result-verdict-pill" id="result-verdict-pill" style="display:none">
+        <span class="result-verdict-text" id="result-verdict-text">MIXED</span>
+        <span class="result-verdict-score" id="result-verdict-score"></span>
+      </div>
+      <button class="reset-btn" onclick="reset()" style="margin-left:8px;">← Back</button>
     </div>
-    <div class="msgs" id="msgs"></div>
-    <div class="bottom-bar" id="bottom-bar" style="display:none">
-      <button class="dl-btn" id="dl-report-btn" onclick="triggerDownload()">📧 Email My Report</button>
-      <div class="chat-inp" id="chat-inp">
-        <input type="text" id="chat-ui" placeholder="Ask a follow-up question..."/>
-        <button class="chat-btn" id="chat-btn" onclick="sendChat()">Send</button>
+
+    <!-- Sticky pill switcher — hidden until CALL1 done -->
+    <div class="screen-switcher" id="screen-switcher" style="display:none">
+      <div class="screen-pills">
+        <button class="screen-pill active" id="pill-chat" onclick="switchScreen('chat')">💬 Chat</button>
+        <button class="screen-pill" id="pill-report" onclick="switchScreen('report')">📄 Report</button>
       </div>
     </div>
+
+    <!-- Scrollable content area -->
+    <div class="screen-content" id="screen-content">
+
+      <!-- HOOK SCREEN — shown immediately from preCompute data -->
+      <div id="hook-screen" class="hook-wrap">
+        <div class="hook-hi" id="hook-hi">Analysing your chart...</div>
+        <div class="hook-sub" id="hook-sub">Here is what your chart reveals about you...</div>
+        <div id="hook-traits"></div>
+        <div class="hook-loading" id="hook-loading">
+          <div class="hook-spinner"></div>
+          <div class="hook-loading-text" id="hook-loading-text">Reading your Sapta Sutri...</div>
+        </div>
+      </div>
+
+      <!-- CHAT SCREEN — shown after CALL1 completes -->
+      <div id="chat-screen" class="chat-screen" style="display:none">
+        <div class="chat-messages" id="msgs"></div>
+        <div class="chat-quick" id="chat-quick">
+          <div class="chat-quick-label" id="chat-quick-label">Quick questions</div>
+          <div class="chat-chips" id="chat-chips">
+            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
+              <span class="chat-chip-icon">⏰</span>
+              <span class="chat-chip-text" data-key="q1">When will it happen?</span>
+            </button>
+            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
+              <span class="chat-chip-icon">💼</span>
+              <span class="chat-chip-text" data-key="q2">What career suits me?</span>
+            </button>
+            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
+              <span class="chat-chip-icon">✨</span>
+              <span class="chat-chip-text" data-key="q3">What are my strengths?</span>
+            </button>
+            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
+              <span class="chat-chip-icon">🪐</span>
+              <span class="chat-chip-text" data-key="q4">Explain my Saturn</span>
+            </button>
+            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
+              <span class="chat-chip-icon">🎯</span>
+              <span class="chat-chip-text" data-key="q5">What should I do right now?</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REPORT SCREEN — shown when user taps Report tab -->
+      <div id="report-screen" class="report-screen" style="display:none">
+        <div class="report-email-card">
+          <div class="report-email-title" id="rpt-email-title">📧 Get your full report by email</div>
+          <div class="report-email-sub" id="rpt-email-sub">Complete Career Destiny Report as a PDF — in your inbox within 1 minute.</div>
+          <div class="report-email-row">
+            <input type="email" class="report-email-inp" id="report-email-inp" placeholder="your@email.com"/>
+            <button class="report-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
+          </div>
+        </div>
+        <div class="report-preview-label" id="rpt-preview-label">What is inside</div>
+        <div class="report-cards" id="report-cards">
+          <div class="rpt-card">
+            <div class="rpt-card-num">SECTION 1–3</div>
+            <div class="rpt-card-title">Job vs Business Verdict</div>
+            <div class="rpt-card-content" id="rpt-c1">7-factor Sapta Sutri analysis with your final verdict</div>
+          </div>
+          <div class="rpt-card">
+            <div class="rpt-card-num">SECTION 4–7</div>
+            <div class="rpt-card-title">Career Direction</div>
+            <div class="rpt-card-content" id="rpt-c2">Specific roles and business types suited to your chart</div>
+          </div>
+          <div class="rpt-card">
+            <div class="rpt-card-num">SECTION 8–9</div>
+            <div class="rpt-card-title">Timing Windows</div>
+            <div class="rpt-card-content" id="rpt-c3">Exact Dasha periods and when your best window opens</div>
+          </div>
+          <div class="rpt-card">
+            <div class="rpt-card-num">SECTION 10–11</div>
+            <div class="rpt-card-title">Next Step</div>
+            <div class="rpt-card-content" id="rpt-c4">What the skies say right now and your single most important action</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end screen-content -->
+
+    <!-- Fixed chat input bar at bottom — only visible on chat screen -->
+    <div class="chat-input-bar" id="chat-input-bar" style="display:none">
+      <div class="chat-input-row">
+        <input type="text" class="chat-input-field" id="chat-ui" placeholder="Ask anything about your chart..."/>
+        <button class="chat-send-btn" id="chat-btn" onclick="sendChat()">
+          <span class="chat-send-icon">➤</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden compat elements so old code does not break -->
+    <div id="bottom-bar" style="display:none!important"></div>
+
   </div>
 </div>
 
