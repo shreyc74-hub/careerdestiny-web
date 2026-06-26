@@ -281,79 +281,83 @@ input:focus,select:focus{border-color:var(--gold);}
 
 /* ── Screen Navigation UX ────────────────────────────────────────── */
 
-/* Fixed result layout */
+/* Base result section — full screen fixed */
 #result-section{display:flex;flex-direction:column;height:100vh;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--bg);max-width:480px;margin:0 auto;}
 
-/* Fixed compact header */
-.result-header-bar{flex-shrink:0;background:#fff;border-bottom:1px solid #ece9e0;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.result-header-name{font-size:13px;font-weight:600;color:#1a1a1a;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.result-verdict-pill{display:flex;align-items:center;gap:6px;background:#1a1025;border-radius:20px;padding:4px 12px;flex-shrink:0;}
-.result-verdict-text{font-size:11px;font-weight:700;letter-spacing:0.08em;}
-.result-verdict-score{font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:0.05em;}
+/* Shared header — always visible */
+.rs-header{flex-shrink:0;background:#fff;border-bottom:1px solid #ece9e0;padding:12px 20px;display:flex;align-items:center;gap:10px;}
+.rs-back-btn{background:transparent;border:1px solid #ece9e0;border-radius:20px;padding:5px 12px;font-size:12px;color:#666;cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;}
+.rs-back-btn:hover{background:#f5f0e8;}
 
-/* Sticky pill switcher */
-.screen-switcher{flex-shrink:0;background:#fff;padding:10px 20px;border-bottom:1px solid #ece9e0;}
-.screen-pills{display:flex;background:#f5f4f0;border-radius:10px;padding:3px;gap:3px;}
-.screen-pill{flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:13px;font-weight:500;color:#888;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.18s;}
-.screen-pill.active{background:#fff;color:#1a1a1a;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+/* Scrollable body */
+.rs-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
 
-/* Scrollable content area */
-.screen-content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
+/* ── SCREEN A: Results (default) ── */
+#screen-results{padding:20px;}
 
-/* Hook screen */
-.hook-wrap{padding:20px;}
-.hook-hi{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
-.hook-sub{font-size:12px;color:#888;margin-bottom:18px;}
-.hook-trait{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;background:#fff;border:1px solid #ece9e0;border-radius:10px;margin-bottom:8px;opacity:0;transform:translateY(8px);transition:opacity 0.35s ease,transform 0.35s ease;}
-.hook-trait.show{opacity:1;transform:translateY(0);}
-.hook-trait-icon{font-size:20px;flex-shrink:0;margin-top:1px;}
-.hook-trait-body{}
-.hook-trait-headline{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}
-.hook-trait-detail{font-size:11px;color:#888;line-height:1.5;}
-.hook-loading{display:flex;align-items:center;gap:8px;padding:14px 0;opacity:0;transition:opacity 0.4s ease 1.2s;}
-.hook-loading.show{opacity:1;}
-.hook-spinner{width:13px;height:13px;border:2px solid #ece9e0;border-top-color:#c9a96e;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
-.hook-loading-text{font-size:12px;color:#aaa;}
+/* Greeting + verdict */
+.rs-greeting{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.rs-verdict-pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;letter-spacing:0.06em;flex-shrink:0;}
+.rs-verdict-pill.biz{background:#e8f9f3;color:#1D9E75;border:1px solid #b8e8d4;}
+.rs-verdict-pill.job{background:#eeeeff;color:#534AB7;border:1px solid #c8c4ee;}
+.rs-verdict-pill.mix{background:#fdf6e8;color:#c9a96e;border:1px solid #ecdbb8;}
+
+/* Trait lines */
+.rs-summary{font-size:13px;color:#555;line-height:1.7;margin:10px 0 20px;}
+
+/* Moon trait box */
+.rs-moon-trait{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #ece9e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+.rs-moon-icon{font-size:22px;flex-shrink:0;}
+.rs-moon-headline{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
+.rs-moon-detail{font-size:12px;color:#777;line-height:1.5;}
+
+/* Action buttons */
+.rs-actions{display:flex;flex-direction:column;gap:10px;}
+.rs-action-btn{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#fff;border:1.5px solid #ece9e0;border-radius:14px;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;transition:all 0.18s;width:100%;}
+.rs-action-btn:hover{border-color:#c9a96e;background:#fdf8f0;}
+.rs-action-icon{font-size:26px;flex-shrink:0;}
+.rs-action-body{}
+.rs-action-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:2px;}
+.rs-action-sub{font-size:12px;color:#888;line-height:1.4;}
+
+/* Hook loading state */
+.rs-loading{display:flex;align-items:center;gap:10px;padding:20px 0 10px;}
+.rs-spinner{width:14px;height:14px;border:2px solid #ece9e0;border-top-color:#c9a96e;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+.rs-loading-text{font-size:12px;color:#aaa;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* Chat screen */
-.chat-screen{display:flex;flex-direction:column;min-height:100%;}
-.chat-messages{padding:16px 20px 120px;-webkit-overflow-scrolling:touch;}
-.chat-quick{padding:0 20px 12px;}
-.chat-quick-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;}
-.chat-chips{display:flex;flex-direction:column;gap:6px;}
-.chat-chip{display:flex;align-items:center;gap:9px;padding:10px 13px;border:1px solid #ece9e0;background:#fff;border-radius:8px;font-size:12px;color:#444;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-align:left;}
+/* ── SCREEN B: Chat ── */
+#screen-chat{display:none;flex-direction:column;height:100%;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px 20px 8px;-webkit-overflow-scrolling:touch;min-height:0;}
+.chat-chips-wrap{padding:0 20px 10px;display:flex;flex-direction:column;gap:7px;}
+.chat-chip{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #ece9e0;background:#fff;border-radius:10px;font-size:13px;color:#333;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-align:left;}
 .chat-chip:hover{border-color:#c9a96e;background:#fdf8f0;}
-.chat-chip-icon{font-size:14px;flex-shrink:0;}
-
-/* Fixed chat input at bottom */
-.chat-input-bar{flex-shrink:0;background:#fff;border-top:1px solid #ece9e0;padding:10px 16px;padding-bottom:max(10px, env(safe-area-inset-bottom));}
+.chat-chip-icon{font-size:15px;flex-shrink:0;}
+.chat-input-bar{flex-shrink:0;background:#fff;border-top:1px solid #ece9e0;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));}
 .chat-input-row{display:flex;gap:8px;align-items:center;}
 .chat-input-field{flex:1;padding:10px 14px;border:1.5px solid #ece9e0;border-radius:22px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:#f9f9f7;transition:border-color 0.15s;}
 .chat-input-field:focus{border-color:#c9a96e;background:#fff;}
-.chat-send-btn{width:38px;height:38px;background:#534AB7;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity 0.15s;}
+.chat-send-btn{width:38px;height:38px;background:#534AB7;border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .chat-send-btn:hover{opacity:0.85;}
 .chat-send-icon{color:#fff;font-size:16px;line-height:1;}
 
-/* Report screen */
-.report-screen{padding:16px 20px 24px;overflow-y:auto;}
-.report-email-card{background:#f8f8f5;border:1px solid #ece9e0;border-radius:10px;padding:16px;margin-bottom:18px;}
-.report-email-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
-.report-email-sub{font-size:12px;color:#888;margin-bottom:12px;line-height:1.5;}
-.report-email-row{display:flex;gap:8px;}
-.report-email-inp{flex:1;padding:10px 13px;border:1.5px solid #ece9e0;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;}
-.report-email-inp:focus{border-color:#c9a96e;}
-.report-send-btn{padding:10px 16px;background:#534AB7;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
-.report-send-btn:hover{opacity:0.9;}
-.report-send-btn:disabled{opacity:0.6;cursor:not-allowed;}
-.report-preview-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
-.report-cards{display:flex;flex-direction:column;gap:8px;}
-.rpt-card{border:1px solid #ece9e0;border-radius:9px;padding:13px 15px;background:#fff;}
-.rpt-card-num{font-size:10px;color:#c9a96e;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;}
-.rpt-card-title{font-size:12px;font-weight:600;color:#1a1a1a;margin-bottom:5px;}
-.rpt-card-content{font-size:11px;color:#777;line-height:1.6;}
+/* ── SCREEN C: Report ── */
+#screen-report{display:none;padding:20px 20px 40px;}
+.rpt-email-card{background:#fff;border:1.5px solid #ece9e0;border-radius:14px;padding:18px;margin-bottom:20px;}
+.rpt-email-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+.rpt-email-sub{font-size:12px;color:#888;margin-bottom:14px;line-height:1.5;}
+.rpt-email-row{display:flex;gap:8px;}
+.rpt-email-inp{flex:1;padding:10px 13px;border:1.5px solid #ece9e0;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.15s;}
+.rpt-email-inp:focus{border-color:#c9a96e;}
+.rpt-send-btn{padding:10px 18px;background:#534AB7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.rpt-send-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.rpt-sections-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
+.rpt-section-row{display:flex;align-items:baseline;gap:10px;padding:10px 0;border-bottom:1px solid #f0ede6;}
+.rpt-section-num{font-size:11px;font-weight:700;color:#c9a96e;min-width:24px;}
+.rpt-section-title{font-size:13px;font-weight:600;color:#1a1a1a;}
+.rpt-section-sub{font-size:11px;color:#888;margin-top:2px;}
 
-/* Override old bottom-bar styles in result section */
+/* Override old styles */
 #result-section .bottom-bar{display:none!important;}
 #result-section .msgs{padding:0!important;}
 /* ───────────────────────────────────────────────────────────────── */
@@ -3180,18 +3184,15 @@ async function analyze(){
 
   document.getElementById('form-section').style.display='none';
   document.getElementById('result-section').style.display='flex';
-  document.getElementById('result-name').textContent=name+' · '+dob+' · '+place;
-  // Show hook screen immediately — traits will populate after preCompute
-  var hookHi = document.getElementById('hook-hi');
-  var hookSub = document.getElementById('hook-sub');
-  if(hookHi) hookHi.textContent = name.split(' ')[0] ? 'Hi '+name.split(' ')[0]+'!' : 'Reading your chart...';
-  if(hookSub) hookSub.textContent = 'Fetching your birth chart data...';
+  // Set greeting immediately
+  var greetEl = document.getElementById('rs-greeting-name');
+  if(greetEl) greetEl.textContent = name && name!=='User' ? 'Hi '+name.split(' ')[0]+' —' : 'Your chart —';
   setStat('ld','Fetching chart...');
 
   try{
     var coords=await geocode(place);
     var dt=parseDT(parseDOBToISO(dob),time);
-    var hl=document.getElementById('hook-loading-text');
+    var hl=document.getElementById('rs-loading-text');
     if(hl) hl.textContent='Locating '+place.split(',')[0]+'...';
 
     var chart=await fetchChart(dt,coords);
@@ -3301,15 +3302,11 @@ async function analyze(){
     var d9LagnaMatch = summary.match(/NAVAMSHA D9 LAGNA: (\S+)/);
     window._d9Lagna = d9LagnaMatch ? d9LagnaMatch[1] : '?';
 
-    // ── STEP 1: Show hook screen immediately from preCompute data ──
-    removeProg(); removeLoader();
-    // Show hook screen with real trait data now that preCompute is done
-    showHookScreen(pre, name);
-    // Start loading indicator after short delay
-    setTimeout(function(){
-      var ld=document.getElementById('hook-loading');
-      if(ld) ld.classList.add('show');
-    }, 800);
+    // ── STEP 1: Show results screen IMMEDIATELY from preCompute ──
+    var hl2 = document.getElementById('rs-loading-text');
+    if(hl2) hl2.textContent = 'Reading your Sapta Sutri...';
+    // Show verdict + moon trait + buttons RIGHT NOW from JS data
+    showResultsScreen(pre, name, jsVerdict, bizScore, jobScore);
 
     // ── STEP 2: Fire ALL 3 calls in parallel immediately ──
     window._reply1=''; window._reply2=''; window._reply3='';
@@ -3325,17 +3322,20 @@ async function analyze(){
       window._reply1 = d.content&&d.content[0]&&d.content[0].text||'';
       window._call1Ready = true;
       cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-      // ── STEP 3: CALL1 done — transition hook → chat screen ──
-      hideHookScreen();
-      setStat('ok','Ready');
+      // CALL1 done — add teaser to chat (user may already be in chat screen)
       // Add teaser to chat messages
       if(window._reply1){
         var el = document.getElementById('msgs');
-        if(el){ var row=document.createElement('div');row.className='row agent';
+        if(el){
+          var row=document.createElement('div');row.className='row agent';
           var av=document.createElement('div');av.className='av a';av.textContent='ज';
           var b=document.createElement('div');b.className='bub a';
           b.appendChild(renderTeaser(window._reply1));
-          row.appendChild(av);row.appendChild(b);el.appendChild(row); }
+          row.appendChild(av);row.appendChild(b);el.appendChild(row);
+          // Scroll to top of messages
+          var sc=document.getElementById('screen-content');
+          if(sc) sc.scrollTop=0;
+        }
       }
       updateReportPreview();
     }).catch(function(e){ console.log('CALL1 error:',e.message);
@@ -3384,10 +3384,9 @@ async function analyze(){
     fetchChartSVGs(dt,coords).then(function(svgs){ window._svgs=svgs; }).catch(function(){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; });
   }catch(e){
     removeProg();removeLoader();
-    addRow('agent','Error: '+e.message+' Please try again with a valid city name.','er');
+    alert('Error: '+e.message+' Please try again with a valid city name.');
     document.getElementById('form-section').style.display='block';
     document.getElementById('result-section').style.display='none';
-  document.getElementById('bottom-bar').style.display='none';
     setStat('er','Error');
   }
   document.getElementById('analyze-btn').disabled=false;
@@ -3535,6 +3534,9 @@ async function sendChat(){
 
   cdTrack('chat_message_sent', {message_length: txt.length});
   addRow('user',txt);
+  // Hide chips after first message
+  var chips = document.getElementById('chat-chips-wrap');
+  if(chips) chips.style.display='none';
   addLoader('Thinking...');
   setStat('ld','...');
   try{
@@ -3624,8 +3626,91 @@ var LAGNA_TRAITS_HI = {
   'Simha': {icon:'🦁', headline:'आप नेतृत्व करते हैं, अनुसरण नहीं — आपको मंच चाहिए', detail:'सिंह लग्न का अर्थ है आप दृश्यता, अधिकार और पहचान के लिए बने हैं।'}
 };
 
-// ── Screen navigation ────────────────────────────────────────────
-var _currentScreen = 'hook';
+// ── New screen navigation ─────────────────────────────────────────
+var _rsCurrentScreen = 'results';
+
+function rsBack(){
+  if(_rsCurrentScreen === 'results'){
+    reset();
+  } else {
+    // Go back to results screen
+    _rsCurrentScreen = 'results';
+    document.getElementById('screen-results').style.display = 'block';
+    document.getElementById('screen-chat').style.display = 'none';
+    document.getElementById('screen-report').style.display = 'none';
+    document.getElementById('chat-input-bar').style.display = 'none';
+    document.getElementById('rs-body').scrollTop = 0;
+  }
+}
+
+function goToChat(){
+  cdTrack('screen_chat_open');
+  _rsCurrentScreen = 'chat';
+  document.getElementById('screen-results').style.display = 'none';
+  document.getElementById('screen-report').style.display = 'none';
+  document.getElementById('screen-chat').style.display = 'block';
+  document.getElementById('chat-input-bar').style.display = 'block';
+  // Hide chips once user has sent a message
+  setTimeout(function(){ var el=document.getElementById('chat-ui'); if(el) el.focus(); }, 150);
+}
+
+function goToReport(){
+  cdTrack('screen_report_open');
+  _rsCurrentScreen = 'report';
+  document.getElementById('screen-results').style.display = 'none';
+  document.getElementById('screen-chat').style.display = 'none';
+  document.getElementById('chat-input-bar').style.display = 'none';
+  document.getElementById('screen-report').style.display = 'block';
+  // Pre-fill email if available
+  var emailMeta = window._meta && window._meta.email;
+  if(emailMeta){ var inp=document.getElementById('report-email-inp'); if(inp&&!inp.value) inp.value=emailMeta; }
+  updateReportPreview();
+}
+
+function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
+  var firstName = name && name !== 'User' ? name.split(' ')[0] : '';
+
+  // Greeting
+  var greetEl = document.getElementById('rs-greeting-name');
+  if(greetEl) greetEl.textContent = firstName ? 'Hi '+firstName+' —' : 'Your chart —';
+
+  // Verdict pill
+  var pill = document.getElementById('rs-verdict-pill');
+  if(pill){
+    var raw = jsVerdict.replace('MIXED (leaning Business)','MIXED').replace('MIXED (leaning Job)','MIXED');
+    var cls = raw==='BUSINESS'?'biz':raw==='JOB'?'job':'mix';
+    pill.className = 'rs-verdict-pill '+cls;
+    pill.textContent = raw+' '+bizScore+':'+jobScore;
+  }
+
+  // Summary — 2 sentences from preCompute
+  var summaryEl = document.getElementById('rs-summary');
+  if(summaryEl){
+    var akName = pre.amatyakaraka || '';
+    var lagnaSign = window._d1LagnaSign || '';
+    var verdictWord = jsVerdict.includes('BUSINESS') ? 'more suited to business' : jsVerdict.includes('JOB') ? 'more suited to employment' : 'suited to both paths depending on timing';
+    summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job.';
+  }
+
+  // Moon trait
+  var moonSign = window._moonRashi || '';
+  var moonTrait = MOON_TRAITS[moonSign];
+  if(moonTrait){
+    document.getElementById('rs-moon-trait').style.display = 'flex';
+    document.getElementById('rs-moon-icon').textContent = moonTrait.icon;
+    document.getElementById('rs-moon-headline').textContent = moonTrait.headline;
+    document.getElementById('rs-moon-detail').textContent = moonTrait.detail;
+  }
+}
+
+function showResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
+  // Hide loading spinner, show buttons immediately
+  var loading = document.getElementById('rs-loading');
+  var actions = document.getElementById('rs-actions');
+  if(loading) loading.style.display = 'none';
+  if(actions) actions.style.display = 'flex';
+  populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore);
+}
 
 function switchScreen(screen){
   cdTrack('screen_switch', {screen: screen});
@@ -3778,10 +3863,7 @@ function showPathButtons(reply1){
 
 function askQuestion(question){
   cdTrack('quick_question', {q: question.slice(0,30)});
-  if(_currentScreen !== 'chat') switchScreen('chat');
-  // Hide quick chips after first question
-  var qsec = document.getElementById('chat-quick');
-  if(qsec) qsec.style.display = 'none';
+  goToChat();
   document.getElementById('chat-ui').value = question;
   sendChat();
 }
@@ -3833,19 +3915,28 @@ function sendReportFromPath(){
 
 function reset(){
   cdTrack('analyze_another');
-  _currentScreen='hook';
-  var sw=document.getElementById('screen-switcher'); if(sw) sw.style.display='none';
-  var hs=document.getElementById('hook-screen'); if(hs){hs.style.display='block';hs.style.opacity='1';}
-  var cs=document.getElementById('chat-screen'); if(cs) cs.style.display='none';
-  var rs=document.getElementById('report-screen'); if(rs) rs.style.display='none';
-  var cib=document.getElementById('chat-input-bar'); if(cib) cib.style.display='none';
-  var vp=document.getElementById('result-verdict-pill'); if(vp) vp.style.display='none';
+  _rsCurrentScreen = 'results';
+  document.getElementById('screen-results').style.display = 'block';
+  document.getElementById('screen-chat').style.display = 'none';
+  document.getElementById('screen-report').style.display = 'none';
+  document.getElementById('chat-input-bar').style.display = 'none';
+  var loading = document.getElementById('rs-loading');
+  var actions = document.getElementById('rs-actions');
+  var moonTrait = document.getElementById('rs-moon-trait');
+  if(loading){ loading.style.display='flex'; }
+  if(actions){ actions.style.display='none'; }
+  if(moonTrait){ moonTrait.style.display='none'; }
+  var status = document.getElementById('rs-status');
+  if(status){ status.textContent='Analysing...'; status.style.color=''; }
   hist=[];
   document.getElementById('form-section').style.display='block';
   document.getElementById('result-section').style.display='none';
   document.getElementById('analyze-btn').disabled=false;
+  var msgs = document.getElementById('msgs'); if(msgs) msgs.innerHTML='';
+  var chips = document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='flex';
   window._reply1=null; window._reply2=null; window._reply3=null;
   window._analysis=null; window._chartData=null; chartData=null;
+  window._call1Ready=false; window._call2Ready=false; window._call3Ready=false;
 }
 
 document.getElementById('chat-ui').addEventListener('keydown',function(e){
@@ -4046,109 +4137,89 @@ function applyLang(){
 
   <div class="divider"></div>
 
-  <!-- Results Section — full screen layout -->
+  <!-- Results Section -->
   <div id="result-section" style="display:none">
 
-    <!-- Fixed compact header -->
-    <div class="result-header-bar">
-      <div class="result-header-name" id="result-name"></div>
-      <div class="result-verdict-pill" id="result-verdict-pill" style="display:none">
-        <span class="result-verdict-text" id="result-verdict-text">MIXED</span>
-        <span class="result-verdict-score" id="result-verdict-score"></span>
-      </div>
-      <button class="reset-btn" onclick="reset()" style="margin-left:8px;">← Back</button>
+    <!-- Shared header -->
+    <div class="rs-header">
+      <button class="rs-back-btn" id="rs-back-btn" onclick="rsBack()">← Back</button>
+      <span style="font-size:12px;color:#aaa;margin-left:auto;" id="rs-status">Analysing...</span>
+      <button onclick="toggleLang()" style="margin-left:8px;padding:5px 12px;border:1px solid #ddd;border-radius:20px;background:#f5f5f0;font-size:12px;font-weight:500;cursor:pointer;color:#555;font-family:'DM Sans',sans-serif;">हिंदी</button>
     </div>
 
-    <!-- Sticky pill switcher — hidden until CALL1 done -->
-    <div class="screen-switcher" id="screen-switcher" style="display:none">
-      <div class="screen-pills">
-        <button class="screen-pill active" id="pill-chat" onclick="switchScreen('chat')">💬 Chat</button>
-        <button class="screen-pill" id="pill-report" onclick="switchScreen('report')">📄 Report</button>
-      </div>
-    </div>
+    <!-- Scrollable body -->
+    <div class="rs-body" id="rs-body">
 
-    <!-- Scrollable content area -->
-    <div class="screen-content" id="screen-content">
+      <!-- SCREEN A: Results default -->
+      <div id="screen-results" style="padding:20px;">
 
-      <!-- HOOK SCREEN — shown immediately from preCompute data -->
-      <div id="hook-screen" class="hook-wrap">
-        <div class="hook-hi" id="hook-hi">Analysing your chart...</div>
-        <div class="hook-sub" id="hook-sub">Here is what your chart reveals about you...</div>
-        <div id="hook-traits"></div>
-        <div class="hook-loading" id="hook-loading">
-          <div class="hook-spinner"></div>
-          <div class="hook-loading-text" id="hook-loading-text">Reading your Sapta Sutri...</div>
+        <div class="rs-greeting">
+          <span id="rs-greeting-name">Hi there —</span>
+          <span class="rs-verdict-pill mix" id="rs-verdict-pill">...</span>
         </div>
-      </div>
+        <div class="rs-summary" id="rs-summary">Your chart is being read...</div>
 
-      <!-- CHAT SCREEN — shown after CALL1 completes -->
-      <div id="chat-screen" class="chat-screen" style="display:none">
-        <div class="chat-messages" id="msgs"></div>
-        <div class="chat-quick" id="chat-quick">
-          <div class="chat-quick-label" id="chat-quick-label">Quick questions</div>
-          <div class="chat-chips" id="chat-chips">
-            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
-              <span class="chat-chip-icon">⏰</span>
-              <span class="chat-chip-text" data-key="q1">When will it happen?</span>
-            </button>
-            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
-              <span class="chat-chip-icon">💼</span>
-              <span class="chat-chip-text" data-key="q2">What career suits me?</span>
-            </button>
-            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
-              <span class="chat-chip-icon">✨</span>
-              <span class="chat-chip-text" data-key="q3">What are my strengths?</span>
-            </button>
-            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
-              <span class="chat-chip-icon">🪐</span>
-              <span class="chat-chip-text" data-key="q4">Explain my Saturn</span>
-            </button>
-            <button class="chat-chip" onclick="askQuestion(this.querySelector('.chat-chip-text').textContent)">
-              <span class="chat-chip-icon">🎯</span>
-              <span class="chat-chip-text" data-key="q5">What should I do right now?</span>
-            </button>
+        <!-- Moon trait box -->
+        <div class="rs-moon-trait" id="rs-moon-trait" style="display:none">
+          <div class="rs-moon-icon" id="rs-moon-icon">🌙</div>
+          <div>
+            <div class="rs-moon-headline" id="rs-moon-headline"></div>
+            <div class="rs-moon-detail" id="rs-moon-detail"></div>
           </div>
         </div>
-      </div>
 
-      <!-- REPORT SCREEN — shown when user taps Report tab -->
-      <div id="report-screen" class="report-screen" style="display:none">
-        <div class="report-email-card">
-          <div class="report-email-title" id="rpt-email-title">📧 Get your full report by email</div>
-          <div class="report-email-sub" id="rpt-email-sub">Complete Career Destiny Report as a PDF — in your inbox within 1 minute.</div>
-          <div class="report-email-row">
-            <input type="email" class="report-email-inp" id="report-email-inp" placeholder="your@email.com"/>
-            <button class="report-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
+        <!-- Action buttons — always visible immediately -->
+        <div class="rs-actions" id="rs-actions" style="display:none">
+          <button class="rs-action-btn" onclick="goToChat()">
+            <span class="rs-action-icon">💬</span>
+            <div class="rs-action-body">
+              <div class="rs-action-title">Chat with your chart</div>
+              <div class="rs-action-sub">Ask questions about your career, timing, and destiny</div>
+            </div>
+          </button>
+          <button class="rs-action-btn" onclick="goToReport()">
+            <span class="rs-action-icon">📄</span>
+            <div class="rs-action-body">
+              <div class="rs-action-title">Get your full report</div>
+              <div class="rs-action-sub">Complete 11-section analysis delivered to your email</div>
+            </div>
+          </button>
+        </div>
+
+      </div><!-- end screen-results -->
+
+      <!-- SCREEN B: Chat -->
+      <div id="screen-chat" style="display:none">
+        <div id="msgs" style="padding:16px 20px 8px;"></div>
+        <div id="chat-chips-wrap" style="padding:0 20px 100px;display:flex;flex-direction:column;gap:7px;">
+          <div class="chat-chip" onclick="askQuestion('When will it happen?')"><span class="chat-chip-icon">⏰</span>When will it happen?</div>
+          <div class="chat-chip" onclick="askQuestion('What career suits me?')"><span class="chat-chip-icon">💼</span>What career suits me?</div>
+          <div class="chat-chip" onclick="askQuestion('What are my strengths?')"><span class="chat-chip-icon">✨</span>What are my strengths?</div>
+          <div class="chat-chip" onclick="askQuestion('Explain my Saturn')"><span class="chat-chip-icon">🪐</span>Explain my Saturn</div>
+          <div class="chat-chip" onclick="askQuestion('What should I do right now?')"><span class="chat-chip-icon">🎯</span>What should I do right now?</div>
+        </div>
+      </div><!-- end screen-chat -->
+
+      <!-- SCREEN C: Report -->
+      <div id="screen-report" style="display:none;padding:20px 20px 40px;">
+        <div class="rpt-email-card">
+          <div class="rpt-email-title">📧 Get your full report</div>
+          <div class="rpt-email-sub">Your report will be emailed within 1 minute.</div>
+          <div class="rpt-email-row">
+            <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com"/>
+            <button class="rpt-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
           </div>
         </div>
-        <div class="report-preview-label" id="rpt-preview-label">What is inside</div>
-        <div class="report-cards" id="report-cards">
-          <div class="rpt-card">
-            <div class="rpt-card-num">SECTION 1–3</div>
-            <div class="rpt-card-title">Job vs Business Verdict</div>
-            <div class="rpt-card-content" id="rpt-c1">7-factor Sapta Sutri analysis with your final verdict</div>
-          </div>
-          <div class="rpt-card">
-            <div class="rpt-card-num">SECTION 4–7</div>
-            <div class="rpt-card-title">Career Direction</div>
-            <div class="rpt-card-content" id="rpt-c2">Specific roles and business types suited to your chart</div>
-          </div>
-          <div class="rpt-card">
-            <div class="rpt-card-num">SECTION 8–9</div>
-            <div class="rpt-card-title">Timing Windows</div>
-            <div class="rpt-card-content" id="rpt-c3">Exact Dasha periods and when your best window opens</div>
-          </div>
-          <div class="rpt-card">
-            <div class="rpt-card-num">SECTION 10–11</div>
-            <div class="rpt-card-title">Next Step</div>
-            <div class="rpt-card-content" id="rpt-c4">What the skies say right now and your single most important action</div>
-          </div>
-        </div>
-      </div>
+        <div class="rpt-sections-label">Sample preview of report sections</div>
+        <div class="rpt-section-row"><span class="rpt-section-num">01</span><div><div class="rpt-section-title">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">03</span><div><div class="rpt-section-title">Job or Business? (7-factor table)</div><div class="rpt-section-sub">Every sutra scored and explained</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">06</span><div><div class="rpt-section-title">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">09</span><div><div class="rpt-section-title">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
+      </div><!-- end screen-report -->
 
-    </div><!-- end screen-content -->
+    </div><!-- end rs-body -->
 
-    <!-- Fixed chat input bar at bottom — only visible on chat screen -->
+    <!-- Chat input — only on chat screen -->
     <div class="chat-input-bar" id="chat-input-bar" style="display:none">
       <div class="chat-input-row">
         <input type="text" class="chat-input-field" id="chat-ui" placeholder="Ask anything about your chart..."/>
@@ -4158,8 +4229,21 @@ function applyLang(){
       </div>
     </div>
 
-    <!-- Hidden compat elements so old code does not break -->
+    <!-- Hidden compat stubs -->
     <div id="bottom-bar" style="display:none!important"></div>
+    <div id="screen-switcher" style="display:none"></div>
+    <div id="result-verdict-text" style="display:none"></div>
+    <div id="result-verdict-score" style="display:none"></div>
+    <div id="screen-content" style="display:none"></div>
+    <div id="hook-screen" style="display:none"></div>
+    <div id="hook-traits" style="display:none"></div>
+    <div id="hook-loading" style="display:none"></div>
+    <div id="hook-hi" style="display:none"></div>
+    <div id="hook-sub" style="display:none"></div>
+    <div id="hook-loading-text" style="display:none"></div>
+    <div id="result-name" style="display:none"></div>
+    <div id="chat-screen" style="display:none"></div>
+    <div id="report-screen" style="display:none"></div>
 
   </div>
 </div>
