@@ -257,10 +257,8 @@ module.exports = async (req, res) => {
     else if (callNum === 3) system = CALL3;
     else system = CHAT_SYSTEM;
 
-    if (lang === 'hi') {
-      system += '\n\nIMPORTANT: Respond entirely in Hindi (Devanagari script). Sanskrit terms are acceptable. TONE: Use respectful formal Hindi - always use aap/aapka/aapke (never tum/tere/tera). Speak like a trusted senior advisor, warm but dignified. FORMATTING: Always add a blank line between paragraphs. Never run bold text into the next sentence without a space. Keep bullet points clean - one idea per bullet. Career field names can stay in English but explain them in Hindi.';
-
-    }
+    // Always respond in Hindi
+    system += '\n\nLANGUAGE: Always respond in Hindi (Devanagari script) regardless of how the user writes. If user writes in English or Hinglish (like "konsa career", "mujhe batao"), detect as Hindi intent and respond in pure Hindi. Career field names can stay in English. TONE: Always use aap/aapka/aapke, never tum/tere/tera. Warm but dignified senior advisor tone. FORMATTING: Blank line between paragraphs. One idea per bullet.';
 
     // Use Haiku for CALL2+CALL3 (faster), Sonnet for CALL1 (accuracy)
     const model = (callNum === 1 || callNum === 4) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
