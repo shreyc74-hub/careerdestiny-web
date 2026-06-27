@@ -3859,9 +3859,17 @@ function askQuestion(question){
 }
 
 function updateReportPreview(){
+  // Show loading state if calls not ready
+  var c1=document.getElementById('rpt-c1');
+  var c2=document.getElementById('rpt-c2');
+  var c3=document.getElementById('rpt-c3');
+  if(!window._call1Ready && c1) c1.textContent='Generating your verdict analysis...';
+  if(!window._call2Ready && c2) c2.textContent='Generating career suggestions...';
+  if(!window._call3Ready && c3) c3.textContent='Generating timing windows...';
+
   if(window._reply1){
     var vm=window._reply1.match(/VERDICT:\s*(BUSINESS|JOB|MIXED[^—\n]*)/i);
-    if(vm){ var el=document.getElementById('rpt-c1'); if(el) el.textContent=vm[1].trim()+' — 7-factor Sapta Sutri analysis'; }
+    if(vm && c1) c1.textContent=vm[1].trim()+' — 7-factor Sapta Sutri analysis';
   }
   if(window._reply2){
     var careers=[];
@@ -3869,13 +3877,11 @@ function updateReportPreview(){
       var m=l.match(/^\d+\.\s+\*\*([^*]+)\*\*/);
       if(m&&careers.length<3) careers.push(m[1].trim());
     });
-    if(careers.length){ var el=document.getElementById('rpt-c2'); if(el) el.textContent=careers.join(' · '); }
+    if(careers.length && c2) c2.textContent=careers.join(' · ');
   }
   if(window._reply3){
     var w=window._reply3.match(/Window 1[^:]*:[\s\S]*?([A-Z][a-z]+ \d{4})/i);
-    if(w){ var el=document.getElementById('rpt-c3'); if(el) el.textContent='Starting '+w[1]+' — see full dates in report'; }
-    var ns=window._reply3.match(/SECTION 11[\s\S]{0,30}\n([^\n]{20,})/i);
-    if(ns){ var el=document.getElementById('rpt-c4'); if(el) el.textContent=ns[1].trim().slice(0,90)+'...'; }
+    if(w && c3) c3.textContent='Starting '+w[1]+' — see full dates in report';
   }
 }
 
@@ -3891,7 +3897,24 @@ function sendReportFromPath(){
   btn.textContent='⏳'; btn.disabled=true;
   if(!window._analysis) window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
   var reportHtml=buildReportHtml(window._meta,window._analysis,window._svgs);
-  if(!reportHtml){btn.textContent='Send';btn.disabled=false;return;}
+  if(!reportHtml){
+    // Report not ready yet — wait for calls
+    btn.textContent='⏳ Generating...';
+    var waitInterval = setInterval(function(){
+      var analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
+      if(analysis.length > 100){
+        clearInterval(waitInterval);
+        reportHtml = buildReportHtml(window._meta, analysis, window._svgs||{});
+        if(!reportHtml){ btn.textContent='Send'; btn.disabled=false; return; }
+        sendEmail(reportHtml, email, btn);
+      }
+    }, 2000);
+    return;
+  }
+  sendEmail(reportHtml, email, btn);
+}
+
+function sendEmail(reportHtml, email, btn){
   var vm=(window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
   fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({html:reportHtml,email:email,name:window._meta&&window._meta.name||'',verdict:vm?vm[1]:'MIXED'})
@@ -3900,7 +3923,10 @@ function sendReportFromPath(){
     btn.textContent='✓ Sent!';btn.style.background='#1D9E75';
     cdTrack('email_sent_success');
     setTimeout(function(){btn.textContent='Send';btn.style.background='';btn.disabled=false;},4000);
-  }).catch(function(e){btn.textContent='Send';btn.disabled=false;});
+  }).catch(function(e){
+    console.error('Email error:',e);
+    btn.textContent='Send';btn.disabled=false;
+  });
 }
 
 function reset(){
