@@ -3316,59 +3316,65 @@ async function analyze(){
     window._reply1=''; window._reply2=''; window._reply3='';
     window._call1Ready=false; window._call2Ready=false; window._call3Ready=false;
 
-    var call1Promise = fetch(API+'/api/analyze',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nPlease analyze this birth chart for career destiny.'}],
-        lang:window._lang||'en', call:1
-      })
-    }).then(function(r){return r.json();}).then(function(d){
-      window._reply1 = d.content&&d.content[0]&&d.content[0].text||'';
-      window._call1Ready = true;
-      cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-      // CALL1 done — store data, update report preview only
-      updateReportPreview();
-    }).catch(function(e){ console.log('CALL1 error:',e.message);
-      window._call1Ready=true; hideHookScreen();
-      cdTrack('analysis_error', {error:e.message, call:1}); });
-
-    var call2Promise = fetch(API+'/api/analyze',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.'}],
-        lang:window._lang||'en', call:2
-      })
-    }).then(function(r){return r.json();}).then(function(d){
-      window._reply2 = d.content&&d.content[0]&&d.content[0].text||'';
-      window._call2Ready = true;
-      cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-      updateReportPreview();
-    }).catch(function(e){ console.log('CALL2 error:',e.message); });
-
-    var call3Promise = fetch(API+'/api/analyze',{
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11. Read CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS [CURRENT] markers.'}],
-        lang:window._lang||'en', call:3
-      })
-    }).then(function(r){return r.json();}).then(function(d){
-      window._reply3 = d.content&&d.content[0]&&d.content[0].text||'';
-      window._call3Ready = true;
-      cdTrack('analysis_call3_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-      window._analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
-      cdTrack('analysis_complete', {verdict:(window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
-      updateReportPreview();
-    }).catch(function(e){ console.log('CALL3 error:',e.message); });
-
-    // Collect data and store meta — calls running in parallel
+    // Sequential calls — CALL1 → CALL2 → CALL3
     window._meta = {name:name,dob:dob,time:time,place:place,email:email};
     window._analysis = '';
-    // Collect data once CALL1 resolves
-    call1Promise.then(function(){
-      var verdictMatch = (window._reply1||'').match(/VERDICT:\s*([A-Z]+)/i);
-      var verdictVal = verdictMatch ? verdictMatch[1] : 'MIXED';
-      collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictVal, window._reply1||'');
-    });
+
+    async function runSequentialCalls(){
+      // CALL 1
+      try{
+        var r1 = await fetch(API+'/api/analyze',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nPlease analyze this birth chart for career destiny.'}],
+            lang:window._lang||'hi', call:1
+          })
+        });
+        var d1 = await r1.json();
+        window._reply1 = d1.content&&d1.content[0]&&d1.content[0].text||'';
+        window._call1Ready = true;
+        cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+        var verdictMatch = window._reply1.match(/VERDICT:\s*([A-Z]+)/i);
+        collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictMatch?verdictMatch[1]:'MIXED', window._reply1);
+        updateReportPreview();
+      }catch(e){ console.log('CALL1 error:',e.message); window._call1Ready=true; }
+
+      // CALL 2
+      try{
+        var r2 = await fetch(API+'/api/analyze',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nNow generate Sections 4, 5, 6 and 7 of the career destiny report.'}],
+            lang:window._lang||'hi', call:2
+          })
+        });
+        var d2 = await r2.json();
+        window._reply2 = d2.content&&d2.content[0]&&d2.content[0].text||'';
+        window._call2Ready = true;
+        cdTrack('analysis_call2_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+        updateReportPreview();
+      }catch(e){ console.log('CALL2 error:',e.message); window._call2Ready=true; }
+
+      // CALL 3
+      try{
+        var r3 = await fetch(API+'/api/analyze',{
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            messages:[{role:'user',content:'[CHART DATA]\n'+summaryWithScores+'\n[END CHART DATA]\n\nNow generate Sections 8, 9, 10 and 11. Read CURRENT MAHADASHA and ANTARDASHA SUB-PERIODS [CURRENT] markers.'}],
+            lang:window._lang||'hi', call:3
+          })
+        });
+        var d3 = await r3.json();
+        window._reply3 = d3.content&&d3.content[0]&&d3.content[0].text||'';
+        window._call3Ready = true;
+        cdTrack('analysis_call3_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
+        window._analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
+        cdTrack('analysis_complete', {verdict:(window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
+        updateReportPreview();
+      }catch(e){ console.log('CALL3 error:',e.message); window._call3Ready=true; }
+    }
+
+    runSequentialCalls();
     
     // Fetch SVGs in background for PDF/email
     fetchChartSVGs(dt,coords).then(function(svgs){ window._svgs=svgs; }).catch(function(){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; });
