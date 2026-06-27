@@ -256,7 +256,8 @@ module.exports = async (req, res) => {
     else system = CHAT_SYSTEM;
 
     if (lang === 'hi') {
-      system += '\n\nIMPORTANT: Respond entirely in Hindi (Devanagari script). Sanskrit terms are acceptable.';
+      system += '\n\nIMPORTANT: Respond entirely in Hindi (Devanagari script). Sanskrit terms are acceptable. TONE: Use respectful formal Hindi — always use aap/aapka/aapke (never tum/tere/tera). Speak like a trusted senior advisor, warm but dignified. FORMATTING: Always add a blank line between paragraphs. Never run bold text into the next sentence without a space. Keep bullet points clean — one idea per bullet. Career field names can stay in English but explain them in Hindi.';"
+
     }
 
     // Use Haiku for CALL2+CALL3 (faster), Sonnet for CALL1 (accuracy)
