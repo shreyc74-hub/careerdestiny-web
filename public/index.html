@@ -4011,9 +4011,9 @@ function toggleLang(){
 }
 function applyLang(){
   var s=_strings[_lang];
-  document.getElementById("app-title").textContent=s.appTitle;
-  document.getElementById("hsub").textContent=s.appSub;
-  document.getElementById("lang-btn").textContent=s.langBtn;
+  var appTitle=document.getElementById("app-title"); if(appTitle) appTitle.textContent=s.appTitle;
+  var hsubEl=document.getElementById("hsub"); if(hsubEl) hsubEl.textContent=s.appSub;
+  var langBtn=document.getElementById("lang-btn"); if(langBtn) langBtn.textContent=s.langBtn;
   var ft=document.querySelector(".form-title");
   var fs2=document.querySelector(".form-sub");
   if(ft)ft.textContent=s.formTitle;
