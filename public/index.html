@@ -3184,6 +3184,7 @@ async function analyze(){
 
   document.getElementById('form-section').style.display='none';
   document.getElementById('result-section').style.display='flex';
+  document.getElementById('main-hdr').style.display='none';
   // Set greeting immediately
   var greetEl = document.getElementById('rs-greeting-name');
   if(greetEl) greetEl.textContent = name && name!=='User' ? 'Hi '+name.split(' ')[0]+' —' : 'Your chart —';
@@ -3931,6 +3932,7 @@ function reset(){
   hist=[];
   document.getElementById('form-section').style.display='block';
   document.getElementById('result-section').style.display='none';
+  document.getElementById('main-hdr').style.display='flex';
   document.getElementById('analyze-btn').disabled=false;
   var msgs = document.getElementById('msgs'); if(msgs) msgs.innerHTML='';
   var chips = document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='flex';
@@ -4087,7 +4089,7 @@ function applyLang(){
 }
 </script>
 <div class="app">
-  <div class="hdr">
+  <div class="hdr" id="main-hdr">
     <div class="dot" id="dot"></div>
     <span class="htitle" id="app-title">Career Destiny</span>
     <span class="hsub" id="hsub">Vedic Analysis · Sapta Sutri Siddhant</span>
