@@ -328,6 +328,9 @@ input:focus,select:focus{border-color:var(--gold);}
 
 /* ── SCREEN B: Chat ── */
 #screen-chat{display:none;flex-direction:column;height:100%;}
+#msgs .row{margin-bottom:16px;}
+#msgs .bub.a,#msgs .bub.u{line-height:1.75;}
+#msgs .bub.a p{margin-bottom:8px;}
 .chat-messages{flex:1;overflow-y:auto;padding:16px 20px 8px;-webkit-overflow-scrolling:touch;min-height:0;}
 .chat-chips-wrap{padding:0 20px 10px;display:flex;flex-direction:column;gap:7px;}
 .chat-chip{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #ece9e0;background:#fff;border-radius:10px;font-size:13px;color:#333;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-align:left;}
@@ -3323,21 +3326,7 @@ async function analyze(){
       window._reply1 = d.content&&d.content[0]&&d.content[0].text||'';
       window._call1Ready = true;
       cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
-      // CALL1 done — add teaser to chat (user may already be in chat screen)
-      // Add teaser to chat messages
-      if(window._reply1){
-        var el = document.getElementById('msgs');
-        if(el){
-          var row=document.createElement('div');row.className='row agent';
-          var av=document.createElement('div');av.className='av a';av.textContent='ज';
-          var b=document.createElement('div');b.className='bub a';
-          b.appendChild(renderTeaser(window._reply1));
-          row.appendChild(av);row.appendChild(b);el.appendChild(row);
-          // Scroll to top of messages
-          var sc=document.getElementById('screen-content');
-          if(sc) sc.scrollTop=0;
-        }
-      }
+      // CALL1 done — store data, update report preview only
       updateReportPreview();
     }).catch(function(e){ console.log('CALL1 error:',e.message);
       window._call1Ready=true; hideHookScreen();
