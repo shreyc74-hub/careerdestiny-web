@@ -290,7 +290,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .rs-back-btn:hover{background:#f5f0e8;}
 
 /* Scrollable body */
-.rs-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;}
+.rs-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;overflow-x:hidden;}
 
 /* ── SCREEN A: Results (default) ── */
 #screen-results{padding:20px;}
@@ -336,7 +336,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .chat-chip{display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #ece9e0;background:#fff;border-radius:10px;font-size:13px;color:#333;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;text-align:left;}
 .chat-chip:hover{border-color:#c9a96e;background:#fdf8f0;}
 .chat-chip-icon{font-size:15px;flex-shrink:0;}
-.chat-input-bar{flex-shrink:0;background:#fff;border-top:1px solid #ece9e0;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));}
+.chat-input-bar{flex-shrink:0;background:#fff;border-top:1px solid #ece9e0;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));position:relative;z-index:10;}
 .chat-input-row{display:flex;gap:8px;align-items:center;}
 .chat-input-field{flex:1;padding:10px 14px;border:1.5px solid #ece9e0;border-radius:22px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:#f9f9f7;transition:border-color 0.15s;}
 .chat-input-field:focus{border-color:#c9a96e;background:#fff;}
