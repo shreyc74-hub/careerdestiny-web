@@ -3814,7 +3814,7 @@ function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
   var moonSign = window._moonRashi || '';
   var moonTrait = MOON_TRAITS[moonSign];
   if(moonTrait){
-    document.getElementById('rs-moon-trait').style.display = 'flex';
+    document.getElementById('rs-moon-trait').style.display = 'block';
     document.getElementById('rs-moon-icon').textContent = moonTrait.icon;
     document.getElementById('rs-moon-headline').textContent = moonTrait.headline;
     document.getElementById('rs-moon-detail').textContent = moonTrait.detail;
