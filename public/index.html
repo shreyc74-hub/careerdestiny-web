@@ -409,12 +409,40 @@ function setStat(s,t){
 function addRow(role,content,type){
   const w=document.createElement('div');w.className='row '+(role==='agent'?'agent':'u');
   const av=document.createElement('div');av.className='av '+(role==='agent'?'a':'u');
-  av.textContent=role==='agent'?'ज':'आ';
+  const now=new Date();
+  const timeStr=(now.getHours()%12||12)+':'+String(now.getMinutes()).padStart(2,'0')+' '+(now.getHours()>=12?'PM':'AM');
   const b=document.createElement('div');
   b.className='bub '+(role==='agent'?'a':'u')+(type?' '+type:'');
   if(typeof content==='string')b.innerHTML=content.replace(/\n/g,'<br>');
   else b.appendChild(content);
-  w.appendChild(av);w.appendChild(b);
+
+  if(role==='agent'){
+    av.textContent='✦';
+    var wrap=document.createElement('div');
+    wrap.style.cssText='flex:1;min-width:0;';
+    var label=document.createElement('div');
+    label.className='agent-label';
+    label.textContent='Career Destiny';
+    var time=document.createElement('div');
+    time.className='msg-time agent-time';
+    time.textContent=timeStr;
+    wrap.appendChild(label);
+    wrap.appendChild(b);
+    wrap.appendChild(time);
+    w.appendChild(av);w.appendChild(wrap);
+  } else {
+    var uname=window._meta&&window._meta.name||'U';
+    av.textContent=uname.charAt(0).toUpperCase();
+    var uwrap=document.createElement('div');
+    uwrap.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-end;';
+    var utime=document.createElement('div');
+    utime.className='msg-time';
+    utime.textContent=timeStr;
+    uwrap.appendChild(b);
+    uwrap.appendChild(utime);
+    w.appendChild(uwrap);w.appendChild(av);
+  }
+
   getM().appendChild(w);getM().scrollTop=getM().scrollHeight;
   return w;
 }
