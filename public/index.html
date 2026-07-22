@@ -307,9 +307,7 @@ input:focus,select:focus{border-color:var(--gold);}
 
 /* Moon trait box */
 
-.rs-moon-icon{font-size:22px;flex-shrink:0;}
-.rs-moon-headline{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
-.rs-moon-detail{font-size:12px;color:#777;line-height:1.5;}
+
 
 /* Action buttons */
 .rs-actions{display:flex;flex-direction:column;gap:10px;}
@@ -325,6 +323,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .rs-situation-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
 .rs-situation-sub{font-size:12px;color:#888;margin-bottom:14px;}
 .rs-situation-chips{display:flex;flex-direction:column;gap:8px;}
+.rs-situation-item{display:flex;flex-direction:column;gap:0;}
 .rs-situation-chip{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e8e4dc;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a1a1a;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;width:100%;transition:border-color 0.15s,background 0.15s;}
 .rs-situation-chip:hover{border-color:#c9a96e;background:#fffdf5;}
 .rs-situation-chip.selected{border:1.5px solid #c9a96e;background:#fffdf5;color:#B8860B;font-weight:600;}
@@ -2747,7 +2746,6 @@ var SITUATION_CONFIG = {
   'Still Studying':   { icon:'🎓', line:'Your chart shows the best time to start is closer than you think.',            questions:['Which stream or field suits me?','When will I start earning?','Will I do better in job or business later?'] },
   'Working a Job':    { icon:'💼', line:'Your chart has a clear signal on whether this job phase is temporary or long-term.', questions:['Should I stay or is it time to move?','When is the right time to switch?','Is business a real option for me?'] },
   'Running Business': { icon:'🚀', line:'Your chart shows what is holding your business back and when it breaks open.',  questions:['Why is my business struggling?','When will it turn around?','Am I in the right business type?'] },
-  'Between Jobs':     { icon:'🔄', line:'This gap in your chart is not accidental — here is what it means.',            questions:['What kind of role should I target next?','When is my next breakthrough?','Job or business right now?'] },
   'Just Exploring':   { icon:'🌱', line:'Good time to explore — your chart has a clear direction waiting for you.',      questions:['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?'] }
 };
 
@@ -2755,17 +2753,18 @@ var SITUATION_QUESTIONS = {
   'Still Studying': ['Which stream or field suits me?','When will I start earning?','Will I do better in job or business later?'],
   'Working a Job': ['Should I stay or is it time to move?','When is the right time to switch?','Is business a real option for me?'],
   'Running Business': ['Why is my business struggling?','When will it turn around?','Am I in the right business type?'],
-  'Between Jobs': ['What kind of role should I target next?','When is my next breakthrough?','Job or business right now?'],
   'Just Exploring': ['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?']
 };
 
 function renderSituationChips(){
   return Object.keys(SITUATION_CONFIG).map(function(key){
     var cfg = SITUATION_CONFIG[key];
-    return '<button class="rs-situation-chip" onclick="onSituationTap(this,\''+key+'\')">'
+    return '<div class="rs-situation-item">'
+      + '<button class="rs-situation-chip" onclick="onSituationTap(this,\''+key+'\')">'
       + '<span class="rs-situation-chip-icon">'+cfg.icon+'</span>'
-      + key + '</button>';
-      + key + '</button>';
+      + key + '</button>'
+      + '<div class="rs-situation-line" id="rs-sit-line-'+key+'">'
+      + '<div class="rs-situation-line-text">'+cfg.line+'</div></div></div>';
   }).join('');
 }
 
@@ -2780,13 +2779,13 @@ function onSituationTap(btn, situation){
   // Store in meta
   window._meta = window._meta || {};
   window._meta.situation = situation;
-  // Show personalised line
-  var line = document.getElementById('rs-situation-line');
-  var lineText = document.getElementById('rs-situation-line-text');
-  if(line && lineText){
-    lineText.textContent = SITUATION_CONFIG[situation].line;
-    line.classList.add('visible');
-  }
+  // Hide all personalised lines first
+  document.querySelectorAll('.rs-situation-line').forEach(function(l){
+    l.classList.remove('visible');
+  });
+  // Show line under selected chip
+  var line = document.getElementById('rs-sit-line-' + situation);
+  if(line) line.classList.add('visible');
   // Show action buttons after 600ms
   setTimeout(showActionButtons, 600);
   // Swap chat chips to situation-specific questions
