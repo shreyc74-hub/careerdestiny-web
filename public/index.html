@@ -306,7 +306,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .rs-summary{font-size:13px;color:#555;line-height:1.7;margin:10px 0 20px;}
 
 /* Moon trait box */
-.rs-moon-trait{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid #ece9e0;border-radius:12px;padding:14px 16px;margin-bottom:20px;}
+
 .rs-moon-icon{font-size:22px;flex-shrink:0;}
 .rs-moon-headline{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
 .rs-moon-detail{font-size:12px;color:#777;line-height:1.5;}
@@ -319,6 +319,29 @@ input:focus,select:focus{border-color:var(--gold);}
 .rs-action-body{}
 .rs-action-title{font-size:15px;font-weight:700;color:#1a1a1a;margin-bottom:2px;}
 .rs-action-sub{font-size:12px;color:#888;line-height:1.4;}
+
+/* ── Situation selector ── */
+.rs-situation{margin-bottom:20px;display:none;}
+.rs-situation-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px;}
+.rs-situation-sub{font-size:12px;color:#888;margin-bottom:14px;}
+.rs-situation-chips{display:flex;flex-direction:column;gap:8px;}
+.rs-situation-chip{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e8e4dc;border-radius:10px;padding:12px 14px;font-size:13px;color:#1a1a1a;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:left;width:100%;transition:border-color 0.15s,background 0.15s;}
+.rs-situation-chip:hover{border-color:#c9a96e;background:#fffdf5;}
+.rs-situation-chip.selected{border:1.5px solid #c9a96e;background:#fffdf5;color:#B8860B;font-weight:600;}
+.rs-situation-chip-icon{font-size:16px;flex-shrink:0;}
+.rs-situation-line{display:none;margin-top:14px;border-left:3px solid #c9a96e;border-radius:0 8px 8px 0;background:#fffdf5;padding:10px 14px;}
+.rs-situation-line.visible{display:block;}
+.rs-situation-line-text{font-size:13px;color:#1a1a1a;line-height:1.6;}
+.rs-divider{height:1px;background:#e8e4dc;margin:20px 0;}
+
+/* ── Trait card — gold left border, no card frame ── */
+.rs-moon-trait{border-left:3px solid #c9a96e;padding:0 0 0 14px;margin-bottom:20px;background:transparent;border-top:none;border-right:none;border-bottom:none;border-radius:0;}
+.rs-moon-label{font-size:10px;font-weight:600;color:#c9a96e;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:5px;}
+.rs-moon-headline{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:3px;}
+.rs-moon-detail{font-size:12px;color:#777;line-height:1.5;}
+
+/* ── Action button arrow ── */
+.rs-action-arrow{margin-left:auto;color:#c9a96e;font-size:20px;font-weight:300;flex-shrink:0;}
 
 /* Hook loading state */
 .rs-loading{display:flex;align-items:center;gap:10px;padding:20px 0 10px;}
@@ -2720,6 +2743,14 @@ function renderTeaser3(text){
 }
 
 // Situation selector handler
+var SITUATION_CONFIG = {
+  'Still Studying':   { icon:'🎓', line:'Your chart shows the best time to start is closer than you think.',            questions:['Which stream or field suits me?','When will I start earning?','Will I do better in job or business later?'] },
+  'Working a Job':    { icon:'💼', line:'Your chart has a clear signal on whether this job phase is temporary or long-term.', questions:['Should I stay or is it time to move?','When is the right time to switch?','Is business a real option for me?'] },
+  'Running Business': { icon:'🚀', line:'Your chart shows what is holding your business back and when it breaks open.',  questions:['Why is my business struggling?','When will it turn around?','Am I in the right business type?'] },
+  'Between Jobs':     { icon:'🔄', line:'This gap in your chart is not accidental — here is what it means.',            questions:['What kind of role should I target next?','When is my next breakthrough?','Job or business right now?'] },
+  'Just Exploring':   { icon:'🌱', line:'Good time to explore — your chart has a clear direction waiting for you.',      questions:['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?'] }
+};
+
 var SITUATION_QUESTIONS = {
   'Still Studying': ['Which stream or field suits me?','When will I start earning?','Will I do better in job or business later?'],
   'Working a Job': ['Should I stay or is it time to move?','When is the right time to switch?','Is business a real option for me?'],
@@ -2727,6 +2758,67 @@ var SITUATION_QUESTIONS = {
   'Between Jobs': ['What kind of role should I target next?','When is my next breakthrough?','Job or business right now?'],
   'Just Exploring': ['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?']
 };
+
+function renderSituationChips(){
+  return Object.keys(SITUATION_CONFIG).map(function(key){
+    var cfg = SITUATION_CONFIG[key];
+    return '<button class="rs-situation-chip" onclick="onSituationTap(this,''+key+'')">'
+      + '<span class="rs-situation-chip-icon">'+cfg.icon+'</span>'
+      + key + '</button>';
+  }).join('');
+}
+
+function onSituationTap(btn, situation){
+  cdTrack('situation_selected', {situation: situation});
+  // Reset all chips
+  document.querySelectorAll('.rs-situation-chip').forEach(function(b){
+    b.classList.remove('selected');
+  });
+  // Highlight selected chip
+  btn.classList.add('selected');
+  // Store in meta
+  window._meta = window._meta || {};
+  window._meta.situation = situation;
+  // Show personalised line
+  var line = document.getElementById('rs-situation-line');
+  var lineText = document.getElementById('rs-situation-line-text');
+  if(line && lineText){
+    lineText.textContent = SITUATION_CONFIG[situation].line;
+    line.classList.add('visible');
+  }
+  // Show action buttons after 600ms
+  setTimeout(showActionButtons, 600);
+  // Swap chat chips to situation-specific questions
+  swapChatChips(situation);
+}
+
+function showActionButtons(){
+  var actions = document.getElementById('rs-actions');
+  if(actions){
+    actions.style.display = 'flex';
+    actions.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function swapChatChips(situation){
+  var qs = SITUATION_CONFIG[situation] ? SITUATION_CONFIG[situation].questions : [];
+  var wrap = document.getElementById('chat-chips-wrap');
+  if(!wrap || !qs.length) return;
+  var icons = ['⏰','💼','✨','🪐','🎯'];
+  wrap.innerHTML = qs.map(function(q, i){
+    return '<div class="chat-chip" onclick="askQuestion(''+q.replace(/'/g,"\'")+'')">'
+      + '<span class="chat-chip-icon">'+(icons[i]||'❓')+'</span>'+q+'</div>';
+  }).join('');
+}
+
+function startSituationTimeout(){
+  setTimeout(function(){
+    var actions = document.getElementById('rs-actions');
+    if(actions && actions.style.display === 'none'){
+      showActionButtons();
+    }
+  }, 15000);
+}
 
 function showSituationSelector(){
   showPathButtons(window._reply1||''); return;
@@ -3730,12 +3822,18 @@ function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
 }
 
 function showResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
-  // Hide loading spinner, show buttons immediately
+  // Hide loading spinner
   var loading = document.getElementById('rs-loading');
-  var actions = document.getElementById('rs-actions');
   if(loading) loading.style.display = 'none';
-  if(actions) actions.style.display = 'flex';
+  // Populate results from JS data — instant, no call dependency
   populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore);
+  // Populate and show situation selector — instant, no call dependency
+  var sitChips = document.getElementById('rs-situation-chips');
+  if(sitChips) sitChips.innerHTML = renderSituationChips();
+  var sitSection = document.getElementById('rs-situation');
+  if(sitSection) sitSection.style.display = 'block';
+  // Action buttons appear after situation tap or 15s fallback
+  startSituationTimeout();
 }
 
 function switchScreen(screen){
@@ -4220,21 +4318,33 @@ function applyLang(){
 
         <!-- Moon trait box -->
         <div class="rs-moon-trait" id="rs-moon-trait" style="display:none">
-          <div class="rs-moon-icon" id="rs-moon-icon">🌙</div>
-          <div>
-            <div class="rs-moon-headline" id="rs-moon-headline"></div>
-            <div class="rs-moon-detail" id="rs-moon-detail"></div>
+          <div class="rs-moon-label">Your chart says</div>
+          <div class="rs-moon-icon" id="rs-moon-icon" style="display:none"></div>
+          <div class="rs-moon-headline" id="rs-moon-headline"></div>
+          <div class="rs-moon-detail" id="rs-moon-detail"></div>
+        </div>
+
+        <!-- Situation selector — shown instantly from JS data, no call dependency -->
+        <div class="rs-situation" id="rs-situation">
+          <div class="rs-divider"></div>
+          <div class="rs-situation-title">What is your current situation?</div>
+          <div class="rs-situation-sub">This helps personalise your analysis</div>
+          <div class="rs-situation-chips" id="rs-situation-chips"></div>
+          <div class="rs-situation-line" id="rs-situation-line">
+            <div class="rs-situation-line-text" id="rs-situation-line-text"></div>
           </div>
         </div>
 
-        <!-- Action buttons — always visible immediately -->
+        <!-- Action buttons — appear after situation tap or 15s timeout -->
         <div class="rs-actions" id="rs-actions" style="display:none">
+          <div class="rs-divider"></div>
           <button class="rs-action-btn" onclick="goToChat()">
             <span class="rs-action-icon">💬</span>
             <div class="rs-action-body">
               <div class="rs-action-title">Chat with your chart</div>
               <div class="rs-action-sub">Ask questions about your career, timing, and destiny</div>
             </div>
+            <span class="rs-action-arrow">›</span>
           </button>
           <button class="rs-action-btn" onclick="goToReport()">
             <span class="rs-action-icon">📄</span>
@@ -4242,6 +4352,7 @@ function applyLang(){
               <div class="rs-action-title">Get your full report</div>
               <div class="rs-action-sub">Complete 11-section analysis delivered to your email</div>
             </div>
+            <span class="rs-action-arrow">›</span>
           </button>
         </div>
 
