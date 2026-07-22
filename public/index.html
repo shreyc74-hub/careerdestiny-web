@@ -2762,8 +2762,9 @@ var SITUATION_QUESTIONS = {
 function renderSituationChips(){
   return Object.keys(SITUATION_CONFIG).map(function(key){
     var cfg = SITUATION_CONFIG[key];
-    return '<button class="rs-situation-chip" onclick="onSituationTap(this,''+key+'')">'
+    return '<button class="rs-situation-chip" onclick="onSituationTap(this,\''+key+'\')">'
       + '<span class="rs-situation-chip-icon">'+cfg.icon+'</span>'
+      + key + '</button>';
       + key + '</button>';
   }).join('');
 }
