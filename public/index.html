@@ -2807,7 +2807,7 @@ function swapChatChips(situation){
   if(!wrap || !qs.length) return;
   var icons = ['⏰','💼','✨','🪐','🎯'];
   wrap.innerHTML = qs.map(function(q, i){
-    return '<div class="chat-chip" onclick="askQuestion(''+q.replace(/'/g,"\'")+'')">'
+    return '<div class="chat-chip" onclick="askQuestion(\''+q.replace(/'/g,'\\\'')+'\')">'
       + '<span class="chat-chip-icon">'+(icons[i]||'❓')+'</span>'+q+'</div>';
   }).join('');
 }
