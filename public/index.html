@@ -55,8 +55,8 @@ body{
 }
 
 .dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;}
-.dot.er{background:#E24B4A;}
-.dot.ld{background:var(--gold);animation:bk 1s infinite;}
+.dot.er{background:var(--green);}
+.dot.ld{background:var(--green);animation:none;}
 @keyframes bk{0%,100%{opacity:1}50%{opacity:.3}}
 
 .htitle{
@@ -402,8 +402,7 @@ let chartData=null;
 var M=null; function getM(){ if(!M) M=document.getElementById('msgs'); return M; }
 
 function setStat(s,t){
-  document.getElementById('dot').className='dot'+(s==='er'?' er':s==='ld'?' ld':'');
-  document.getElementById('hsub').textContent=t||'Vedic Analysis · Sapta Sutri Siddhant';
+  // Dot and status text removed — not meaningful to users
 }
 
 function addRow(role,content,type){
@@ -4150,7 +4149,7 @@ function applyLang(){
   <div class="hdr" id="main-hdr">
     <div class="dot" id="dot"></div>
     <span class="htitle" id="app-title">Career Destiny</span>
-    <span class="hsub" id="hsub">Vedic Analysis · Sapta Sutri Siddhant</span>
+    <span class="hsub" id="hsub"></span>
     
   </div>
 
