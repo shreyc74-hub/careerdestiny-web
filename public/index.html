@@ -3968,17 +3968,8 @@ if(_chatUi) _chatUi.addEventListener('keydown',function(e){
 });
 
 function fixViewportHeight(){
-  var rs = document.getElementById('result-section');
-  if(!rs) return;
-  var h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-  rs.style.height = h + 'px';
+  // CSS top:0;bottom:0 handles height — no JS override
 }
-if(window.visualViewport){
-  window.visualViewport.addEventListener('resize', fixViewportHeight);
-  window.visualViewport.addEventListener('scroll', fixViewportHeight);
-}
-window.addEventListener('resize', fixViewportHeight);
-fixViewportHeight();
 
 var SYSTEM_1_CLIENT='You are an expert Vedic Jyotish practitioner. The chart data includes PRE-COMPUTED ANALYSIS with verified calculations. Use pre-computed values directly. Return ONLY: 1) VERDICT line 2) Two sentence summary 3) Planet positions table. VERDICT must be BUSINESS/JOB/MIXED. FORMAT: VERDICT: [BUSINESS/JOB/MIXED — description]\n\nSummary: [sentence 1. sentence 2.]\n\n| Planet | Sign | House | Degree | Status |\n|--------|------|-------|--------|--------|\n[one row per planet]. Rules: never mention book or author. Under 350 words. Nothing else.';
 
