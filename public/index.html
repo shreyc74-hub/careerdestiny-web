@@ -118,6 +118,132 @@ body{
 .lang-switch[data-lang="en"] .lang-switch-label.en,
 .lang-switch[data-lang="hi"] .lang-switch-label.hi{color:#fff;}
 
+/* ── Account: sign-up button, user menu, auth screens, nudge modal ── */
+.signup-btn{
+  padding:7px 16px;border:1px solid var(--purple);border-radius:20px;background:transparent;
+  color:var(--purple);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;
+  font-family:'DM Sans',sans-serif;
+}
+.signup-btn:hover{background:var(--accent-bg);}
+
+.user-menu{position:relative;flex-shrink:0;}
+.user-menu-trigger{
+  display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:1px solid var(--border);
+  border-radius:20px;background:var(--bg-card);cursor:pointer;font-family:'DM Sans',sans-serif;
+  max-width:140px;
+}
+.user-avatar{
+  width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+}
+.user-name{font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.user-chevron{font-size:9px;color:var(--text-dim);flex-shrink:0;transition:transform 0.15s;}
+.user-menu-trigger.open .user-chevron{transform:rotate(180deg);}
+.user-dropdown{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;width:220px;background:var(--bg-card);
+  border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,0.15);
+  overflow:hidden;z-index:210;
+}
+.user-dropdown.open{display:block;}
+.user-dropdown-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+.user-dropdown-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-dropdown-email{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+.user-dropdown-item{
+  display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;background:none;
+  text-align:left;font-size:13px;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.user-dropdown-item:hover{background:var(--bg-form);}
+.user-dropdown-item.logout{color:#c0392b;}
+
+/* Full-screen account overlay (Profile / Saved Chats / My Birth Chart) */
+.acct-section{
+  display:none;flex-direction:column;position:fixed;inset:0;background:var(--bg);
+  max-width:480px;margin:0 auto;z-index:200;overflow:hidden;
+}
+.acct-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;}
+.acct-empty{font-size:13px;color:var(--text-muted);text-align:center;padding:40px 20px;line-height:1.6;}
+.chat-list-item{
+  display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);
+  border-radius:10px;margin-bottom:10px;cursor:pointer;background:var(--bg-card);
+}
+.chat-list-item:hover{border-color:var(--gold);}
+.chat-list-body{flex:1;min-width:0;}
+.chat-list-title{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chat-list-sub{font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chat-list-date{font-size:10px;color:var(--text-dim);flex-shrink:0;}
+.chat-list-del{flex-shrink:0;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:4px;}
+.profile-card{
+  display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);
+  border-radius:10px;margin-bottom:10px;background:var(--bg-card);
+}
+.profile-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold-bg);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.profile-body{flex:1;min-width:0;}
+.profile-name{font-size:13px;font-weight:600;color:var(--text);}
+.profile-sub{font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-actions{display:flex;gap:6px;flex-shrink:0;}
+.profile-use-btn{padding:6px 12px;border:1px solid var(--purple);border-radius:16px;background:transparent;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;}
+.profile-del-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:4px;}
+.acct-add-btn{width:100%;padding:12px;border:1px dashed var(--gold);border-radius:10px;background:var(--gold-bg);color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif;}
+
+/* Auth (sign up / log in) */
+#auth-section{
+  display:none;flex-direction:column;position:fixed;inset:0;background:var(--bg);
+  max-width:480px;margin:0 auto;z-index:220;overflow:hidden;
+}
+.auth-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;}
+.auth-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px 20px;}
+.auth-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.auth-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px;}
+.auth-field{margin-bottom:14px;}
+.auth-field label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:0.3px;margin-bottom:5px;}
+.auth-pw-row{position:relative;}
+.auth-pw-row input{padding-right:44px;}
+.auth-pw-toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;
+  cursor:pointer;font-size:15px;padding:6px;color:var(--text-dim);
+}
+.auth-pw-strength{display:flex;gap:4px;margin-top:6px;}
+.auth-pw-strength-seg{flex:1;height:3px;border-radius:2px;background:var(--border);}
+.auth-pw-strength-seg.on{background:var(--gold);}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:18px 0 6px;color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-divider-note{font-size:11px;color:var(--text-dim);margin:-2px 0 14px;}
+.auth-agree{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--text-muted);line-height:1.5;margin:6px 0 16px;}
+.auth-agree input{width:auto;margin-top:2px;flex-shrink:0;}
+.auth-agree .auth-link{color:var(--purple);font-weight:600;cursor:pointer;}
+.auth-submit-btn{
+  width:100%;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.auth-submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.auth-switch{text-align:center;font-size:12px;color:var(--text-muted);margin-top:16px;}
+.auth-switch a{color:var(--purple);font-weight:600;cursor:pointer;}
+.auth-error{font-size:12px;color:#c0392b;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;margin-bottom:14px;display:none;}
+
+/* Save-your-reading nudge modal */
+#save-nudge-overlay{
+  display:none;position:fixed;inset:0;background:rgba(20,10,35,0.6);z-index:230;
+  align-items:center;justify-content:center;padding:20px;
+}
+.nudge-card{width:100%;max-width:340px;background:var(--bg-card);border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+.nudge-header{position:relative;background:linear-gradient(135deg,#4338CA,#312E81);padding:26px 22px 22px;color:#fff;}
+.nudge-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-size:13px;}
+.nudge-icon{font-size:30px;margin-bottom:10px;}
+.nudge-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;margin-bottom:6px;}
+.nudge-sub{font-size:12px;line-height:1.6;color:rgba(255,255,255,0.85);}
+.nudge-body{padding:20px 22px 22px;}
+.nudge-bullet{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.4;}
+.nudge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px;}
+.nudge-cta{width:100%;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;font-family:'DM Sans',sans-serif;}
+.nudge-later{width:100%;padding:13px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif;}
+
+.saved-toast{text-align:center;margin:10px 0;}
+.saved-toast span{
+  display:inline-flex;align-items:center;gap:6px;background:#eefaf1;color:#1D9E75;
+  border:1px solid #cdeedd;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;
+}
+
 /* HERO — compact, just text */
 .hero{
   padding:20px 20px 16px;
@@ -196,8 +322,8 @@ body{
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
-.form-group.place-field{position:relative;}
-#place-dropdown{
+.place-field{position:relative;}
+.place-dropdown-el{
   display:none;
   position:absolute;
   top:100%;
@@ -472,6 +598,7 @@ window._RASHI_HI=_RASHI_HI;
 const API='';
 let hist=[];
 let chartData=null;
+window._currentUser = getCurrentUser();
 
 var M=null; function getM(){ if(!M) M=document.getElementById('msgs'); return M; }
 
@@ -3285,6 +3412,412 @@ function syncAllTranslatables(){
   });
 }
 
+// ══════════════════════════════════════════════════════════════════
+// Account: sign-up/login, saved chats, birth profiles
+// STUB STORAGE — everything below is backed by localStorage because no
+// database is wired up yet. Every function here is written as the single
+// place that talks to "the backend", so swapping in real Supabase calls
+// later means rewriting these bodies only — no caller changes anywhere.
+// Passwords are deliberately never persisted, even here, since a real
+// credential store is not in place: signUp/logIn only ever keep
+// {name, email} as the "session".
+// ══════════════════════════════════════════════════════════════════
+var AUTH_KEY='cd_user', PROFILES_KEY='cd_profiles', CHATS_KEY='cd_chats';
+
+function getCurrentUser(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)); }catch(e){ return null; } }
+function setCurrentUser(user){
+  try{ localStorage.setItem(AUTH_KEY, JSON.stringify(user)); }catch(e){}
+  window._currentUser = user;
+}
+function signUp(details){
+  var user = { name: details.name||'', email: details.email };
+  setCurrentUser(user);
+  return Promise.resolve(user);
+}
+function logIn(details){
+  var existing = getCurrentUser();
+  var user = { name: (existing && existing.email===details.email && existing.name) || '', email: details.email };
+  setCurrentUser(user);
+  return Promise.resolve(user);
+}
+function logOut(){
+  try{ localStorage.removeItem(AUTH_KEY); }catch(e){}
+  window._currentUser = null;
+  window._chatSessionId = null; window._chatSessionSaved = false;
+  refreshAuthUI();
+}
+
+function listProfiles(){ try{ return JSON.parse(localStorage.getItem(PROFILES_KEY))||[]; }catch(e){ return []; } }
+function saveProfile(profile){
+  var list = listProfiles();
+  profile.id = profile.id || ('p_'+Date.now()+'_'+Math.floor(Math.random()*1000));
+  var idx = list.findIndex(function(p){return p.id===profile.id;});
+  if(idx>=0) list[idx]=profile; else list.push(profile);
+  try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(list)); }catch(e){}
+  return profile;
+}
+function deleteProfileById(id){
+  var list = listProfiles().filter(function(p){return p.id!==id;});
+  try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(list)); }catch(e){}
+}
+
+function listChats(){ try{ return JSON.parse(localStorage.getItem(CHATS_KEY))||[]; }catch(e){ return []; } }
+function saveChatSession(session){
+  var list = listChats();
+  session.id = session.id || ('c_'+Date.now()+'_'+Math.floor(Math.random()*1000));
+  session.updatedAt = Date.now();
+  var idx = list.findIndex(function(c){return c.id===session.id;});
+  if(idx>=0) list[idx]=session; else list.unshift(session);
+  try{ localStorage.setItem(CHATS_KEY, JSON.stringify(list)); }catch(e){}
+  return session;
+}
+function deleteChatById(id){
+  var list = listChats().filter(function(c){return c.id!==id;});
+  try{ localStorage.setItem(CHATS_KEY, JSON.stringify(list)); }catch(e){}
+}
+
+// ── Header: Sign up button ↔ user avatar/dropdown ──────────────────
+function renderAuthArea(){
+  var user = window._currentUser;
+  var lang = window._lang || 'en';
+  if(!user){
+    return '<button class="signup-btn" onclick="openAuth(\'signup\')">'+(lang==='hi'?'साइन अप':'Sign up')+'</button>';
+  }
+  var displayName = user.name || (user.email ? user.email.split('@')[0] : 'U');
+  var initials = displayName.trim().charAt(0).toUpperCase() || 'U';
+  var firstName = displayName.split(' ')[0];
+  return '<div class="user-menu">'
+    + '<button class="user-menu-trigger" onclick="toggleUserDropdown(this)">'
+    +   '<span class="user-avatar">'+initials+'</span>'
+    +   '<span class="user-name">'+firstName+'</span>'
+    +   '<span class="user-chevron">▾</span>'
+    + '</button>'
+    + '<div class="user-dropdown">'
+    +   '<div class="user-dropdown-header"><div class="user-dropdown-name">'+displayName+'</div><div class="user-dropdown-email">'+(user.email||'')+'</div></div>'
+    +   '<button class="user-dropdown-item" onclick="openProfile()">👤 '+(lang==='hi'?'प्रोफ़ाइल':'Profile')+'</button>'
+    +   '<button class="user-dropdown-item" onclick="openSavedChats()">💬 '+(lang==='hi'?'सहेजी गई चैट':'Saved Chats')+'</button>'
+    +   '<button class="user-dropdown-item" onclick="openMyBirthChart()">🔮 '+(lang==='hi'?'मेरी कुंडली':'My Birth Chart')+'</button>'
+    +   '<button class="user-dropdown-item logout" onclick="handleLogout()">↩ '+(lang==='hi'?'लॉगआउट':'Logout')+'</button>'
+    + '</div></div>';
+}
+function refreshAuthUI(){
+  var html = renderAuthArea();
+  ['auth-area-main','auth-area-rs'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
+}
+function toggleUserDropdown(btn){
+  var dd = btn.parentElement.querySelector('.user-dropdown');
+  var wasOpen = dd.classList.contains('open');
+  document.querySelectorAll('.user-dropdown.open').forEach(function(d){d.classList.remove('open');});
+  document.querySelectorAll('.user-menu-trigger.open').forEach(function(b){b.classList.remove('open');});
+  if(!wasOpen){ dd.classList.add('open'); btn.classList.add('open'); }
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.user-menu')){
+    document.querySelectorAll('.user-dropdown.open').forEach(function(d){d.classList.remove('open');});
+    document.querySelectorAll('.user-menu-trigger.open').forEach(function(b){b.classList.remove('open');});
+  }
+});
+function handleLogout(){ cdTrack('logout'); logOut(); }
+
+// ── Auth screens (sign up / log in) ─────────────────────────────────
+function openAuth(screen){
+  cdTrack('auth_open', {screen: screen});
+  dismissNudge();
+  document.getElementById('auth-section').style.display='flex';
+  showAuthScreen(screen||'signup');
+}
+function closeAuth(){ document.getElementById('auth-section').style.display='none'; }
+function showAuthScreen(screen){
+  document.getElementById('screen-signup').style.display = screen==='signup' ? 'block' : 'none';
+  document.getElementById('screen-login').style.display = screen==='login' ? 'block' : 'none';
+  document.getElementById('signup-error').style.display='none';
+  document.getElementById('login-error').style.display='none';
+}
+function showAuthError(screen, msg){
+  var el = document.getElementById(screen+'-error');
+  if(!el) return;
+  el.textContent = msg; el.style.display='block';
+}
+function togglePwVisibility(id, btn){
+  var el = document.getElementById(id);
+  if(el.type==='password'){ el.type='text'; btn.textContent='🙈'; }
+  else { el.type='password'; btn.textContent='👁'; }
+}
+function computePwStrength(pw){
+  var score=0;
+  if(pw.length>=8) score++;
+  if(pw.length>=12) score++;
+  if(/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if(/[0-9]/.test(pw) || /[^A-Za-z0-9]/.test(pw)) score++;
+  return score;
+}
+function updatePwStrength(){
+  var pw = document.getElementById('signup-password').value;
+  var score = computePwStrength(pw);
+  document.querySelectorAll('#signup-pw-strength .auth-pw-strength-seg').forEach(function(seg,i){
+    seg.classList.toggle('on', i<score);
+  });
+}
+function _msgsExist(){ var m=document.getElementById('msgs'); return !!(m && m.children.length); }
+function handleSignUp(){
+  var lang = window._lang||'en';
+  var email = document.getElementById('signup-email').value.trim();
+  var pw = document.getElementById('signup-password').value;
+  var pw2 = document.getElementById('signup-password2').value;
+  var name = document.getElementById('signup-name').value.trim();
+  var agree = document.getElementById('signup-agree').checked;
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAuthError('signup', lang==='hi'?'कृपया मान्य ईमेल दर्ज करें।':'Please enter a valid email address.'); return; }
+  if(pw.length<8){ showAuthError('signup', lang==='hi'?'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।':'Password must be at least 8 characters.'); return; }
+  if(pw!==pw2){ showAuthError('signup', lang==='hi'?'पासवर्ड मेल नहीं खाते।':'Passwords do not match.'); return; }
+  if(!agree){ showAuthError('signup', lang==='hi'?'कृपया जारी रखने के लिए सहमति दें।':'Please agree to continue.'); return; }
+
+  cdTrack('signup_submit');
+  signUp({name:name, email:email}).then(function(){
+    var dob = document.getElementById('signup-dob').value;
+    var time = document.getElementById('signup-time').value;
+    var placeEl = document.getElementById('signup-place');
+    if(dob || time || placeEl.value){
+      saveProfile({ label: name || (lang==='hi'?'स्वयं':'Myself'), name:name, dob:dob, time:time, place:placeEl.value, isSelf:true });
+    }
+    closeAuth();
+    refreshAuthUI();
+    if(_msgsExist()) autoSaveChatIfLoggedIn();
+  });
+}
+function handleLogIn(){
+  var lang = window._lang||'en';
+  var email = document.getElementById('login-email').value.trim();
+  var pw = document.getElementById('login-password').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAuthError('login', lang==='hi'?'कृपया मान्य ईमेल दर्ज करें।':'Please enter a valid email address.'); return; }
+  if(!pw){ showAuthError('login', lang==='hi'?'कृपया पासवर्ड दर्ज करें।':'Please enter your password.'); return; }
+  cdTrack('login_submit');
+  logIn({email:email}).then(function(){
+    closeAuth();
+    refreshAuthUI();
+    if(_msgsExist()) autoSaveChatIfLoggedIn();
+  });
+}
+
+// ── Save-your-reading nudge modal ────────────────────────────────────
+var NUDGE_MSG_THRESHOLD = 3;
+window._msgsSinceNudge = 0;
+function maybeShowSaveNudge(){
+  if(window._currentUser) return;
+  window._msgsSinceNudge = (window._msgsSinceNudge||0) + 1;
+  if(window._msgsSinceNudge >= NUDGE_MSG_THRESHOLD){
+    window._msgsSinceNudge = 0;
+    showSaveNudge();
+  }
+}
+function showSaveNudge(){ cdTrack('save_nudge_shown'); document.getElementById('save-nudge-overlay').style.display='flex'; }
+function dismissNudge(){ cdTrack('save_nudge_dismissed'); document.getElementById('save-nudge-overlay').style.display='none'; }
+
+// ── Auto-save chat history for logged-in users ──────────────────────
+function autoSaveChatIfLoggedIn(){
+  if(!window._currentUser) return;
+  var user = window._currentUser;
+  var rows = document.querySelectorAll('#msgs .row');
+  if(!rows.length) return;
+  var messages = Array.prototype.map.call(rows, function(row){
+    var isUser = row.classList.contains('u');
+    var bub = row.querySelector('.bub');
+    return { role: isUser?'user':'agent', text: bub ? bub.textContent : '' };
+  });
+  var lagna = window._d1LagnaSign ? (window._d1LagnaSign+' Lagna') : '';
+  var title = (window._lang==='hi'?'करियर रीडिंग · ':'Career Reading · ') + (user.name || (user.email?user.email.split('@')[0]:''));
+  var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages };
+  var saved = saveChatSession(session);
+  window._chatSessionId = saved.id;
+  if(!window._chatSessionSaved){
+    window._chatSessionSaved = true;
+    showSavedToast(title);
+  }
+}
+function showSavedToast(title){
+  var m = getM();
+  if(!m) return;
+  var w = document.createElement('div');
+  w.className = 'saved-toast';
+  var label = window._lang==='hi' ? 'चैट सहेजी गई: "' : 'Chat auto-saved as "';
+  w.innerHTML = '<span>● '+label+title+'"</span>';
+  m.appendChild(w); m.scrollTop = m.scrollHeight;
+}
+
+// ── Account section: Profile / Saved Chats / My Birth Chart ────────
+function openAccountSection(screen, title){
+  document.getElementById('account-section').style.display='flex';
+  document.getElementById('account-section-title').textContent=title;
+  ['screen-profile','screen-saved-chats','screen-birth-chart'].forEach(function(id){
+    document.getElementById(id).style.display = id===screen ? 'block' : 'none';
+  });
+}
+function closeAccountSection(){ document.getElementById('account-section').style.display='none'; }
+function openProfile(){
+  var lang = window._lang||'en';
+  var user = window._currentUser||{};
+  document.getElementById('profile-name-display').textContent = user.name || (lang==='hi'?'(कोई नाम नहीं)':'(no name set)');
+  document.getElementById('profile-email-display').textContent = user.email || '';
+  document.getElementById('profile-avatar').textContent = (user.name||user.email||'U').trim().charAt(0).toUpperCase();
+  openAccountSection('screen-profile', lang==='hi'?'प्रोफ़ाइल':'Profile');
+}
+function openSavedChats(){
+  renderSavedChatsList();
+  openAccountSection('screen-saved-chats', window._lang==='hi'?'सहेजी गई चैट':'Saved Chats');
+}
+function openMyBirthChart(){
+  renderBirthProfilesList();
+  document.getElementById('add-profile-form').style.display='none';
+  openAccountSection('screen-birth-chart', window._lang==='hi'?'मेरी कुंडली':'My Birth Chart');
+}
+function renderSavedChatsList(){
+  var lang = window._lang||'en';
+  var list = listChats();
+  var el = document.getElementById('saved-chats-list');
+  if(!list.length){
+    el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'अभी तक कोई सहेजी गई चैट नहीं। अपनी कुंडली से बात शुरू करें — यह अपने आप सहेज दी जाएगी।':'No saved chats yet. Start a conversation with your chart — it will save automatically.')+'</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(c){
+    var date = new Date(c.updatedAt||Date.now());
+    var dateStr = date.toLocaleDateString(lang==='hi'?'hi-IN':'en-IN', {day:'numeric',month:'short'});
+    return '<div class="chat-list-item" onclick="resumeChat(\''+c.id+'\')">'
+      + '<div class="chat-list-body">'
+      +   '<div class="chat-list-title">'+(c.title||'Career Reading')+'</div>'
+      +   (c.subtitle ? '<div class="chat-list-sub">'+c.subtitle+'</div>' : '')
+      + '</div>'
+      + '<div class="chat-list-date">'+dateStr+'</div>'
+      + '<button class="chat-list-del" onclick="event.stopPropagation();removeChatEntry(\''+c.id+'\')">🗑</button>'
+      + '</div>';
+  }).join('');
+}
+function resumeChat(id){
+  var session = listChats().find(function(c){return c.id===id;});
+  if(!session) return;
+  cdTrack('resume_saved_chat');
+  window._chatSessionId = session.id;
+  window._chatSessionSaved = true;
+  closeAccountSection();
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('result-section').style.display='flex';
+  document.getElementById('main-hdr').style.display='none';
+  goToChat();
+  var m=getM(); if(m) m.innerHTML='';
+  (session.messages||[]).forEach(function(msg){
+    addRow(msg.role==='user'?'user':'agent', msg.text);
+  });
+  var chips=document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='none';
+}
+function removeChatEntry(id){ deleteChatById(id); renderSavedChatsList(); }
+function renderBirthProfilesList(){
+  var lang = window._lang||'en';
+  var list = listProfiles();
+  var el = document.getElementById('birth-profiles-list');
+  if(!list.length){
+    el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'अभी तक कोई प्रोफ़ाइल सहेजी नहीं गई।':'No birth profiles saved yet.')+'</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(p){
+    var initials = (p.label||p.name||'?').trim().charAt(0).toUpperCase();
+    return '<div class="profile-card">'
+      + '<div class="profile-avatar">'+initials+'</div>'
+      + '<div class="profile-body"><div class="profile-name">'+(p.label||p.name||'—')+'</div><div class="profile-sub">'+[p.dob,p.place].filter(Boolean).join(' · ')+'</div></div>'
+      + '<div class="profile-actions">'
+      +   '<button class="profile-use-btn" onclick="useProfile(\''+p.id+'\')">'+(lang==='hi'?'उपयोग करें':'Use')+'</button>'
+      +   '<button class="profile-del-btn" onclick="removeProfileEntry(\''+p.id+'\')">🗑</button>'
+      + '</div></div>';
+  }).join('');
+}
+function showAddProfileForm(){ document.getElementById('add-profile-form').style.display='block'; }
+function handleSaveProfile(){
+  var lang = window._lang||'en';
+  var name = document.getElementById('ap-name').value.trim();
+  var dob = document.getElementById('ap-dob').value.trim();
+  var time = document.getElementById('ap-time').value;
+  var place = document.getElementById('ap-place').value.trim();
+  if(!name){ alert(lang==='hi'?'कृपया एक नाम दर्ज करें।':'Please enter a name.'); return; }
+  saveProfile({ label:name, name:name, dob:dob, time:time, place:place });
+  document.getElementById('ap-name').value='';
+  document.getElementById('ap-dob').value='';
+  document.getElementById('ap-time').value='';
+  document.getElementById('ap-place').value='';
+  document.getElementById('add-profile-form').style.display='none';
+  renderBirthProfilesList();
+}
+function removeProfileEntry(id){ deleteProfileById(id); renderBirthProfilesList(); }
+function useProfile(id){
+  var p = listProfiles().find(function(x){return x.id===id;});
+  if(!p) return;
+  cdTrack('use_saved_profile');
+  reset();
+  closeAccountSection();
+  document.getElementById('f-name').value = p.name || p.label || '';
+  document.getElementById('f-dob').value = p.dob || '';
+  document.getElementById('f-time').value = p.time || '';
+  document.getElementById('f-place').value = p.place || '';
+}
+
+// ── Bilingual text for the account/auth UI ──────────────────────────
+function applyAccountLang(){
+  var lang = window._lang || 'en';
+  var t = lang==='hi' ? {
+    signupTitle:'अपना खाता बनाएं', signupSub:'मुफ़्त में शुरू करें। किसी क्रेडिट कार्ड की आवश्यकता नहीं।',
+    email:'ईमेल पता', password:'पासवर्ड', pwPh:'न्यूनतम 8 अक्षर', retype:'पासवर्ड फिर से लिखें', retypePh:'अपना पासवर्ड दोहराएं',
+    optional:'वैकल्पिक विवरण', optionalNote:'हम इन्हें आपकी प्रोफ़ाइल में स्वतः सहेज लेंगे',
+    fullName:'पूरा नाम', dob:'जन्म तिथि', tob:'जन्म समय', pob:'जन्म स्थान',
+    agree:'मैं ', agreeLink1:'गोपनीयता नीति', agreeMid:' और ', agreeLink2:'सेवा की शर्तों', agreeEnd:' से सहमत हूं। मेरे जन्म डेटा का उपयोग केवल वैदिक विश्लेषण के लिए किया जाएगा।',
+    createAccount:'खाता बनाएं', haveAccount:'पहले से खाता है? ', signIn:'साइन इन करें',
+    loginTitle:'वापसी पर स्वागत है', loginSub:'अपनी सहेजी गई रीडिंग देखने के लिए साइन इन करें।',
+    yourPassword:'आपका पासवर्ड', noAccount:'खाता नहीं है? ', signUp2:'साइन अप करें',
+    nudgeTitle:'अपनी करियर रीडिंग सहेजें', nudgeSub:'टैब बंद करने पर आपकी कुंडली की जानकारी खो जाएगी। इसे रखने के लिए मुफ़्त साइन अप करें।',
+    nb1:'अपनी सभी कुंडली रीडिंग सहेजें और देखें', nb2:'कभी भी बातचीत जारी रखें', nb3:'परिवार और दोस्तों की कुंडली विश्लेषण करें',
+    createFree:'मुफ़्त खाता बनाएं', maybeLater:'शायद बाद में',
+    apName:'नाम', apSave:'प्रोफ़ाइल सहेजें'
+  } : {
+    signupTitle:'Create your account', signupSub:'Start for free. No credit card needed.',
+    email:'Email address', password:'Password', pwPh:'Min. 8 characters', retype:'Retype password', retypePh:'Repeat your password',
+    optional:'optional details', optionalNote:"We'll save these to your profile automatically",
+    fullName:'Full name', dob:'Date of Birth', tob:'Time of Birth', pob:'Place of Birth',
+    agree:'I agree to the ', agreeLink1:'Privacy Policy', agreeMid:' and ', agreeLink2:'Terms of Service', agreeEnd:'. My birth data will be used only for Vedic analysis.',
+    createAccount:'Create account', haveAccount:'Already have an account? ', signIn:'Sign in',
+    loginTitle:'Welcome back', loginSub:'Sign in to see your saved readings.',
+    yourPassword:'Your password', noAccount:"Don't have an account? ", signUp2:'Sign up',
+    nudgeTitle:'Save your career reading', nudgeSub:'Your chart insights will be lost when you close this tab. Sign up free to keep them.',
+    nb1:'Save and revisit all your chart readings', nb2:'Continue conversations anytime', nb3:'Analyze charts for family and friends',
+    createFree:'Create a free account', maybeLater:'Maybe later',
+    apName:'Name', apSave:'Save profile'
+  };
+  var set=function(id,text){ var el=document.getElementById(id); if(el) el.textContent=text; };
+  set('signup-title',t.signupTitle); set('signup-sub',t.signupSub);
+  set('signup-email-label',t.email); set('signup-pw-label',t.password); set('signup-pw2-label',t.retype);
+  set('signup-optional-label',t.optional); set('signup-optional-note',t.optionalNote);
+  set('signup-name-label',t.fullName); set('signup-dob-label',t.dob); set('signup-time-label',t.tob); set('signup-place-label',t.pob);
+  set('signup-submit-btn',t.createAccount);
+  var pw1=document.getElementById('signup-password'); if(pw1) pw1.placeholder=t.pwPh;
+  var pw2=document.getElementById('signup-password2'); if(pw2) pw2.placeholder=t.retypePh;
+  var agreeEl=document.getElementById('signup-agree-text');
+  if(agreeEl) agreeEl.innerHTML = t.agree+'<span class="auth-link">'+t.agreeLink1+'</span>'+t.agreeMid+'<span class="auth-link">'+t.agreeLink2+'</span>'+t.agreeEnd;
+  var signupSwitch=document.getElementById('signup-switch');
+  if(signupSwitch) signupSwitch.innerHTML = t.haveAccount+'<a onclick="showAuthScreen(\'login\')">'+t.signIn+'</a>';
+
+  set('login-title',t.loginTitle); set('login-sub',t.loginSub);
+  set('login-email-label',t.email); set('login-pw-label',t.password);
+  var lpw=document.getElementById('login-password'); if(lpw) lpw.placeholder=t.yourPassword;
+  set('login-submit-btn',t.signIn);
+  var loginSwitch=document.getElementById('login-switch');
+  if(loginSwitch) loginSwitch.innerHTML = t.noAccount+'<a onclick="showAuthScreen(\'signup\')">'+t.signUp2+'</a>';
+
+  set('nudge-title',t.nudgeTitle); set('nudge-sub',t.nudgeSub);
+  set('nudge-b1',t.nb1); set('nudge-b2',t.nb2); set('nudge-b3',t.nb3);
+  set('nudge-cta',t.createFree); set('nudge-later',t.maybeLater);
+
+  set('ap-name-label',t.apName); set('ap-dob-label',t.dob); set('ap-time-label',t.tob); set('ap-place-label',t.pob);
+  set('ap-save-btn',t.apSave);
+}
+
 function formatDOB(inp){
   var v = inp.value.replace(/\D/g,'');
   if(v.length > 8) v = v.slice(0,8);
@@ -3424,34 +3957,53 @@ function triggerDownload_old(){
   }
 }
 
-var _placeTimer=null;var _selectedCoords=null;var _selectedPlaceName=null;
-function searchPlace(val){
-  _selectedCoords=null;_selectedPlaceName=null;
+var _placeTimer=null;
+function getSelectedPlaceCoords(inputEl){
+  if(!inputEl || inputEl.dataset.selectedPlace !== inputEl.value || !inputEl.dataset.selectedLat) return null;
+  return {
+    lat: parseFloat(inputEl.dataset.selectedLat),
+    lon: parseFloat(inputEl.dataset.selectedLon),
+    name: inputEl.dataset.selectedName,
+    coordinates: inputEl.dataset.selectedLat+','+inputEl.dataset.selectedLon
+  };
+}
+function searchPlace(inputEl){
+  var val = inputEl.value;
+  delete inputEl.dataset.selectedPlace; delete inputEl.dataset.selectedLat; delete inputEl.dataset.selectedLon;
   if(_placeTimer)clearTimeout(_placeTimer);
-  if(!val||val.length<3){hidePlaceDropdown();return;}
+  if(!val||val.length<3){hidePlaceDropdown(inputEl);return;}
   _placeTimer=setTimeout(function(){
     fetch(API+"/api/geocode?place="+encodeURIComponent(val)+"&limit=5").then(function(r){return r.json();}).then(function(data){
-      if(data.error||!data.length){hidePlaceDropdown();return;}
-      showPlaceDropdown(data);
-    }).catch(function(){hidePlaceDropdown();});
+      if(data.error||!data.length){hidePlaceDropdown(inputEl);return;}
+      showPlaceDropdown(inputEl,data);
+    }).catch(function(){hidePlaceDropdown(inputEl);});
   },400);
 }
-function showPlaceDropdown(results){
-  var dd=document.getElementById("place-dropdown");
+function showPlaceDropdown(inputEl,results){
+  var dd=inputEl.nextElementSibling;
+  if(!dd) return;
   dd.innerHTML="";
   results.forEach(function(r){
     var item=document.createElement("div");
     item.style.cssText="padding:10px 12px;cursor:pointer;font-size:13px;color:#1a1a1a;border-bottom:0.5px solid #eee;line-height:1.4;";
     item.innerHTML="<div style=\"font-weight:500;\">"+r.short_name+"</div><div style=\"font-size:11px;color:#888;margin-top:2px;\">"+r.display_name.slice(0,60)+"</div>";
-    item.addEventListener("mousedown",function(e){e.preventDefault();document.getElementById("f-place").value=r.short_name;var glat=parseFloat(r.lat),glon=parseFloat(r.lon);_selectedCoords={lat:glat,lon:glon,name:r.display_name,coordinates:glat+","+glon};_selectedPlaceName=r.short_name;hidePlaceDropdown();});
+    item.addEventListener("mousedown",function(e){
+      e.preventDefault();
+      inputEl.value=r.short_name;
+      var glat=parseFloat(r.lat),glon=parseFloat(r.lon);
+      inputEl.dataset.selectedLat=glat; inputEl.dataset.selectedLon=glon;
+      inputEl.dataset.selectedName=r.display_name; inputEl.dataset.selectedPlace=r.short_name;
+      hidePlaceDropdown(inputEl);
+    });
     item.addEventListener("mouseover",function(){this.style.background="#f5f0e8";});
     item.addEventListener("mouseout",function(){this.style.background="";});
     dd.appendChild(item);
   });
   dd.style.display="block";
 }
-function hidePlaceDropdown(){
-  setTimeout(function(){var dd=document.getElementById("place-dropdown");if(dd)dd.style.display="none";},150);
+function hidePlaceDropdown(inputEl){
+  var dd = inputEl && inputEl.nextElementSibling;
+  setTimeout(function(){if(dd)dd.style.display="none";},150);
 }
 function collectData(meta, verdict, analysis){
   try{
@@ -3513,7 +4065,7 @@ async function analyze(){
   setStat('ld','Fetching chart...');
 
   try{
-    var coords=(_selectedCoords && _selectedPlaceName===place) ? _selectedCoords : await geocode(place);
+    var coords=getSelectedPlaceCoords(document.getElementById('f-place')) || await geocode(place);
     var dt=parseDT(parseDOBToISO(dob),time);
     var hl=document.getElementById('rs-loading-text');
     if(hl) hl.textContent='Locating '+place.split(',')[0]+'...';
@@ -3885,6 +4437,7 @@ async function sendChat(){
     removeLoader();
     addRow('agent',renderChatReply(reply),null,reply);
     setStat('ok','Ready');
+    if(window._currentUser){ autoSaveChatIfLoggedIn(); } else { maybeShowSaveNudge(); }
   }catch(e){
     removeLoader();
     addRow('agent','Error: '+e.message,'er');
@@ -4501,6 +5054,8 @@ function applyLang(){
     renderDefaultChatChips();
   }
   syncAllTranslatables();
+  refreshAuthUI();
+  applyAccountLang();
 }
 document.addEventListener('DOMContentLoaded', applyLang);
 </script>
@@ -4513,6 +5068,7 @@ document.addEventListener('DOMContentLoaded', applyLang);
       <span class="lang-switch-label en">EN</span>
       <span class="lang-switch-label hi">HI</span>
     </button>
+    <div id="auth-area-main"></div>
   </div>
 
   <!-- Birth Details Form -->
@@ -4546,8 +5102,8 @@ document.addEventListener('DOMContentLoaded', applyLang);
       </div>
       <div class="form-group place-field">
         <label for="f-place">Place of Birth</label>
-        <input type="text" id="f-place" autocomplete="off" onfocus="cdTrack('field_focus',{field:'place'})" oninput="searchPlace(this.value)" onblur="hidePlaceDropdown()" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
-        <div id="place-dropdown"></div>
+        <input type="text" id="f-place" autocomplete="off" onfocus="cdTrack('field_focus',{field:'place'})" oninput="searchPlace(this)" onblur="hidePlaceDropdown(this)" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+        <div class="place-dropdown-el"></div>
       </div>
       <div class="form-group full">
         <label for="f-email">Email Address <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
@@ -4571,6 +5127,7 @@ document.addEventListener('DOMContentLoaded', applyLang);
         <span class="lang-switch-label en">EN</span>
         <span class="lang-switch-label hi">HI</span>
       </button>
+      <div id="auth-area-rs"></div>
     </div>
 
     <!-- Scrollable body -->
@@ -4685,6 +5242,168 @@ document.addEventListener('DOMContentLoaded', applyLang);
     <div id="report-screen" style="display:none"></div>
 
   </div>
+
+  <!-- ── Auth: Sign up / Log in ─────────────────────────────────────── -->
+  <div id="auth-section">
+    <div class="rs-header">
+      <button class="rs-back-btn" onclick="closeAuth()">← Back</button>
+      <span class="htitle" style="margin-left:8px;">Career Destiny</span>
+    </div>
+    <div class="auth-body">
+      <div class="auth-card">
+
+        <div id="screen-signup">
+          <div class="auth-title" id="signup-title">Create your account</div>
+          <div class="auth-sub" id="signup-sub">Start for free. No credit card needed.</div>
+          <div class="auth-error" id="signup-error"></div>
+
+          <div class="auth-field">
+            <label id="signup-email-label">Email address</label>
+            <input type="email" id="signup-email" placeholder="your@email.com"/>
+          </div>
+          <div class="auth-field">
+            <label id="signup-pw-label">Password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="signup-password" placeholder="Min. 8 characters" oninput="updatePwStrength()"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password',this)">👁</button>
+            </div>
+            <div class="auth-pw-strength" id="signup-pw-strength">
+              <div class="auth-pw-strength-seg"></div><div class="auth-pw-strength-seg"></div>
+              <div class="auth-pw-strength-seg"></div><div class="auth-pw-strength-seg"></div>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label id="signup-pw2-label">Retype password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="signup-password2" placeholder="Repeat your password"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password2',this)">👁</button>
+            </div>
+          </div>
+
+          <div class="auth-divider" id="signup-optional-label">optional details</div>
+          <div class="auth-divider-note" id="signup-optional-note">We'll save these to your profile automatically</div>
+
+          <div class="auth-field">
+            <label id="signup-name-label">Full name</label>
+            <input type="text" id="signup-name" placeholder="e.g. Rahul Sharma"/>
+          </div>
+          <div class="auth-field">
+            <label id="signup-dob-label">Date of Birth</label>
+            <input type="text" id="signup-dob" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDOB(this)" onkeydown="handleDOBKey(event,this)"/>
+          </div>
+          <div class="auth-field">
+            <label id="signup-time-label">Time of Birth</label>
+            <input type="time" id="signup-time" step="60"/>
+          </div>
+          <div class="auth-field place-field">
+            <label id="signup-place-label">Place of Birth</label>
+            <input type="text" id="signup-place" autocomplete="off" oninput="searchPlace(this)" onblur="hidePlaceDropdown(this)" placeholder="e.g. Ghaziabad, Uttar Pradesh"/>
+            <div class="place-dropdown-el"></div>
+          </div>
+
+          <label class="auth-agree">
+            <input type="checkbox" id="signup-agree"/>
+            <span id="signup-agree-text">I agree to the <span class="auth-link">Privacy Policy</span> and <span class="auth-link">Terms of Service</span>. My birth data will be used only for Vedic analysis.</span>
+          </label>
+
+          <button class="auth-submit-btn" id="signup-submit-btn" onclick="handleSignUp()">Create account</button>
+          <div class="auth-switch" id="signup-switch">Already have an account? <a onclick="showAuthScreen('login')">Sign in</a></div>
+        </div>
+
+        <div id="screen-login" style="display:none">
+          <div class="auth-title" id="login-title">Welcome back</div>
+          <div class="auth-sub" id="login-sub">Sign in to see your saved readings.</div>
+          <div class="auth-error" id="login-error"></div>
+
+          <div class="auth-field">
+            <label id="login-email-label">Email address</label>
+            <input type="email" id="login-email" placeholder="your@email.com"/>
+          </div>
+          <div class="auth-field">
+            <label id="login-pw-label">Password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="login-password" placeholder="Your password"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('login-password',this)">👁</button>
+            </div>
+          </div>
+
+          <button class="auth-submit-btn" id="login-submit-btn" onclick="handleLogIn()">Sign in</button>
+          <div class="auth-switch" id="login-switch">Don't have an account? <a onclick="showAuthScreen('signup')">Sign up</a></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Save-your-reading nudge modal ──────────────────────────────── -->
+  <div id="save-nudge-overlay">
+    <div class="nudge-card">
+      <div class="nudge-header">
+        <button class="nudge-close" onclick="dismissNudge()">✕</button>
+        <div class="nudge-icon">🔮</div>
+        <div class="nudge-title" id="nudge-title">Save your career reading</div>
+        <div class="nudge-sub" id="nudge-sub">Your chart insights will be lost when you close this tab. Sign up free to keep them.</div>
+      </div>
+      <div class="nudge-body">
+        <div class="nudge-bullet"><span class="nudge-dot"></span><span id="nudge-b1">Save and revisit all your chart readings</span></div>
+        <div class="nudge-bullet"><span class="nudge-dot"></span><span id="nudge-b2">Continue conversations anytime</span></div>
+        <div class="nudge-bullet"><span class="nudge-dot"></span><span id="nudge-b3">Analyze charts for family and friends</span></div>
+        <button class="nudge-cta" id="nudge-cta" onclick="openAuth('signup')">Create a free account</button>
+        <button class="nudge-later" id="nudge-later" onclick="dismissNudge()">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Account: Profile / Saved Chats / My Birth Chart ────────────── -->
+  <div class="acct-section" id="account-section">
+    <div class="rs-header">
+      <button class="rs-back-btn" onclick="closeAccountSection()">← Back</button>
+      <span class="htitle" id="account-section-title" style="margin-left:8px;">Profile</span>
+    </div>
+    <div class="acct-body">
+
+      <div id="screen-profile">
+        <div class="profile-card">
+          <div class="profile-avatar" id="profile-avatar">U</div>
+          <div class="profile-body">
+            <div class="profile-name" id="profile-name-display">—</div>
+            <div class="profile-sub" id="profile-email-display">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-saved-chats" style="display:none">
+        <div id="saved-chats-list"></div>
+      </div>
+
+      <div id="screen-birth-chart" style="display:none">
+        <div id="birth-profiles-list"></div>
+        <button class="acct-add-btn" id="add-profile-btn" onclick="showAddProfileForm()">+ Add a birth profile</button>
+        <div id="add-profile-form" style="display:none;margin-top:14px;">
+          <div class="auth-field">
+            <label id="ap-name-label">Name</label>
+            <input type="text" id="ap-name" placeholder="e.g. Mom"/>
+          </div>
+          <div class="auth-field">
+            <label id="ap-dob-label">Date of Birth</label>
+            <input type="text" id="ap-dob" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDOB(this)" onkeydown="handleDOBKey(event,this)"/>
+          </div>
+          <div class="auth-field">
+            <label id="ap-time-label">Time of Birth</label>
+            <input type="time" id="ap-time" step="60"/>
+          </div>
+          <div class="auth-field place-field">
+            <label id="ap-place-label">Place of Birth</label>
+            <input type="text" id="ap-place" autocomplete="off" oninput="searchPlace(this)" onblur="hidePlaceDropdown(this)" placeholder="e.g. Ghaziabad, Uttar Pradesh"/>
+            <div class="place-dropdown-el"></div>
+          </div>
+          <button class="auth-submit-btn" id="ap-save-btn" onclick="handleSaveProfile()">Save profile</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 </body>
