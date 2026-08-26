@@ -3414,67 +3414,131 @@ function syncAllTranslatables(){
 
 // ══════════════════════════════════════════════════════════════════
 // Account: sign-up/login, saved chats, birth profiles
-// STUB STORAGE — everything below is backed by localStorage because no
-// database is wired up yet. Every function here is written as the single
-// place that talks to "the backend", so swapping in real Supabase calls
-// later means rewriting these bodies only — no caller changes anywhere.
-// Passwords are deliberately never persisted, even here, since a real
-// credential store is not in place: signUp/logIn only ever keep
-// {name, email} as the "session".
+// Backed by Supabase — Auth (GoTrue) for sign-up/login, PostgREST for
+// profiles/chat_sessions. Called via plain fetch (no supabase-js) to
+// match the rest of this file. The publishable key is safe to embed —
+// Row Level Security on both tables is what actually restricts each
+// user to their own rows, not secrecy of this key.
 // ══════════════════════════════════════════════════════════════════
-var AUTH_KEY='cd_user', PROFILES_KEY='cd_profiles', CHATS_KEY='cd_chats';
+var SUPABASE_URL = 'https://ybuqwggrkbtdubnzeecb.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_K-3ThVzekUIwHWhtZ-jbNg_SK0SNDdn';
+var SB_AUTH = SUPABASE_URL + '/auth/v1';
+var SB_REST = SUPABASE_URL + '/rest/v1';
+var SESSION_KEY = 'cd_session';
 
-function getCurrentUser(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)); }catch(e){ return null; } }
-function setCurrentUser(user){
-  try{ localStorage.setItem(AUTH_KEY, JSON.stringify(user)); }catch(e){}
-  window._currentUser = user;
+function getStoredSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)); }catch(e){ return null; } }
+function setStoredSession(session){
+  try{
+    if(session) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else localStorage.removeItem(SESSION_KEY);
+  }catch(e){}
 }
-function signUp(details){
-  var user = { name: details.name||'', email: details.email };
-  setCurrentUser(user);
-  return Promise.resolve(user);
+function getCurrentUser(){
+  var s = getStoredSession();
+  if(!s || !s.user) return null;
+  return { id: s.user.id, email: s.user.email, name: (s.user.user_metadata && s.user.user_metadata.name) || '' };
 }
-function logIn(details){
-  var existing = getCurrentUser();
-  var user = { name: (existing && existing.email===details.email && existing.name) || '', email: details.email };
-  setCurrentUser(user);
-  return Promise.resolve(user);
+async function _sbAuthFetch(path, body){
+  var r = await fetch(SB_AUTH+path, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},
+    body: JSON.stringify(body)
+  });
+  var data = await r.json();
+  if(!r.ok) throw new Error(data.error_description || data.msg || data.error || 'Authentication failed');
+  return data;
+}
+function _storeAuthResponse(data){
+  setStoredSession({ access_token:data.access_token, refresh_token:data.refresh_token, expires_at:data.expires_at, user:data.user });
+  window._currentUser = getCurrentUser();
+}
+async function ensureValidAccessToken(){
+  var s = getStoredSession();
+  if(!s || !s.access_token) return null;
+  if(s.expires_at && Date.now() < (s.expires_at*1000 - 30000)) return s.access_token;
+  try{
+    var data = await _sbAuthFetch('/token?grant_type=refresh_token', { refresh_token: s.refresh_token });
+    _storeAuthResponse(data);
+    return data.access_token;
+  }catch(e){
+    setStoredSession(null);
+    window._currentUser = null;
+    return null;
+  }
+}
+async function signUp(details){
+  var data = await _sbAuthFetch('/signup', { email:details.email, password:details.password, data:{ name: details.name||'' } });
+  if(data.access_token){
+    _storeAuthResponse(data);
+  } else {
+    // Some project configs return only the user object from /signup even
+    // with email confirmation off — log in right after to get a session.
+    var loginData = await _sbAuthFetch('/token?grant_type=password', { email:details.email, password:details.password });
+    _storeAuthResponse(loginData);
+  }
+  return window._currentUser;
+}
+async function logIn(details){
+  var data = await _sbAuthFetch('/token?grant_type=password', { email:details.email, password:details.password });
+  _storeAuthResponse(data);
+  return window._currentUser;
 }
 function logOut(){
-  try{ localStorage.removeItem(AUTH_KEY); }catch(e){}
+  var s = getStoredSession();
+  setStoredSession(null);
   window._currentUser = null;
   window._chatSessionId = null; window._chatSessionSaved = false;
   refreshAuthUI();
+  if(s && s.access_token){
+    fetch(SB_AUTH+'/logout', { method:'POST', headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+s.access_token} }).catch(function(){});
+  }
 }
 
-function listProfiles(){ try{ return JSON.parse(localStorage.getItem(PROFILES_KEY))||[]; }catch(e){ return []; } }
-function saveProfile(profile){
-  var list = listProfiles();
-  profile.id = profile.id || ('p_'+Date.now()+'_'+Math.floor(Math.random()*1000));
-  var idx = list.findIndex(function(p){return p.id===profile.id;});
-  if(idx>=0) list[idx]=profile; else list.push(profile);
-  try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(list)); }catch(e){}
-  return profile;
-}
-function deleteProfileById(id){
-  var list = listProfiles().filter(function(p){return p.id!==id;});
-  try{ localStorage.setItem(PROFILES_KEY, JSON.stringify(list)); }catch(e){}
+// ── Data access (PostgREST, RLS-scoped by the caller's JWT) ─────────
+async function _sbRest(method, path, body){
+  var token = await ensureValidAccessToken();
+  if(!token) throw new Error('Not signed in');
+  var headers = {'apikey':SUPABASE_ANON_KEY, 'Authorization':'Bearer '+token, 'Content-Type':'application/json'};
+  if(method!=='GET') headers['Prefer']='return=representation';
+  var r = await fetch(SB_REST+path, { method:method, headers:headers, body: body?JSON.stringify(body):undefined });
+  if(!r.ok){ var errText=await r.text(); throw new Error('Supabase error: '+errText.slice(0,200)); }
+  if(r.status===204) return null;
+  return r.json();
 }
 
-function listChats(){ try{ return JSON.parse(localStorage.getItem(CHATS_KEY))||[]; }catch(e){ return []; } }
-function saveChatSession(session){
-  var list = listChats();
-  session.id = session.id || ('c_'+Date.now()+'_'+Math.floor(Math.random()*1000));
-  session.updatedAt = Date.now();
-  var idx = list.findIndex(function(c){return c.id===session.id;});
-  if(idx>=0) list[idx]=session; else list.unshift(session);
-  try{ localStorage.setItem(CHATS_KEY, JSON.stringify(list)); }catch(e){}
-  return session;
+async function listProfiles(){
+  if(!getCurrentUser()) return [];
+  try{ return await _sbRest('GET', '/profiles?select=*&order=created_at.asc'); }
+  catch(e){ console.error('listProfiles failed:', e.message); return []; }
 }
-function deleteChatById(id){
-  var list = listChats().filter(function(c){return c.id!==id;});
-  try{ localStorage.setItem(CHATS_KEY, JSON.stringify(list)); }catch(e){}
+async function saveProfile(profile){
+  var payload = { label:profile.label, name:profile.name||null, dob:profile.dob||null, time:profile.time||null, place:profile.place||null, is_self:!!profile.isSelf };
+  var rows;
+  if(profile.id){
+    rows = await _sbRest('PATCH', '/profiles?id=eq.'+profile.id, payload);
+  } else {
+    rows = await _sbRest('POST', '/profiles', payload);
+  }
+  return rows && rows[0];
 }
+async function deleteProfileById(id){ await _sbRest('DELETE', '/profiles?id=eq.'+id); }
+
+async function listChats(){
+  if(!getCurrentUser()) return [];
+  try{ return await _sbRest('GET', '/chat_sessions?select=*&order=updated_at.desc'); }
+  catch(e){ console.error('listChats failed:', e.message); return []; }
+}
+async function saveChatSession(session){
+  var payload = { title:session.title, subtitle:session.subtitle||null, messages:session.messages, profile_id:session.profileId||null, updated_at:new Date().toISOString() };
+  var rows;
+  if(session.id){
+    rows = await _sbRest('PATCH', '/chat_sessions?id=eq.'+session.id, payload);
+  } else {
+    rows = await _sbRest('POST', '/chat_sessions', payload);
+  }
+  return rows && rows[0];
+}
+async function deleteChatById(id){ await _sbRest('DELETE', '/chat_sessions?id=eq.'+id); }
 
 // ── Header: Sign up button ↔ user avatar/dropdown ──────────────────
 function renderAuthArea(){
@@ -3562,7 +3626,7 @@ function updatePwStrength(){
   });
 }
 function _msgsExist(){ var m=document.getElementById('msgs'); return !!(m && m.children.length); }
-function handleSignUp(){
+async function handleSignUp(){
   var lang = window._lang||'en';
   var email = document.getElementById('signup-email').value.trim();
   var pw = document.getElementById('signup-password').value;
@@ -3576,30 +3640,44 @@ function handleSignUp(){
   if(!agree){ showAuthError('signup', lang==='hi'?'कृपया जारी रखने के लिए सहमति दें।':'Please agree to continue.'); return; }
 
   cdTrack('signup_submit');
-  signUp({name:name, email:email}).then(function(){
+  var btn = document.getElementById('signup-submit-btn');
+  btn.disabled = true;
+  try{
+    await signUp({name:name, email:email, password:pw});
     var dob = document.getElementById('signup-dob').value;
     var time = document.getElementById('signup-time').value;
     var placeEl = document.getElementById('signup-place');
     if(dob || time || placeEl.value){
-      saveProfile({ label: name || (lang==='hi'?'स्वयं':'Myself'), name:name, dob:dob, time:time, place:placeEl.value, isSelf:true });
+      await saveProfile({ label: name || (lang==='hi'?'स्वयं':'Myself'), name:name, dob:dob, time:time, place:placeEl.value, isSelf:true });
     }
     closeAuth();
     refreshAuthUI();
     if(_msgsExist()) autoSaveChatIfLoggedIn();
-  });
+  }catch(e){
+    showAuthError('signup', e.message || (lang==='hi'?'साइन अप विफल रहा। कृपया पुनः प्रयास करें।':'Sign up failed. Please try again.'));
+  }finally{
+    btn.disabled = false;
+  }
 }
-function handleLogIn(){
+async function handleLogIn(){
   var lang = window._lang||'en';
   var email = document.getElementById('login-email').value.trim();
   var pw = document.getElementById('login-password').value;
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAuthError('login', lang==='hi'?'कृपया मान्य ईमेल दर्ज करें।':'Please enter a valid email address.'); return; }
   if(!pw){ showAuthError('login', lang==='hi'?'कृपया पासवर्ड दर्ज करें।':'Please enter your password.'); return; }
   cdTrack('login_submit');
-  logIn({email:email}).then(function(){
+  var btn = document.getElementById('login-submit-btn');
+  btn.disabled = true;
+  try{
+    await logIn({email:email, password:pw});
     closeAuth();
     refreshAuthUI();
     if(_msgsExist()) autoSaveChatIfLoggedIn();
-  });
+  }catch(e){
+    showAuthError('login', e.message || (lang==='hi'?'साइन इन विफल रहा। कृपया अपना ईमेल और पासवर्ड जांचें।':'Sign in failed. Please check your email and password.'));
+  }finally{
+    btn.disabled = false;
+  }
 }
 
 // ── Save-your-reading nudge modal ────────────────────────────────────
@@ -3617,7 +3695,7 @@ function showSaveNudge(){ cdTrack('save_nudge_shown'); document.getElementById('
 function dismissNudge(){ cdTrack('save_nudge_dismissed'); document.getElementById('save-nudge-overlay').style.display='none'; }
 
 // ── Auto-save chat history for logged-in users ──────────────────────
-function autoSaveChatIfLoggedIn(){
+async function autoSaveChatIfLoggedIn(){
   if(!window._currentUser) return;
   var user = window._currentUser;
   var rows = document.querySelectorAll('#msgs .row');
@@ -3630,12 +3708,14 @@ function autoSaveChatIfLoggedIn(){
   var lagna = window._d1LagnaSign ? (window._d1LagnaSign+' Lagna') : '';
   var title = (window._lang==='hi'?'करियर रीडिंग · ':'Career Reading · ') + (user.name || (user.email?user.email.split('@')[0]:''));
   var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages };
-  var saved = saveChatSession(session);
-  window._chatSessionId = saved.id;
-  if(!window._chatSessionSaved){
-    window._chatSessionSaved = true;
-    showSavedToast(title);
-  }
+  try{
+    var saved = await saveChatSession(session);
+    if(saved) window._chatSessionId = saved.id;
+    if(!window._chatSessionSaved){
+      window._chatSessionSaved = true;
+      showSavedToast(title);
+    }
+  }catch(e){ console.error('autoSaveChatIfLoggedIn failed:', e.message); }
 }
 function showSavedToast(title){
   var m = getM();
@@ -3673,16 +3753,17 @@ function openMyBirthChart(){
   document.getElementById('add-profile-form').style.display='none';
   openAccountSection('screen-birth-chart', window._lang==='hi'?'मेरी कुंडली':'My Birth Chart');
 }
-function renderSavedChatsList(){
+async function renderSavedChatsList(){
   var lang = window._lang||'en';
-  var list = listChats();
   var el = document.getElementById('saved-chats-list');
+  el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'लोड हो रहा है...':'Loading...')+'</div>';
+  var list = await listChats();
   if(!list.length){
     el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'अभी तक कोई सहेजी गई चैट नहीं। अपनी कुंडली से बात शुरू करें — यह अपने आप सहेज दी जाएगी।':'No saved chats yet. Start a conversation with your chart — it will save automatically.')+'</div>';
     return;
   }
   el.innerHTML = list.map(function(c){
-    var date = new Date(c.updatedAt||Date.now());
+    var date = new Date(c.updated_at||Date.now());
     var dateStr = date.toLocaleDateString(lang==='hi'?'hi-IN':'en-IN', {day:'numeric',month:'short'});
     return '<div class="chat-list-item" onclick="resumeChat(\''+c.id+'\')">'
       + '<div class="chat-list-body">'
@@ -3694,8 +3775,9 @@ function renderSavedChatsList(){
       + '</div>';
   }).join('');
 }
-function resumeChat(id){
-  var session = listChats().find(function(c){return c.id===id;});
+async function resumeChat(id){
+  var list = await listChats();
+  var session = list.find(function(c){return c.id===id;});
   if(!session) return;
   cdTrack('resume_saved_chat');
   window._chatSessionId = session.id;
@@ -3711,11 +3793,12 @@ function resumeChat(id){
   });
   var chips=document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='none';
 }
-function removeChatEntry(id){ deleteChatById(id); renderSavedChatsList(); }
-function renderBirthProfilesList(){
+async function removeChatEntry(id){ await deleteChatById(id); renderSavedChatsList(); }
+async function renderBirthProfilesList(){
   var lang = window._lang||'en';
-  var list = listProfiles();
   var el = document.getElementById('birth-profiles-list');
+  el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'लोड हो रहा है...':'Loading...')+'</div>';
+  var list = await listProfiles();
   if(!list.length){
     el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'अभी तक कोई प्रोफ़ाइल सहेजी नहीं गई।':'No birth profiles saved yet.')+'</div>';
     return;
@@ -3732,24 +3815,33 @@ function renderBirthProfilesList(){
   }).join('');
 }
 function showAddProfileForm(){ document.getElementById('add-profile-form').style.display='block'; }
-function handleSaveProfile(){
+async function handleSaveProfile(){
   var lang = window._lang||'en';
   var name = document.getElementById('ap-name').value.trim();
   var dob = document.getElementById('ap-dob').value.trim();
   var time = document.getElementById('ap-time').value;
   var place = document.getElementById('ap-place').value.trim();
   if(!name){ alert(lang==='hi'?'कृपया एक नाम दर्ज करें।':'Please enter a name.'); return; }
-  saveProfile({ label:name, name:name, dob:dob, time:time, place:place });
-  document.getElementById('ap-name').value='';
-  document.getElementById('ap-dob').value='';
-  document.getElementById('ap-time').value='';
-  document.getElementById('ap-place').value='';
-  document.getElementById('add-profile-form').style.display='none';
-  renderBirthProfilesList();
+  var btn = document.getElementById('ap-save-btn');
+  btn.disabled = true;
+  try{
+    await saveProfile({ label:name, name:name, dob:dob, time:time, place:place });
+    document.getElementById('ap-name').value='';
+    document.getElementById('ap-dob').value='';
+    document.getElementById('ap-time').value='';
+    document.getElementById('ap-place').value='';
+    document.getElementById('add-profile-form').style.display='none';
+    renderBirthProfilesList();
+  }catch(e){
+    alert(e.message || (lang==='hi'?'प्रोफ़ाइल सहेजने में विफल।':'Failed to save profile.'));
+  }finally{
+    btn.disabled = false;
+  }
 }
-function removeProfileEntry(id){ deleteProfileById(id); renderBirthProfilesList(); }
-function useProfile(id){
-  var p = listProfiles().find(function(x){return x.id===id;});
+async function removeProfileEntry(id){ await deleteProfileById(id); renderBirthProfilesList(); }
+async function useProfile(id){
+  var list = await listProfiles();
+  var p = list.find(function(x){return x.id===id;});
   if(!p) return;
   cdTrack('use_saved_profile');
   reset();
