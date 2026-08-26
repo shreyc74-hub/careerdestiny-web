@@ -242,6 +242,9 @@ body{
 .auth-info{font-size:12px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;margin-bottom:14px;display:none;}
 .auth-forgot{text-align:right;margin-top:6px;}
 .auth-forgot a{font-size:12px;color:var(--purple);font-weight:600;cursor:pointer;}
+.auth-field-hint{font-size:11.5px;margin-top:6px;display:none;}
+.auth-field-hint.err{color:#c0392b;}
+.auth-field-hint.ok{color:#16a34a;}
 
 /* Save-your-reading nudge modal */
 #save-nudge-overlay{
@@ -3704,6 +3707,9 @@ function showAuthScreen(screen){
   document.getElementById('signup-error').style.display='none';
   document.getElementById('login-error').style.display='none';
   var infoEl = document.getElementById('login-info'); if(infoEl) infoEl.style.display='none';
+  ['signup-email-hint','signup-pw2-hint','reset-password-pw2-hint'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display='none';
+  });
   var toggle = document.getElementById('auth-toggle');
   if(toggle){
     toggle.style.display = screen==='reset-password' ? 'none' : 'flex';
@@ -3734,6 +3740,61 @@ function updatePwStrength(){
   document.querySelectorAll('#signup-pw-strength .auth-pw-strength-seg').forEach(function(seg,i){
     seg.classList.toggle('on', i<score);
   });
+}
+// Live "do these two passwords match" feedback — previously this only
+// surfaced on submit, so a typo went unnoticed until "Create account" failed.
+function checkPwMatch(pwId, pw2Id, hintId){
+  var lang = window._lang||'en';
+  var pw = document.getElementById(pwId), pw2El = document.getElementById(pw2Id), hint = document.getElementById(hintId);
+  if(!pw || !pw2El || !hint) return;
+  var pw2 = pw2El.value;
+  if(!pw2){ hint.style.display='none'; return; }
+  if(pw.value !== pw2){
+    hint.textContent = lang==='hi' ? 'पासवर्ड मेल नहीं खाते।' : 'Passwords do not match.';
+    hint.className = 'auth-field-hint err';
+  } else {
+    hint.textContent = lang==='hi' ? 'पासवर्ड मेल खाते हैं।' : 'Passwords match.';
+    hint.className = 'auth-field-hint ok';
+  }
+  hint.style.display = 'block';
+}
+
+// Live "did you mean gmail.com" feedback for typo'd domains on popular
+// mailbox providers worldwide — catches e.g. gnail.com, yahooo.com, otlook.com.
+var COMMON_EMAIL_DOMAINS = ['gmail.com','yahoo.com','outlook.com','hotmail.com','icloud.com','aol.com','protonmail.com','live.com','msn.com','zoho.com','gmx.com','mail.com','yandex.com','rediffmail.com','qq.com','163.com','naver.com','comcast.net','att.net','verizon.net'];
+function _levenshtein(a, b){
+  var m=a.length, n=b.length;
+  var dp=[]; var i,j;
+  for(i=0;i<=m;i++){ dp.push([i]); }
+  for(j=0;j<=n;j++){ dp[0][j]=j; }
+  for(i=1;i<=m;i++){
+    for(j=1;j<=n;j++){
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function checkEmailDomainTypo(inputId, hintId){
+  var lang = window._lang||'en';
+  var el = document.getElementById(inputId), hint = document.getElementById(hintId);
+  if(!el || !hint) return;
+  var email = el.value.trim();
+  var at = email.lastIndexOf('@');
+  if(at<0 || at===email.length-1){ hint.style.display='none'; return; }
+  var domain = email.slice(at+1).toLowerCase();
+  if(COMMON_EMAIL_DOMAINS.indexOf(domain)>-1){ hint.style.display='none'; return; }
+  var best=null, bestDist=99;
+  COMMON_EMAIL_DOMAINS.forEach(function(d){
+    var dist=_levenshtein(domain, d);
+    if(dist<bestDist){ bestDist=dist; best=d; }
+  });
+  if(best && bestDist>0 && bestDist<=2){
+    hint.textContent = lang==='hi' ? 'क्या आपका मतलब '+best+' था? कृपया अपना ईमेल दोबारा जांचें।' : 'Did you mean '+best+'? Please check your email address again.';
+    hint.className = 'auth-field-hint err';
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
 }
 function _msgsExist(){ var m=document.getElementById('msgs'); return !!(m && m.children.length); }
 async function handleSignUp(){
@@ -5690,12 +5751,13 @@ document.addEventListener('DOMContentLoaded', applyLang);
 
           <div class="auth-field">
             <label id="signup-email-label">Email address</label>
-            <input type="email" id="signup-email" placeholder="your@email.com"/>
+            <input type="email" id="signup-email" placeholder="your@email.com" onblur="checkEmailDomainTypo('signup-email','signup-email-hint')"/>
+            <div class="auth-field-hint" id="signup-email-hint"></div>
           </div>
           <div class="auth-field">
             <label id="signup-pw-label">Password</label>
             <div class="auth-pw-row">
-              <input type="password" id="signup-password" placeholder="Min. 8 characters" oninput="updatePwStrength()"/>
+              <input type="password" id="signup-password" placeholder="Min. 8 characters" oninput="updatePwStrength();checkPwMatch('signup-password','signup-password2','signup-pw2-hint')"/>
               <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password',this)">👁</button>
             </div>
             <div class="auth-pw-strength" id="signup-pw-strength">
@@ -5706,9 +5768,10 @@ document.addEventListener('DOMContentLoaded', applyLang);
           <div class="auth-field">
             <label id="signup-pw2-label">Retype password</label>
             <div class="auth-pw-row">
-              <input type="password" id="signup-password2" placeholder="Repeat your password"/>
+              <input type="password" id="signup-password2" placeholder="Repeat your password" oninput="checkPwMatch('signup-password','signup-password2','signup-pw2-hint')"/>
               <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password2',this)">👁</button>
             </div>
+            <div class="auth-field-hint" id="signup-pw2-hint"></div>
           </div>
 
           <label class="auth-agree">
@@ -5752,16 +5815,17 @@ document.addEventListener('DOMContentLoaded', applyLang);
           <div class="auth-field">
             <label id="reset-password-new-label">New password</label>
             <div class="auth-pw-row">
-              <input type="password" id="reset-password-new" placeholder="Min. 8 characters"/>
+              <input type="password" id="reset-password-new" placeholder="Min. 8 characters" oninput="checkPwMatch('reset-password-new','reset-password-new2','reset-password-pw2-hint')"/>
               <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('reset-password-new',this)">👁</button>
             </div>
           </div>
           <div class="auth-field">
             <label id="reset-password-new2-label">Retype new password</label>
             <div class="auth-pw-row">
-              <input type="password" id="reset-password-new2" placeholder="Repeat your new password"/>
+              <input type="password" id="reset-password-new2" placeholder="Repeat your new password" oninput="checkPwMatch('reset-password-new','reset-password-new2','reset-password-pw2-hint')"/>
               <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('reset-password-new2',this)">👁</button>
             </div>
+            <div class="auth-field-hint" id="reset-password-pw2-hint"></div>
           </div>
 
           <button class="auth-submit-btn" id="reset-password-submit-btn" onclick="handleUpdatePassword()">Update password</button>
