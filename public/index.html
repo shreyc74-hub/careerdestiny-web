@@ -199,6 +199,25 @@ body{
 }
 .auth-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;}
 .auth-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px 20px;}
+.auth-toggle{
+  position:relative;display:flex;width:100%;max-width:260px;margin:0 auto 24px;
+  padding:3px;border-radius:12px;background:var(--bg-form);border:1px solid var(--border);
+}
+.auth-toggle-thumb{
+  position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);
+  border-radius:9px;background:linear-gradient(135deg,#6C63D6,var(--purple));
+  box-shadow:0 2px 8px rgba(83,74,183,0.35);
+  transition:transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+.auth-toggle[data-active="signup"] .auth-toggle-thumb{transform:translateX(100%);}
+.auth-toggle-seg{
+  position:relative;z-index:1;flex:1;padding:9px 0;border:none;background:none;border-radius:9px;
+  font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:color 0.22s;
+}
+.auth-toggle[data-active="login"] .auth-toggle-seg.login,
+.auth-toggle[data-active="signup"] .auth-toggle-seg.signup{color:#fff;}
+
 .auth-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:3px;}
 .auth-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px;}
 .auth-field{margin-bottom:14px;}
@@ -3680,6 +3699,8 @@ function showAuthScreen(screen){
   document.getElementById('screen-login').style.display = screen==='login' ? 'block' : 'none';
   document.getElementById('signup-error').style.display='none';
   document.getElementById('login-error').style.display='none';
+  var toggle = document.getElementById('auth-toggle');
+  if(toggle) toggle.setAttribute('data-active', screen==='login' ? 'login' : 'signup');
 }
 function showAuthError(screen, msg){
   var el = document.getElementById(screen+'-error');
@@ -3712,7 +3733,6 @@ async function handleSignUp(){
   var email = document.getElementById('signup-email').value.trim();
   var pw = document.getElementById('signup-password').value;
   var pw2 = document.getElementById('signup-password2').value;
-  var name = document.getElementById('signup-name').value.trim();
   var agree = document.getElementById('signup-agree').checked;
 
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAuthError('signup', lang==='hi'?'कृपया मान्य ईमेल दर्ज करें।':'Please enter a valid email address.'); return; }
@@ -3724,13 +3744,10 @@ async function handleSignUp(){
   var btn = document.getElementById('signup-submit-btn');
   btn.disabled = true;
   try{
-    await signUp({name:name, email:email, password:pw});
-    var dob = document.getElementById('signup-dob').value;
-    var time = document.getElementById('signup-time').value;
-    var placeEl = document.getElementById('signup-place');
-    if(dob || time || placeEl.value){
-      await saveProfile({ label: name || (lang==='hi'?'स्वयं':'Myself'), name:name, dob:dob, time:time, place:placeEl.value, isSelf:true });
-    }
+    // Name/DOB/time/place aren't collected at signup anymore — they're
+    // captured naturally the first time this account runs an analysis
+    // (findOrCreateProfileForEntry), so there's nothing to save here.
+    await signUp({name:'', email:email, password:pw});
     closeAuth();
     refreshAuthUI();
     if(_msgsExist()) autoSaveChatIfLoggedIn();
@@ -3964,10 +3981,9 @@ function applyAccountLang(){
   var t = lang==='hi' ? {
     signupTitle:'अपना खाता बनाएं', signupSub:'मुफ़्त में शुरू करें। किसी क्रेडिट कार्ड की आवश्यकता नहीं।',
     email:'ईमेल पता', password:'पासवर्ड', pwPh:'न्यूनतम 8 अक्षर', retype:'पासवर्ड फिर से लिखें', retypePh:'अपना पासवर्ड दोहराएं',
-    optional:'वैकल्पिक विवरण', optionalNote:'हम इन्हें आपकी प्रोफ़ाइल में स्वतः सहेज लेंगे',
-    fullName:'पूरा नाम', dob:'जन्म तिथि', tob:'जन्म समय', pob:'जन्म स्थान',
+    dob:'जन्म तिथि', tob:'जन्म समय', pob:'जन्म स्थान',
     agree:'मैं ', agreeLink1:'गोपनीयता नीति', agreeMid:' और ', agreeLink2:'सेवा की शर्तों', agreeEnd:' से सहमत हूं। मेरे जन्म डेटा का उपयोग केवल वैदिक विश्लेषण के लिए किया जाएगा।',
-    createAccount:'खाता बनाएं', haveAccount:'पहले से खाता है? ', signIn:'साइन इन करें',
+    createAccount:'खाता बनाएं', haveAccount:'पहले से खाता है? ', signIn:'साइन इन करें', toggleLogin:'लॉग इन', toggleSignup:'साइन अप',
     loginTitle:'वापसी पर स्वागत है', loginSub:'अपनी सहेजी गई रीडिंग देखने के लिए साइन इन करें।',
     yourPassword:'आपका पासवर्ड', noAccount:'खाता नहीं है? ', signUp2:'साइन अप करें',
     nudgeTitle:'अपनी करियर रीडिंग सहेजें', nudgeSub:'टैब बंद करने पर आपकी कुंडली की जानकारी खो जाएगी। इसे रखने के लिए मुफ़्त साइन अप करें।',
@@ -3977,10 +3993,9 @@ function applyAccountLang(){
   } : {
     signupTitle:'Create your account', signupSub:'Start for free. No credit card needed.',
     email:'Email address', password:'Password', pwPh:'Min. 8 characters', retype:'Retype password', retypePh:'Repeat your password',
-    optional:'optional details', optionalNote:"We'll save these to your profile automatically",
-    fullName:'Full name', dob:'Date of Birth', tob:'Time of Birth', pob:'Place of Birth',
+    dob:'Date of Birth', tob:'Time of Birth', pob:'Place of Birth',
     agree:'I agree to the ', agreeLink1:'Privacy Policy', agreeMid:' and ', agreeLink2:'Terms of Service', agreeEnd:'. My birth data will be used only for Vedic analysis.',
-    createAccount:'Create account', haveAccount:'Already have an account? ', signIn:'Sign in',
+    createAccount:'Create account', haveAccount:'Already have an account? ', signIn:'Sign in', toggleLogin:'Log in', toggleSignup:'Sign up',
     loginTitle:'Welcome back', loginSub:'Sign in to see your saved readings.',
     yourPassword:'Your password', noAccount:"Don't have an account? ", signUp2:'Sign up',
     nudgeTitle:'Save your career reading', nudgeSub:'Your chart insights will be lost when you close this tab. Sign up free to keep them.',
@@ -3989,10 +4004,9 @@ function applyAccountLang(){
     apName:'Name', apSave:'Save profile'
   };
   var set=function(id,text){ var el=document.getElementById(id); if(el) el.textContent=text; };
+  set('auth-toggle-login',t.toggleLogin); set('auth-toggle-signup',t.toggleSignup);
   set('signup-title',t.signupTitle); set('signup-sub',t.signupSub);
   set('signup-email-label',t.email); set('signup-pw-label',t.password); set('signup-pw2-label',t.retype);
-  set('signup-optional-label',t.optional); set('signup-optional-note',t.optionalNote);
-  set('signup-name-label',t.fullName); set('signup-dob-label',t.dob); set('signup-time-label',t.tob); set('signup-place-label',t.pob);
   set('signup-submit-btn',t.createAccount);
   var pw1=document.getElementById('signup-password'); if(pw1) pw1.placeholder=t.pwPh;
   var pw2=document.getElementById('signup-password2'); if(pw2) pw2.placeholder=t.retypePh;
@@ -5515,6 +5529,12 @@ document.addEventListener('DOMContentLoaded', applyLang);
     <div class="auth-body">
       <div class="auth-card">
 
+        <div class="auth-toggle" id="auth-toggle" data-active="signup">
+          <div class="auth-toggle-thumb"></div>
+          <button class="auth-toggle-seg login" id="auth-toggle-login" onclick="showAuthScreen('login')">Log in</button>
+          <button class="auth-toggle-seg signup" id="auth-toggle-signup" onclick="showAuthScreen('signup')">Sign up</button>
+        </div>
+
         <div id="screen-signup">
           <div class="auth-title" id="signup-title">Create your account</div>
           <div class="auth-sub" id="signup-sub">Start for free. No credit card needed.</div>
@@ -5541,27 +5561,6 @@ document.addEventListener('DOMContentLoaded', applyLang);
               <input type="password" id="signup-password2" placeholder="Repeat your password"/>
               <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password2',this)">👁</button>
             </div>
-          </div>
-
-          <div class="auth-divider" id="signup-optional-label">optional details</div>
-          <div class="auth-divider-note" id="signup-optional-note">We'll save these to your profile automatically</div>
-
-          <div class="auth-field">
-            <label id="signup-name-label">Full name</label>
-            <input type="text" id="signup-name" placeholder="e.g. Rahul Sharma"/>
-          </div>
-          <div class="auth-field">
-            <label id="signup-dob-label">Date of Birth</label>
-            <input type="text" id="signup-dob" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDOB(this)" onkeydown="handleDOBKey(event,this)"/>
-          </div>
-          <div class="auth-field">
-            <label id="signup-time-label">Time of Birth</label>
-            <input type="time" id="signup-time" step="60"/>
-          </div>
-          <div class="auth-field place-field">
-            <label id="signup-place-label">Place of Birth</label>
-            <input type="text" id="signup-place" autocomplete="off" oninput="searchPlace(this)" onblur="hidePlaceDropdown(this)" placeholder="e.g. Ghaziabad, Uttar Pradesh"/>
-            <div class="place-dropdown-el"></div>
           </div>
 
           <label class="auth-agree">
