@@ -3540,6 +3540,78 @@ async function saveChatSession(session){
 }
 async function deleteChatById(id){ await _sbRest('DELETE', '/chat_sessions?id=eq.'+id); }
 
+// ── Leads: every analyze() submission, logged in or not ─────────────
+// Insert-only from the client (anon or authenticated) — no select/update/
+// delete policy exists for public roles, so this is unreadable by users;
+// only the project owner reads it via the Supabase dashboard.
+async function saveLead(details){
+  try{
+    await fetch(SB_REST+'/leads', {
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({
+        user_id: (window._currentUser && window._currentUser.id) || null,
+        name: details.name||null, email: details.email||null,
+        dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
+        verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
+      })
+    });
+  }catch(e){ console.error('saveLead failed:', e.message); }
+}
+
+// ── Chart analysis cache: skip Prokerala + all 3 Claude calls on repeat
+// visits to the same birth profile. NOTE: this caches raw chart_data
+// wholesale, including today's transits (gochar) — accurate forever for
+// the static parts of the chart (D1/dasha/navamsha/dashamsha/yoga), but
+// "what the skies say right now" (Section 10) will reflect whatever day
+// the cache was written, not today, until the cache is refreshed.
+async function getCachedAnalysis(profileId){
+  if(!getCurrentUser() || !profileId) return null;
+  try{
+    var rows = await _sbRest('GET', '/chart_analyses?profile_id=eq.'+profileId+'&select=*&limit=1');
+    return rows && rows[0] || null;
+  }catch(e){ console.error('getCachedAnalysis failed:', e.message); return null; }
+}
+async function saveChartAnalysis(profileId, data){
+  if(!getCurrentUser() || !profileId) return;
+  try{
+    var existing = await _sbRest('GET', '/chart_analyses?profile_id=eq.'+profileId+'&select=id&limit=1');
+    var payload = {
+      profile_id: profileId, chart_data: data.chartData,
+      reply1: data.reply1||null, reply2: data.reply2||null, reply3: data.reply3||null,
+      verdict: data.verdict||null, biz_score: data.bizScore, job_score: data.jobScore,
+      computed_at: new Date().toISOString()
+    };
+    if(existing && existing[0]){
+      await _sbRest('PATCH', '/chart_analyses?id=eq.'+existing[0].id, payload);
+    } else {
+      await _sbRest('POST', '/chart_analyses', payload);
+    }
+  }catch(e){ console.error('saveChartAnalysis failed:', e.message); }
+}
+// Pure lookup — never writes. Used before starting an analysis to decide
+// whether a cache check is even worth making: only an exact dob+time+place
+// match against something already saved counts, never a fuzzy one.
+async function findMatchingProfile(details){
+  if(!getCurrentUser()) return null;
+  try{
+    var list = await listProfiles();
+    return list.find(function(p){ return p.dob===details.dob && p.time===details.time && p.place===details.place; }) || null;
+  }catch(e){ return null; }
+}
+// Find an existing saved profile matching these exact birth details, or
+// create one — so a logged-in user's analysis is always cacheable even
+// if they typed the form directly instead of picking "Use this profile".
+async function findOrCreateProfileForEntry(details){
+  if(!getCurrentUser()) return null;
+  var match = await findMatchingProfile(details);
+  if(match) return match.id;
+  try{
+    var created = await saveProfile({ label: details.name||'My Chart', name: details.name, dob: details.dob, time: details.time, place: details.place, isSelf:true });
+    return created && created.id;
+  }catch(e){ console.error('findOrCreateProfileForEntry failed:', e.message); return null; }
+}
+
 // ── Header: Sign up button ↔ user avatar/dropdown ──────────────────
 function renderAuthArea(){
   var user = window._currentUser;
@@ -4154,6 +4226,25 @@ async function analyze(){
   // Set greeting immediately
   var greetEl = document.getElementById('rs-greeting-name');
   if(greetEl) greetEl.textContent = name && name!=='User' ? 'Hi '+name.split(' ')[0]+' —' : 'Your chart —';
+
+  // If this exact dob+time+place was already analyzed for this logged-in
+  // user, skip Prokerala + all 3 Claude calls and load the saved result
+  // instantly. Any other combination (never searched, or a different
+  // detail) falls straight through to the normal flow below.
+  window._activeProfileId = null;
+  if(getCurrentUser()){
+    var matchedProfile = await findMatchingProfile({dob:dob, time:time, place:place});
+    if(matchedProfile){
+      window._activeProfileId = matchedProfile.id;
+      var cachedAnalysis = await getCachedAnalysis(matchedProfile.id);
+      if(cachedAnalysis && cachedAnalysis.chart_data){
+        cdTrack('analysis_cache_hit');
+        loadFromCachedAnalysis(cachedAnalysis, name, email, dob, time, place);
+        return;
+      }
+    }
+  }
+
   setStat('ld','Fetching chart...');
 
   try{
@@ -4299,6 +4390,7 @@ async function analyze(){
         cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
         var verdictMatch = window._reply1.match(/VERDICT:\s*([A-Z]+)/i);
         collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictMatch?verdictMatch[1]:'MIXED', window._reply1);
+        saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:verdictMatch?verdictMatch[1]:'MIXED', bizScore:bizScore, jobScore:jobScore});
         updateReportPreview();
       }catch(e){ console.log('CALL1 error:',e.message); window._call1Ready=true; }
 
@@ -4334,6 +4426,16 @@ async function analyze(){
         window._analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
         cdTrack('analysis_complete', {verdict:(window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
         updateReportPreview();
+        // Cache this analysis for the logged-in user so their next visit
+        // to this exact birth profile skips Prokerala + Claude entirely.
+        if(getCurrentUser()){
+          (window._activeProfileId ? Promise.resolve(window._activeProfileId) : findOrCreateProfileForEntry({name:name,dob:dob,time:time,place:place}))
+            .then(function(profileId){
+              if(!profileId) return;
+              window._activeProfileId = profileId;
+              saveChartAnalysis(profileId, { chartData:chart, reply1:window._reply1, reply2:window._reply2, reply3:window._reply3, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore });
+            });
+        }
       }catch(e){ console.log('CALL3 error:',e.message); window._call3Ready=true; }
     }
 
@@ -4349,6 +4451,41 @@ async function analyze(){
     setStat('er','Error');
   }
   document.getElementById('analyze-btn').disabled=false;
+}
+
+// Instant path for a birth profile already analyzed before by this
+// logged-in user — no Prokerala or Claude calls, just render from cache.
+function loadFromCachedAnalysis(cached, name, email, dob, time, place){
+  var chart = cached.chart_data;
+  chartData = chart;
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('result-section').style.display='flex';
+  document.getElementById('main-hdr').style.display='none';
+
+  var pre = preCompute(chart);
+  var bizScore = cached.biz_score!=null ? cached.biz_score : 0;
+  var jobScore = cached.job_score!=null ? cached.job_score : 0;
+  var jsVerdict = cached.verdict || 'MIXED';
+
+  window._meta = {name:name, dob:dob, time:time, place:place, email:email};
+  window._chartSummary = buildSummary(chart, {name:name, dob:dob, time:time, place:place, email:email});
+  window._reply1 = cached.reply1||''; window._reply2 = cached.reply2||''; window._reply3 = cached.reply3||'';
+  window._call1Ready = true; window._call2Ready = true; window._call3Ready = true;
+  window._analysis = [window._reply1, window._reply2, window._reply3].join('\n');
+
+  var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
+  window._d1Lagna = d1LagnaSign ? (d1LagnaSign.rasi&&d1LagnaSign.rasi.name||'?') : '?';
+
+  showResultsScreen(pre, name, jsVerdict, bizScore, jobScore);
+  updateReportPreview();
+  document.getElementById('analyze-btn').disabled=false;
+
+  // SVGs for the emailed PDF aren't cached — re-geocode and fetch them in
+  // the background so "Get my full report" still has real chart images.
+  (getSelectedPlaceCoords(document.getElementById('f-place')) ? Promise.resolve(getSelectedPlaceCoords(document.getElementById('f-place'))) : geocode(place))
+    .then(function(coords){ return fetchChartSVGs(parseDT(parseDOBToISO(dob),time), coords); })
+    .then(function(svgs){ window._svgs=svgs; })
+    .catch(function(){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; });
 }
 function showRegenButton(reply1, partialReply2){
   var row=document.createElement('div');row.className='row agent';row.id='regen-row';
