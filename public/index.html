@@ -125,12 +125,6 @@ body{
   font-family:'DM Sans',sans-serif;
 }
 .signup-btn:hover{background:var(--accent-bg);}
-.header-auth-group{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.login-link{
-  background:none;border:none;color:var(--text-muted);font-size:12px;font-weight:600;
-  cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;padding:4px 0;
-}
-.login-link:hover{color:var(--purple);}
 
 .user-menu{position:relative;flex-shrink:0;}
 .user-menu-trigger{
@@ -245,6 +239,9 @@ body{
 .auth-switch{text-align:center;font-size:12px;color:var(--text-muted);margin-top:16px;}
 .auth-switch a{color:var(--purple);font-weight:600;cursor:pointer;}
 .auth-error{font-size:12px;color:#c0392b;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;margin-bottom:14px;display:none;}
+.auth-info{font-size:12px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;margin-bottom:14px;display:none;}
+.auth-forgot{text-align:right;margin-top:6px;}
+.auth-forgot a{font-size:12px;color:var(--purple);font-weight:600;cursor:pointer;}
 
 /* Save-your-reading nudge modal */
 #save-nudge-overlay{
@@ -3642,10 +3639,7 @@ function renderAuthArea(){
   var user = window._currentUser;
   var lang = window._lang || 'en';
   if(!user){
-    return '<div class="header-auth-group">'
-      + '<button class="login-link" onclick="openAuth(\'login\')">'+(lang==='hi'?'लॉग इन':'Log in')+'</button>'
-      + '<button class="signup-btn" onclick="openAuth(\'signup\')">'+(lang==='hi'?'साइन अप':'Sign up')+'</button>'
-      + '</div>';
+    return '<button class="signup-btn" onclick="openAuth(\'signup\')">'+(lang==='hi'?'लॉग इन / साइन अप':'Log in / Sign up')+'</button>';
   }
   var displayName = user.name || (user.email ? user.email.split('@')[0] : 'U');
   var initials = displayName.trim().charAt(0).toUpperCase() || 'U';
@@ -3697,10 +3691,15 @@ function closeAuth(){ document.getElementById('auth-section').style.display='non
 function showAuthScreen(screen){
   document.getElementById('screen-signup').style.display = screen==='signup' ? 'block' : 'none';
   document.getElementById('screen-login').style.display = screen==='login' ? 'block' : 'none';
+  document.getElementById('screen-reset-password').style.display = screen==='reset-password' ? 'block' : 'none';
   document.getElementById('signup-error').style.display='none';
   document.getElementById('login-error').style.display='none';
+  var infoEl = document.getElementById('login-info'); if(infoEl) infoEl.style.display='none';
   var toggle = document.getElementById('auth-toggle');
-  if(toggle) toggle.setAttribute('data-active', screen==='login' ? 'login' : 'signup');
+  if(toggle){
+    toggle.style.display = screen==='reset-password' ? 'none' : 'flex';
+    toggle.setAttribute('data-active', screen==='login' ? 'login' : 'signup');
+  }
 }
 function showAuthError(screen, msg){
   var el = document.getElementById(screen+'-error');
@@ -3777,6 +3776,86 @@ async function handleLogIn(){
     btn.disabled = false;
   }
 }
+
+// ── Forgot / reset password ──────────────────────────────────────────
+// Sends Supabase's own reset email; the link it contains brings the user
+// back to this same page with a recovery token in the URL fragment,
+// which checkForPasswordRecovery() picks up on load.
+async function handleForgotPassword(){
+  var lang = window._lang||'en';
+  var email = document.getElementById('login-email').value.trim();
+  document.getElementById('login-error').style.display='none';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showAuthError('login', lang==='hi'?'पहले ऊपर अपना ईमेल दर्ज करें, फिर "पासवर्ड भूल गए?" पर क्लिक करें।':'Enter your email above first, then click "Forgot password?"');
+    return;
+  }
+  cdTrack('forgot_password_submit');
+  try{
+    await fetch(SB_AUTH+'/recover', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},
+      body: JSON.stringify({ email:email, options:{ redirect_to: window.location.origin+window.location.pathname } })
+    });
+  }catch(e){ /* fall through to the same neutral message either way */ }
+  // Deliberately the same message whether or not the email is registered —
+  // Supabase's own endpoint behaves the same way, to avoid confirming
+  // which emails have accounts.
+  var infoEl = document.getElementById('login-info');
+  infoEl.textContent = lang==='hi' ? 'यदि यह ईमेल पंजीकृत है, तो हमने एक पासवर्ड रीसेट लिंक भेज दिया है।' : "If that email is registered, we've sent a password reset link.";
+  infoEl.style.display='block';
+}
+function _parseRecoveryHash(){
+  var hash = window.location.hash||'';
+  if(hash.indexOf('type=recovery')===-1) return null;
+  var params = new URLSearchParams(hash.replace(/^#/,''));
+  var accessToken = params.get('access_token');
+  if(!accessToken) return null;
+  return {
+    access_token: accessToken,
+    refresh_token: params.get('refresh_token'),
+    expires_at: Math.floor(Date.now()/1000) + (parseInt(params.get('expires_in'),10) || 3600)
+  };
+}
+function checkForPasswordRecovery(){
+  var recovery = _parseRecoveryHash();
+  if(!recovery) return;
+  window._recoverySession = recovery;
+  // Strip the tokens out of the visible URL immediately — they're
+  // sensitive and don't need to sit in the address bar or browser history.
+  history.replaceState(null, '', window.location.pathname+window.location.search);
+  document.getElementById('auth-section').style.display='flex';
+  showAuthScreen('reset-password');
+}
+async function handleUpdatePassword(){
+  var lang = window._lang||'en';
+  var pw = document.getElementById('reset-password-new').value;
+  var pw2 = document.getElementById('reset-password-new2').value;
+  if(pw.length<8){ showAuthError('reset-password', lang==='hi'?'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।':'Password must be at least 8 characters.'); return; }
+  if(pw!==pw2){ showAuthError('reset-password', lang==='hi'?'पासवर्ड मेल नहीं खाते।':'Passwords do not match.'); return; }
+  var recovery = window._recoverySession;
+  if(!recovery){ showAuthError('reset-password', lang==='hi'?'यह रीसेट लिंक समाप्त हो गया है। कृपया एक नया अनुरोध करें।':'This reset link has expired. Please request a new one.'); return; }
+  cdTrack('reset_password_submit');
+  var btn = document.getElementById('reset-password-submit-btn');
+  btn.disabled = true;
+  try{
+    var r = await fetch(SB_AUTH+'/user', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+recovery.access_token},
+      body: JSON.stringify({ password: pw })
+    });
+    var data = await r.json();
+    if(!r.ok) throw new Error(data.error_description || data.msg || 'Could not update password.');
+    _storeAuthResponse({ access_token:recovery.access_token, refresh_token:recovery.refresh_token, expires_at:recovery.expires_at, user:data });
+    window._recoverySession = null;
+    closeAuth();
+    refreshAuthUI();
+  }catch(e){
+    showAuthError('reset-password', e.message || (lang==='hi'?'पासवर्ड अपडेट नहीं हो सका। कृपया पुनः प्रयास करें।':'Could not update password. Please try again.'));
+  }finally{
+    btn.disabled = false;
+  }
+}
+document.addEventListener('DOMContentLoaded', checkForPasswordRecovery);
 
 // ── Save-your-reading nudge modal ────────────────────────────────────
 var NUDGE_MSG_THRESHOLD = 3;
@@ -3989,7 +4068,9 @@ function applyAccountLang(){
     nudgeTitle:'अपनी करियर रीडिंग सहेजें', nudgeSub:'टैब बंद करने पर आपकी कुंडली की जानकारी खो जाएगी। इसे रखने के लिए मुफ़्त साइन अप करें।',
     nb1:'अपनी सभी कुंडली रीडिंग सहेजें और देखें', nb2:'कभी भी बातचीत जारी रखें', nb3:'परिवार और दोस्तों की कुंडली विश्लेषण करें',
     createFree:'मुफ़्त खाता बनाएं', maybeLater:'शायद बाद में',
-    apName:'नाम', apSave:'प्रोफ़ाइल सहेजें'
+    apName:'नाम', apSave:'प्रोफ़ाइल सहेजें',
+    forgotPw:'पासवर्ड भूल गए?', resetTitle:'नया पासवर्ड सेट करें', resetSub:'अपने खाते के लिए एक नया पासवर्ड चुनें।',
+    newPw:'नया पासवर्ड', retypeNewPw:'नया पासवर्ड फिर से लिखें', retypeNewPwPh:'अपना नया पासवर्ड दोहराएं', updatePw:'पासवर्ड अपडेट करें'
   } : {
     signupTitle:'Create your account', signupSub:'Start for free. No credit card needed.',
     email:'Email address', password:'Password', pwPh:'Min. 8 characters', retype:'Retype password', retypePh:'Repeat your password',
@@ -4001,7 +4082,9 @@ function applyAccountLang(){
     nudgeTitle:'Save your career reading', nudgeSub:'Your chart insights will be lost when you close this tab. Sign up free to keep them.',
     nb1:'Save and revisit all your chart readings', nb2:'Continue conversations anytime', nb3:'Analyze charts for family and friends',
     createFree:'Create a free account', maybeLater:'Maybe later',
-    apName:'Name', apSave:'Save profile'
+    apName:'Name', apSave:'Save profile',
+    forgotPw:'Forgot password?', resetTitle:'Set a new password', resetSub:'Choose a new password for your account.',
+    newPw:'New password', retypeNewPw:'Retype new password', retypeNewPwPh:'Repeat your new password', updatePw:'Update password'
   };
   var set=function(id,text){ var el=document.getElementById(id); if(el) el.textContent=text; };
   set('auth-toggle-login',t.toggleLogin); set('auth-toggle-signup',t.toggleSignup);
@@ -4021,6 +4104,14 @@ function applyAccountLang(){
   set('login-submit-btn',t.signIn);
   var loginSwitch=document.getElementById('login-switch');
   if(loginSwitch) loginSwitch.innerHTML = t.noAccount+'<a onclick="showAuthScreen(\'signup\')">'+t.signUp2+'</a>';
+  var forgotEl=document.getElementById('login-forgot');
+  if(forgotEl) forgotEl.innerHTML = '<a onclick="handleForgotPassword()">'+t.forgotPw+'</a>';
+
+  set('reset-password-title',t.resetTitle); set('reset-password-sub',t.resetSub);
+  set('reset-password-new-label',t.newPw); set('reset-password-new2-label',t.retypeNewPw);
+  set('reset-password-submit-btn',t.updatePw);
+  var rpw1=document.getElementById('reset-password-new'); if(rpw1) rpw1.placeholder=t.pwPh;
+  var rpw2=document.getElementById('reset-password-new2'); if(rpw2) rpw2.placeholder=t.retypeNewPwPh;
 
   set('nudge-title',t.nudgeTitle); set('nudge-sub',t.nudgeSub);
   set('nudge-b1',t.nb1); set('nudge-b2',t.nb2); set('nudge-b3',t.nb3);
@@ -5577,6 +5668,8 @@ document.addEventListener('DOMContentLoaded', applyLang);
           <div class="auth-sub" id="login-sub">Sign in to see your saved readings.</div>
           <div class="auth-error" id="login-error"></div>
 
+          <div class="auth-info" id="login-info"></div>
+
           <div class="auth-field">
             <label id="login-email-label">Email address</label>
             <input type="email" id="login-email" placeholder="your@email.com"/>
@@ -5587,10 +5680,34 @@ document.addEventListener('DOMContentLoaded', applyLang);
               <input type="password" id="login-password" placeholder="Your password"/>
               <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('login-password',this)">👁</button>
             </div>
+            <div class="auth-forgot" id="login-forgot"><a onclick="handleForgotPassword()">Forgot password?</a></div>
           </div>
 
           <button class="auth-submit-btn" id="login-submit-btn" onclick="handleLogIn()">Sign in</button>
           <div class="auth-switch" id="login-switch">Don't have an account? <a onclick="showAuthScreen('signup')">Sign up</a></div>
+        </div>
+
+        <div id="screen-reset-password" style="display:none">
+          <div class="auth-title" id="reset-password-title">Set a new password</div>
+          <div class="auth-sub" id="reset-password-sub">Choose a new password for your account.</div>
+          <div class="auth-error" id="reset-password-error"></div>
+
+          <div class="auth-field">
+            <label id="reset-password-new-label">New password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="reset-password-new" placeholder="Min. 8 characters"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('reset-password-new',this)">👁</button>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label id="reset-password-new2-label">Retype new password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="reset-password-new2" placeholder="Repeat your new password"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('reset-password-new2',this)">👁</button>
+            </div>
+          </div>
+
+          <button class="auth-submit-btn" id="reset-password-submit-btn" onclick="handleUpdatePassword()">Update password</button>
         </div>
 
       </div>
