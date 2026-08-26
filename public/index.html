@@ -3902,7 +3902,7 @@ async function autoSaveChatIfLoggedIn(){
   });
   var lagna = window._d1LagnaSign ? (window._d1LagnaSign+' Lagna') : '';
   var title = _sessionTitle();
-  var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages };
+  var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages, profileId: window._activeProfileId||null };
   try{
     var saved = await saveChatSession(session);
     if(saved) window._chatSessionId = saved.id;
@@ -3970,6 +3970,34 @@ async function renderSavedChatsList(){
       + '</div>';
   }).join('');
 }
+// Resuming only replays the visible bubbles by default — without this, the
+// chart context (window._chartSummary/_reply1-3/_call*Ready) a follow-up
+// question needs is empty, so sendChat() has nothing to answer from and
+// waitForCall() polls for up to 180s waiting for a "ready" flag that can
+// never turn true in the resumed session.
+async function restoreChatContext(profileId){
+  if(!profileId) return false;
+  try{
+    var cached = await getCachedAnalysis(profileId);
+    if(!cached || !cached.chart_data) return false;
+    var list = await listProfiles();
+    var profile = list.find(function(p){return p.id===profileId;});
+    var name = (profile && (profile.name||profile.label)) || (window._currentUser&&window._currentUser.name) || 'User';
+    var dob = (profile && profile.dob) || '';
+    var time = (profile && profile.time) || '';
+    var place = (profile && profile.place) || '';
+    var email = (window._currentUser && window._currentUser.email) || '';
+    var chart = cached.chart_data;
+    chartData = chart;
+    window._activeProfileId = profileId;
+    window._meta = {name:name, dob:dob, time:time, place:place, email:email};
+    window._chartSummary = buildSummary(chart, window._meta);
+    window._reply1 = cached.reply1||''; window._reply2 = cached.reply2||''; window._reply3 = cached.reply3||'';
+    window._call1Ready = true; window._call2Ready = true; window._call3Ready = true;
+    window._analysis = [window._reply1, window._reply2, window._reply3].join('\n');
+    return true;
+  }catch(e){ console.error('restoreChatContext failed:', e.message); return false; }
+}
 async function resumeChat(id){
   var list = await listChats();
   var session = list.find(function(c){return c.id===id;});
@@ -3977,6 +4005,7 @@ async function resumeChat(id){
   cdTrack('resume_saved_chat');
   window._chatSessionId = session.id;
   window._chatSessionSaved = true;
+  await restoreChatContext(session.profile_id);
   closeAccountSection();
   document.getElementById('form-section').style.display='none';
   document.getElementById('result-section').style.display='flex';
@@ -5243,6 +5272,10 @@ function reset(){
   window._reply1=null; window._reply2=null; window._reply3=null;
   window._analysis=null; window._chartData=null; chartData=null;
   window._call1Ready=false; window._call2Ready=false; window._call3Ready=false;
+  // A new analysis is a new conversation — without this, autosave would
+  // PATCH the previous chat's saved row (matched by the stale session id)
+  // instead of creating a fresh one, silently overwriting it.
+  window._chatSessionId=null; window._chatSessionSaved=false;
 }
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -5250,6 +5283,19 @@ document.addEventListener('DOMContentLoaded', function(){
   if(_chatUi) _chatUi.addEventListener('keydown',function(e){
     if(e.key==='Enter'){ e.preventDefault(); sendChat(); }
   });
+  // None of the auth screens are wrapped in a <form>, so Enter did nothing
+  // in any of their inputs — wire each group to its submit handler.
+  function _submitOnEnter(fieldIds, submitFn){
+    fieldIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.addEventListener('keydown', function(e){
+        if(e.key==='Enter'){ e.preventDefault(); submitFn(); }
+      });
+    });
+  }
+  _submitOnEnter(['signup-email','signup-password','signup-password2'], handleSignUp);
+  _submitOnEnter(['login-email','login-password'], handleLogIn);
+  _submitOnEnter(['reset-password-new','reset-password-new2'], handleUpdatePassword);
 });
 
 function fixViewportHeight(){
