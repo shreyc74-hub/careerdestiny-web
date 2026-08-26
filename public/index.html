@@ -70,7 +70,7 @@ body{
 .hsub{font-size:11px;color:var(--text-dim);margin-left:auto;text-align:right;}
 
 #lang-btn{
-  margin-left:8px;
+  margin-right:8px;
   padding:5px 12px;
   border:1px solid var(--border);
   border-radius:20px;
@@ -4103,7 +4103,7 @@ var SYSTEM_1_CLIENT='You are an expert Vedic Jyotish practitioner. The chart dat
 
 var SYSTEM_2_CLIENT='You are an expert Vedic Jyotish practitioner. Use PRE-COMPUTED values from chart data directly — do not recalculate Sutra 1, Sutra 3, Indu Lagna, Amatyakaraka or Dasha. Provide detailed analysis. FORMAT:\n\n| Principle | What Your Chart Shows | Indicates |\n|-----------|----------------------|-----------|\n[7 sutras]\n\n| Planet | D9 Sign | Key Insight |\n|--------|---------|-------------|\n[Saturn Jupiter Mercury Mars Lagna only]\n\n| Planet | D10 House | Career Significance |\n|--------|-----------|-------------------|\n[Sun Saturn D10 Lagna only]\n\n| Period | Planet | From | To | Significance |\n|--------|--------|------|----|--------------|\n[use ONLY provided dasha data]\n\n| Transit | Position | Effect |\n|---------|----------|--------|\n[Jupiter and Saturn only]\n\nCareer Obstacles: [1-2 lines]\n\nFinal Verdict: [3-4 complete sentences. NEVER end mid-sentence.]\n\nRules: never mention book or author. Always complete Final Verdict.';
 
-var _lang="hi";
+var _lang="en";
 var _strings={
   en:{
     appTitle:"Career Destiny",
@@ -4242,13 +4242,15 @@ function applyLang(){
 
   window._lang=_lang;
 }
+document.addEventListener('DOMContentLoaded', applyLang);
 </script>
 <div class="app">
   <div class="hdr" id="main-hdr">
+    <button id="lang-btn" onclick="toggleLang()">हिंदी</button>
     <div class="dot" id="dot"></div>
     <span class="htitle" id="app-title">Career Destiny</span>
     <span class="hsub" id="hsub"></span>
-    
+
   </div>
 
   <!-- Birth Details Form -->
