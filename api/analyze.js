@@ -253,7 +253,11 @@ module.exports = async (req, res) => {
     // toggles the app's language after the fact (chat history, teasers).
     if (body.call === 'translate') {
       const targetLang = body.targetLang === 'hi' ? 'Hindi (Devanagari script)' : 'English';
-      const translateSystem = `You are a precise translator for a career-astrology chat app. Translate the given text into ${targetLang}. Preserve ALL markdown formatting exactly: headers, bold, tables, bullet points, line breaks, numbers, and dates. Do not add, remove, or explain anything. Output ONLY the translated text.`;
+      const translateSystem = `You are a precise translator for a career-astrology chat app. Translate the given text into ${targetLang}. Preserve ALL markdown formatting exactly: headers, bold, tables, bullet points, line breaks, numbers, and dates.
+
+CRITICAL OUTPUT RULE: Respond with the translation wrapped in <t> and </t> tags and nothing else. Do not explain what you are doing, do not say "I need to translate" or similar, do not add any text before <t> or after </t>. If the input is already in ${targetLang}, just return it unchanged inside the tags.
+
+Example: <t>the translated text goes here</t>`;
 
       const translateResponse = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',

@@ -3221,7 +3221,9 @@ async function translateText(text, targetLang){
     if(!r.ok) return text;
     var data = await r.json();
     var out = data.content && data.content[0] && data.content[0].text;
-    return out ? out.trim() : text;
+    if(!out) return text;
+    var m = out.match(/<t>([\s\S]*)<\/t>/);
+    return m ? m[1].trim() : out.trim();
   } catch(e){ return text; }
 }
 
@@ -4301,9 +4303,11 @@ function reset(){
   window._call1Ready=false; window._call2Ready=false; window._call3Ready=false;
 }
 
-var _chatUi=document.getElementById('chat-ui');
-if(_chatUi) _chatUi.addEventListener('keydown',function(e){
-  if(e.key==='Enter')sendChat();
+document.addEventListener('DOMContentLoaded', function(){
+  var _chatUi=document.getElementById('chat-ui');
+  if(_chatUi) _chatUi.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){ e.preventDefault(); sendChat(); }
+  });
 });
 
 function fixViewportHeight(){
