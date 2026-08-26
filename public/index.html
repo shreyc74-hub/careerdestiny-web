@@ -3645,6 +3645,22 @@ async function findOrCreateProfileForEntry(details){
     return created && created.id;
   }catch(e){ console.error('findOrCreateProfileForEntry failed:', e.message); return null; }
 }
+// Covers the anonymous-then-sign-up-mid-session gap: analyze() only saves a
+// chart_analyses row if the user was ALREADY logged in when CALL3 finished.
+// Someone who ran an analysis anonymously, chatted a bit, and only then
+// created an account would otherwise have their chat saved (autoSaveChatIfLoggedIn
+// checks _currentUser at call-time) but their underlying chart analysis
+// never cached — call this right after sign-up/login succeeds to catch up.
+async function saveActiveAnalysisIfNeeded(){
+  if(!getCurrentUser() || window._activeProfileId || !chartData || !window._meta || !window._meta.dob) return;
+  try{
+    await waitForCall(3);
+    var profileId = await findOrCreateProfileForEntry({name:window._meta.name, dob:window._meta.dob, time:window._meta.time, place:window._meta.place});
+    if(!profileId) return;
+    window._activeProfileId = profileId;
+    await saveChartAnalysis(profileId, { chartData:chartData, reply1:window._reply1, reply2:window._reply2, reply3:window._reply3, verdict:window._verdict, bizScore:window._bizScore, jobScore:window._jobScore });
+  }catch(e){ console.error('saveActiveAnalysisIfNeeded failed:', e.message); }
+}
 
 // ── Header: Sign up button ↔ user avatar/dropdown ──────────────────
 function renderAuthArea(){
@@ -3819,6 +3835,7 @@ async function handleSignUp(){
     await signUp({name:'', email:email, password:pw});
     closeAuth();
     refreshAuthUI();
+    await saveActiveAnalysisIfNeeded();
     if(_msgsExist()) autoSaveChatIfLoggedIn();
   }catch(e){
     showAuthError('signup', e.message || (lang==='hi'?'साइन अप विफल रहा। कृपया पुनः प्रयास करें।':'Sign up failed. Please try again.'));
@@ -3839,6 +3856,7 @@ async function handleLogIn(){
     await logIn({email:email, password:pw});
     closeAuth();
     refreshAuthUI();
+    await saveActiveAnalysisIfNeeded();
     if(_msgsExist()) autoSaveChatIfLoggedIn();
   }catch(e){
     showAuthError('login', e.message || (lang==='hi'?'साइन इन विफल रहा। कृपया अपना ईमेल और पासवर्ड जांचें।':'Sign in failed. Please check your email and password.'));
@@ -4525,6 +4543,10 @@ async function analyze(){
     });
     var saturnOverride = pre.sutra3 && pre.sutra3.indicates==='Job';
     var jsVerdict = saturnOverride && bizScore<7 ? (bizScore>=5?'MIXED (leaning Business)':'MIXED (leaning Job)') : bizScore>=6?'BUSINESS':jobScore>=6?'JOB':bizScore>jobScore?'MIXED (leaning Business)':jobScore>bizScore?'MIXED (leaning Job)':'MIXED';
+    // Exposed on window so a sign-up/login that happens later in this same
+    // session (after this analysis already ran anonymously) can still save
+    // it — see saveActiveAnalysisIfNeeded().
+    window._verdict = jsVerdict; window._bizScore = bizScore; window._jobScore = jobScore;
     scoresBlock += '\nSCORE: '+bizScore+' of 7 point toward Business. '+jobScore+' point toward Job.\n';
     scoresBlock += 'JS VERDICT: '+jsVerdict+'\n';
     scoresBlock += '\nOTHER PRE-COMPUTED VALUES:\n';
