@@ -3577,13 +3577,21 @@ async function deleteChatById(id){ await _sbRest('DELETE', '/chat_sessions?id=eq
 // Insert-only from the client (anon or authenticated) — no select/update/
 // delete policy exists for public roles, so this is unreadable by users;
 // only the project owner reads it via the Supabase dashboard.
+// user_id is deliberately NOT sent here — it defaults to auth.uid() on the
+// database side (null when anonymous), the same safe pattern profiles/
+// chat_sessions already use. Sending it from the client and trusting it
+// would let anyone submit a lead with an arbitrary, spoofed user_id, since
+// this table's RLS policy has to allow anonymous inserts and so can't rely
+// on `auth.uid() = user_id` alone to reject a client-supplied value.
 async function saveLead(details){
   try{
+    var token = await ensureValidAccessToken();
+    var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'};
+    if(token) headers['Authorization'] = 'Bearer '+token;
     await fetch(SB_REST+'/leads', {
       method:'POST',
-      headers:{'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'},
+      headers:headers,
       body: JSON.stringify({
-        user_id: (window._currentUser && window._currentUser.id) || null,
         profile_id: details.profileId||null,
         name: details.name||null, email: details.email||null,
         dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
