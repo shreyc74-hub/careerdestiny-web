@@ -192,6 +192,22 @@ body{
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.place-field{position:relative;}
+#place-dropdown{
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  margin-top:4px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  max-height:200px;
+  overflow-y:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
+  z-index:50;
+}
 .form-group.full{grid-column:1/-1;}
 
 label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:0.3px;}
@@ -3422,7 +3438,7 @@ function showPlaceDropdown(results){
     var item=document.createElement("div");
     item.style.cssText="padding:10px 12px;cursor:pointer;font-size:13px;color:#1a1a1a;border-bottom:0.5px solid #eee;line-height:1.4;";
     item.innerHTML="<div style=\"font-weight:500;\">"+r.short_name+"</div><div style=\"font-size:11px;color:#888;margin-top:2px;\">"+r.display_name.slice(0,60)+"</div>";
-    item.addEventListener("mousedown",function(e){e.preventDefault();document.getElementById("f-place").value=r.short_name;_selectedCoords={lat:r.lat,lon:r.lon,name:r.display_name,coordinates:r.lat+","+r.lon};_selectedPlaceName=r.short_name;hidePlaceDropdown();});
+    item.addEventListener("mousedown",function(e){e.preventDefault();document.getElementById("f-place").value=r.short_name;var glat=parseFloat(r.lat),glon=parseFloat(r.lon);_selectedCoords={lat:glat,lon:glon,name:r.display_name,coordinates:glat+","+glon};_selectedPlaceName=r.short_name;hidePlaceDropdown();});
     item.addEventListener("mouseover",function(){this.style.background="#f5f0e8";});
     item.addEventListener("mouseout",function(){this.style.background="";});
     dd.appendChild(item);
@@ -3492,7 +3508,7 @@ async function analyze(){
   setStat('ld','Fetching chart...');
 
   try{
-    var coords=await geocode(place);
+    var coords=(_selectedCoords && _selectedPlaceName===place) ? _selectedCoords : await geocode(place);
     var dt=parseDT(parseDOBToISO(dob),time);
     var hl=document.getElementById('rs-loading-text');
     if(hl) hl.textContent='Locating '+place.split(',')[0]+'...';
@@ -4329,6 +4345,7 @@ var _strings={
     namePlaceholder:"e.g. Rahul Sharma",
     dobLabel:"Date of Birth",
     timeLabel:"Time of Birth",
+    timeHint:"🕐 Tap to set hour, minute & AM/PM — no seconds needed",
     placeLabel:"Place of Birth",
     placePlaceholder:"e.g. Ghaziabad, Uttar Pradesh",
     genderLabel:"Gender",
@@ -4361,6 +4378,7 @@ var _strings={
     namePlaceholder:"जैसे राहुल शर्मा",
     dobLabel:"जन्म तिथि",
     timeLabel:"जन्म समय",
+    timeHint:"🕐 घंटा, मिनट और AM/PM चुनने के लिए टैप करें — सेकंड की आवश्यकता नहीं",
     placeLabel:"जन्म स्थान",
     placePlaceholder:"जैसे गाजियाबाद, उत्तर प्रदेश",
     genderLabel:"लिंग",
@@ -4416,6 +4434,7 @@ function applyLang(){
   if(np)np.placeholder=s.namePlaceholder;
   if(dl)dl.textContent=s.dobLabel;
   if(tl)tl.textContent=s.timeLabel;
+  var thEl=document.getElementById('f-time-hint'); if(thEl&&s.timeHint) thEl.textContent=s.timeHint;
   if(pl)pl.textContent=s.placeLabel;
   if(pp)pp.placeholder=s.placePlaceholder;
   if(gl)gl.textContent=s.genderLabel;
@@ -4517,11 +4536,13 @@ document.addEventListener('DOMContentLoaded', applyLang);
       </div>
       <div class="form-group">
         <label for="f-time">Time of Birth</label>
-        <input type="time" id="f-time" required onfocus="cdTrack('field_focus',{field:'time'})"/>
+        <input type="time" id="f-time" step="60" required onfocus="cdTrack('field_focus',{field:'time'})"/>
+        <div style="font-size:11px;color:#aaa;margin-top:4px;" id="f-time-hint">🕐 Tap to set hour, minute &amp; AM/PM — no seconds needed</div>
       </div>
-      <div class="form-group">
+      <div class="form-group place-field">
         <label for="f-place">Place of Birth</label>
-        <input type="text" id="f-place" onfocus="cdTrack('field_focus',{field:'place'})" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+        <input type="text" id="f-place" autocomplete="off" onfocus="cdTrack('field_focus',{field:'place'})" oninput="searchPlace(this.value)" onblur="hidePlaceDropdown()" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+        <div id="place-dropdown"></div>
       </div>
       <div class="form-group full">
         <label for="f-email">Email Address <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
