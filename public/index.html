@@ -3767,18 +3767,36 @@ function showSaveNudge(){ cdTrack('save_nudge_shown'); document.getElementById('
 function dismissNudge(){ cdTrack('save_nudge_dismissed'); document.getElementById('save-nudge-overlay').style.display='none'; }
 
 // ── Auto-save chat history for logged-in users ──────────────────────
+// Named after whoever's chart this actually is (window._meta.name, set at
+// analyze() time) — not the account holder — so a user with several saved
+// profiles (self, Mom, a friend) gets distinguishable titles in Saved Chats
+// instead of every chat being labeled with their own account name.
+function _sessionTitle(){
+  var lang = window._lang||'en';
+  var prefix = lang==='hi' ? 'करियर रीडिंग' : 'Career Reading';
+  var metaName = window._meta && window._meta.name && window._meta.name!=='User' ? window._meta.name : '';
+  var user = window._currentUser;
+  var accountName = (user && (user.name || (user.email && user.email.split('@')[0]))) || '';
+  var subject = metaName || accountName;
+  return subject ? (prefix+' · '+subject) : prefix;
+}
 async function autoSaveChatIfLoggedIn(){
   if(!window._currentUser) return;
-  var user = window._currentUser;
   var rows = document.querySelectorAll('#msgs .row');
   if(!rows.length) return;
+  // Store each bubble's raw markdown source and the language it was
+  // written in (not the flattened, currently-displayed text) so a resumed
+  // chat can be re-rendered with formatting intact and translated
+  // correctly regardless of which language is active when it's reopened.
   var messages = Array.prototype.map.call(rows, function(row){
     var isUser = row.classList.contains('u');
     var bub = row.querySelector('.bub');
-    return { role: isUser?'user':'agent', text: bub ? bub.textContent : '' };
+    var text = bub ? (bub.dataset.srcText || bub.textContent) : '';
+    var lang = (bub && bub.dataset.srcLang) || window._lang || 'en';
+    return { role: isUser?'user':'agent', text: text, lang: lang };
   });
   var lagna = window._d1LagnaSign ? (window._d1LagnaSign+' Lagna') : '';
-  var title = (window._lang==='hi'?'करियर रीडिंग · ':'Career Reading · ') + (user.name || (user.email?user.email.split('@')[0]:''));
+  var title = _sessionTitle();
   var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages };
   try{
     var saved = await saveChatSession(session);
@@ -3861,8 +3879,15 @@ async function resumeChat(id){
   goToChat();
   var m=getM(); if(m) m.innerHTML='';
   (session.messages||[]).forEach(function(msg){
-    addRow(msg.role==='user'?'user':'agent', msg.text);
+    var row = (msg.role==='user') ? addRow('user', msg.text) : addRow('agent', renderChatReply(msg.text));
+    var bub = row && row.querySelector('.bub');
+    // Re-tag with the language this message was actually written in (not
+    // whatever language happens to be active right now), then immediately
+    // sync every bubble to the current language below — this is what lets
+    // a resumed chat show correctly whether it was saved in EN or HI.
+    if(bub) markTranslatable(bub, msg.text, msg.lang||'en', msg.role==='user'?'text':'md');
   });
+  syncAllTranslatables();
   var chips=document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='none';
 }
 async function removeChatEntry(id){ await deleteChatById(id); renderSavedChatsList(); }
