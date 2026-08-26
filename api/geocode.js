@@ -9,16 +9,22 @@ async function tryNominatim(place, limit) {
   if (!r.ok) throw new Error(`Nominatim ${r.status}`);
   const data = await r.json();
   if (!data || !data.length) return [];
-  return data.map(item => ({
-    lat: item.lat,
-    lon: item.lon,
-    display_name: item.display_name,
-    short_name: [
-      item.address?.city || item.address?.town || item.address?.village || item.address?.county,
-      item.address?.state,
-      item.address?.country
-    ].filter(Boolean).join(', ') || item.display_name.split(',').slice(0, 2).join(',').trim()
-  }));
+  return data.map(item => {
+    const locality = item.address?.city || item.address?.town || item.address?.village
+      || item.address?.county || item.address?.municipality || item.address?.state_district
+      || item.address?.suburb || item.address?.hamlet;
+    return {
+      lat: item.lat,
+      lon: item.lon,
+      display_name: item.display_name,
+      // Fall back to the first two segments of display_name whenever none of the
+      // known locality keys matched — otherwise short_name silently drops the
+      // city and keeps only state/country (e.g. "Uttar Pradesh, India").
+      short_name: locality
+        ? [locality, item.address?.state, item.address?.country].filter(Boolean).join(', ')
+        : item.display_name.split(',').slice(0, 2).join(',').trim()
+    };
+  });
 }
 
 async function tryPhoton(place, limit) {
