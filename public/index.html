@@ -3573,6 +3573,7 @@ async function saveLead(details){
       headers:{'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'},
       body: JSON.stringify({
         user_id: (window._currentUser && window._currentUser.id) || null,
+        profile_id: details.profileId||null,
         name: details.name||null, email: details.email||null,
         dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
         verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
@@ -4423,6 +4424,12 @@ async function analyze(){
 
     var chart=await fetchChart(dt,coords);
     chartData=chart;
+    // Resolve (or create) the saved profile now, before CALL1, so the lead
+    // captured below and the cached-analysis save at the end both link to
+    // the same profile row instead of leaving leads.profile_id null.
+    if(getCurrentUser() && !window._activeProfileId){
+      window._activeProfileId = await findOrCreateProfileForEntry({name:name,dob:dob,time:time,place:place});
+    }
     window._meta={name:name,dob:dob,time:time,place:place,email:email,coords:coords};
     if(hl) hl.textContent='Charts ready. Running rule engine...';
     var summary=buildSummary(chart,{name:name,dob:dob,time:time,place:place,email:email,coords:coords});
@@ -4558,7 +4565,7 @@ async function analyze(){
         cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
         var verdictMatch = window._reply1.match(/VERDICT:\s*([A-Z]+)/i);
         collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictMatch?verdictMatch[1]:'MIXED', window._reply1);
-        saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:verdictMatch?verdictMatch[1]:'MIXED', bizScore:bizScore, jobScore:jobScore});
+        saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:verdictMatch?verdictMatch[1]:'MIXED', bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
         updateReportPreview();
       }catch(e){ console.log('CALL1 error:',e.message); window._call1Ready=true; }
 
@@ -4596,13 +4603,9 @@ async function analyze(){
         updateReportPreview();
         // Cache this analysis for the logged-in user so their next visit
         // to this exact birth profile skips Prokerala + Claude entirely.
-        if(getCurrentUser()){
-          (window._activeProfileId ? Promise.resolve(window._activeProfileId) : findOrCreateProfileForEntry({name:name,dob:dob,time:time,place:place}))
-            .then(function(profileId){
-              if(!profileId) return;
-              window._activeProfileId = profileId;
-              saveChartAnalysis(profileId, { chartData:chart, reply1:window._reply1, reply2:window._reply2, reply3:window._reply3, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore });
-            });
+        // _activeProfileId was already resolved before CALL1 above.
+        if(getCurrentUser() && window._activeProfileId){
+          saveChartAnalysis(window._activeProfileId, { chartData:chart, reply1:window._reply1, reply2:window._reply2, reply3:window._reply3, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore });
         }
       }catch(e){ console.log('CALL3 error:',e.message); window._call3Ready=true; }
     }
