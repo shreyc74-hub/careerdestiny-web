@@ -248,6 +248,33 @@ module.exports = async (req, res) => {
 
   try {
     const body = req.body;
+
+    // Lightweight translator for already-generated content when the user
+    // toggles the app's language after the fact (chat history, teasers).
+    if (body.call === 'translate') {
+      const targetLang = body.targetLang === 'hi' ? 'Hindi (Devanagari script)' : 'English';
+      const translateSystem = `You are a precise translator for a career-astrology chat app. Translate the given text into ${targetLang}. Preserve ALL markdown formatting exactly: headers, bold, tables, bullet points, line breaks, numbers, and dates. Do not add, remove, or explain anything. Output ONLY the translated text.`;
+
+      const translateResponse = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1200,
+          temperature: 0,
+          system: translateSystem,
+          messages: [{ role: 'user', content: body.text || '' }]
+        })
+      });
+
+      const translateData = await translateResponse.json();
+      return res.status(200).json(translateData);
+    }
+
     const callNum = body.call || 1;
     const lang = body.lang || 'en';
 
@@ -257,8 +284,12 @@ module.exports = async (req, res) => {
     else if (callNum === 3) system = CALL3;
     else system = CHAT_SYSTEM;
 
-    // Always respond in Hindi
-    system += '\n\nLANGUAGE: Always respond in Hindi (Devanagari script) regardless of how the user writes. If user writes in English or Hinglish (like "konsa career", "mujhe batao"), detect as Hindi intent and respond in pure Hindi. Career field names can stay in English. TONE: Always use aap/aapka/aapke, never tum/tere/tera. Warm but dignified senior advisor tone. FORMATTING: Blank line between paragraphs. One idea per bullet.';
+    // Respond in whichever language the user has selected in the app
+    if (lang === 'hi') {
+      system += '\n\nLANGUAGE: Always respond in Hindi (Devanagari script) regardless of how the user writes. If user writes in English or Hinglish (like "konsa career", "mujhe batao"), detect as Hindi intent and respond in pure Hindi. Career field names can stay in English. TONE: Always use aap/aapka/aapke, never tum/tere/tera. Warm but dignified senior advisor tone. FORMATTING: Blank line between paragraphs. One idea per bullet.';
+    } else {
+      system += '\n\nLANGUAGE: Always respond in English, regardless of how the user writes. Career field names and proper nouns can stay as-is. TONE: Warm but dignified senior advisor tone. FORMATTING: Blank line between paragraphs. One idea per bullet.';
+    }
 
     // Use Haiku for CALL2+CALL3 (faster), Sonnet for CALL1 (accuracy)
     const model = (callNum === 1 || callNum === 4) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';

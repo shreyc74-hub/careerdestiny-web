@@ -69,19 +69,50 @@ body{
 
 .hsub{font-size:11px;color:var(--text-dim);margin-left:auto;text-align:right;}
 
-#lang-btn{
+.lang-switch{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+  width:66px;
+  height:26px;
   margin-right:8px;
-  padding:5px 12px;
+  padding:2px;
   border:1px solid var(--border);
-  border-radius:20px;
-  background:var(--gold-bg);
-  font-size:12px;
-  font-weight:500;
+  border-radius:14px;
+  background:var(--bg-form);
   cursor:pointer;
-  color:var(--gold);
   flex-shrink:0;
   font-family:'DM Sans',sans-serif;
+  -webkit-tap-highlight-color:transparent;
 }
+.lang-switch-thumb{
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:calc(50% - 2px);
+  height:calc(100% - 4px);
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  box-shadow:0 1px 3px rgba(0,0,0,0.18);
+  transition:transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+.lang-switch[data-lang="hi"] .lang-switch-thumb{transform:translateX(100%);}
+.lang-switch-label{
+  position:relative;
+  z-index:1;
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--text-dim);
+  transition:color 0.22s;
+  pointer-events:none;
+}
+.lang-switch[data-lang="en"] .lang-switch-label.en,
+.lang-switch[data-lang="hi"] .lang-switch-label.hi{color:#fff;}
 
 /* HERO — compact, just text */
 .hero{
@@ -427,7 +458,7 @@ function setStat(s,t){
   // Dot and status text removed — not meaningful to users
 }
 
-function addRow(role,content,type){
+function addRow(role,content,type,rawText){
   const w=document.createElement('div');w.className='row '+(role==='agent'?'agent':'u');
   const av=document.createElement('div');av.className='av '+(role==='agent'?'a':'u');
   const now=new Date();
@@ -436,6 +467,11 @@ function addRow(role,content,type){
   b.className='bub '+(role==='agent'?'a':'u')+(type?' '+type:'');
   if(typeof content==='string')b.innerHTML=content.replace(/\n/g,'<br>');
   else b.appendChild(content);
+
+  if(type!=='er'){
+    if(rawText) markTranslatable(b, rawText, window._lang, typeof content==='string' ? 'text' : 'md');
+    else if(typeof content==='string') markTranslatable(b, content, window._lang, 'text');
+  }
 
   if(role==='agent'){
     av.textContent='✦';
@@ -2756,16 +2792,97 @@ var SITUATION_QUESTIONS = {
   'Just Exploring': ['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?']
 };
 
+var SITUATION_LABELS_HI = {
+  'Still Studying':'अभी पढ़ाई कर रहे हैं',
+  'Working a Job':'नौकरी कर रहे हैं',
+  'Running Business':'व्यवसाय चला रहे हैं',
+  'Just Exploring':'अभी तलाश कर रहे हैं'
+};
+var SITUATION_CONFIG_HI = {
+  'Still Studying':   { line:'आपकी कुंडली बताती है कि शुरुआत का सबसे अच्छा समय आपकी सोच से भी करीब है।', questions:['कौन सी स्ट्रीम या क्षेत्र मेरे लिए उपयुक्त है?','मैं कमाना कब शुरू करूंगा/करूंगी?','क्या बाद में नौकरी या व्यवसाय में बेहतर करूंगा/करूंगी?'] },
+  'Working a Job':    { line:'आपकी कुंडली में स्पष्ट संकेत है कि यह नौकरी का दौर अस्थायी है या दीर्घकालिक।', questions:['क्या मुझे रुकना चाहिए या अब बदलाव का समय है?','बदलाव के लिए सही समय कब है?','क्या व्यवसाय मेरे लिए एक वास्तविक विकल्प है?'] },
+  'Running Business': { line:'आपकी कुंडली बताती है कि आपके व्यवसाय को क्या रोक रहा है और यह कब खुलेगा।', questions:['मेरा व्यवसाय संघर्ष क्यों कर रहा है?','यह कब बेहतर होगा?','क्या मैं सही व्यवसाय में हूं?'] },
+  'Just Exploring':   { line:'तलाशने का अच्छा समय है — आपकी कुंडली में एक स्पष्ट दिशा आपका इंतज़ार कर रही है।', questions:['मेरी सबसे बड़ी करियर ताकत क्या है?','मेरा सबसे अच्छा करियर दौर कब है?','मुझे धनवान क्या बनाएगा?'] }
+};
+
 function renderSituationChips(){
+  var lang = window._lang || 'en';
   return Object.keys(SITUATION_CONFIG).map(function(key){
     var cfg = SITUATION_CONFIG[key];
+    var label = (lang==='hi' && SITUATION_LABELS_HI[key]) ? SITUATION_LABELS_HI[key] : key;
+    var line = (lang==='hi' && SITUATION_CONFIG_HI[key]) ? SITUATION_CONFIG_HI[key].line : cfg.line;
     return '<div class="rs-situation-item">'
-      + '<button class="rs-situation-chip" onclick="onSituationTap(this,\''+key+'\')">'
+      + '<button class="rs-situation-chip" data-situation="'+key+'" onclick="onSituationTap(this,\''+key+'\')">'
       + '<span class="rs-situation-chip-icon">'+cfg.icon+'</span>'
-      + key + '</button>'
+      + label + '</button>'
       + '<div class="rs-situation-line" id="rs-sit-line-'+key+'">'
-      + '<div class="rs-situation-line-text">'+cfg.line+'</div></div></div>';
+      + '<div class="rs-situation-line-text">'+line+'</div></div></div>';
   }).join('');
+}
+
+function refreshSituationChips(){
+  var sitChips = document.getElementById('rs-situation-chips');
+  if(!sitChips || !sitChips.innerHTML) return;
+  var selected = window._meta && window._meta.situation;
+  sitChips.innerHTML = renderSituationChips();
+  if(selected){
+    var btn = sitChips.querySelector('[data-situation="'+selected+'"]');
+    if(btn){
+      btn.classList.add('selected');
+      var line = document.getElementById('rs-sit-line-'+selected);
+      if(line) line.classList.add('visible');
+    }
+  }
+}
+
+function refreshSituationLabels(){
+  var lang = window._lang || 'en';
+  var t = document.querySelector('.rs-situation-title');
+  var s = document.querySelector('.rs-situation-sub');
+  if(t) t.textContent = lang==='hi' ? 'आपकी वर्तमान स्थिति क्या है?' : 'What is your current situation?';
+  if(s) s.textContent = lang==='hi' ? 'इससे आपका विश्लेषण व्यक्तिगत बनाने में मदद मिलती है' : 'This helps personalise your analysis';
+}
+
+function refreshActionLabels(){
+  var lang = window._lang || 'en';
+  var map = {
+    'rs-action1-title': lang==='hi' ? 'अपनी कुंडली से चैट करें' : 'Chat with your chart',
+    'rs-action1-sub':   lang==='hi' ? 'अपने करियर, समय और भाग्य के बारे में सवाल पूछें' : 'Ask questions about your career, timing, and destiny',
+    'rs-action2-title': lang==='hi' ? 'अपनी पूरी रिपोर्ट पाएं' : 'Get your full report',
+    'rs-action2-sub':   lang==='hi' ? 'पूरा 11-खंड विश्लेषण आपके ईमेल पर भेजा जाएगा' : 'Complete 11-section analysis delivered to your email'
+  };
+  Object.keys(map).forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent = map[id]; });
+}
+
+function refreshReportLabels(){
+  var lang = window._lang || 'en';
+  var lbl = document.getElementById('rpt-sections-label');
+  if(lbl) lbl.textContent = lang==='hi' ? 'रिपोर्ट अनुभागों की झलक' : 'Sample preview of report sections';
+  var titles = lang==='hi'
+    ? ['करियर डेस्टिनी निर्णय','नौकरी या व्यवसाय? (7-कारक तालिका)','करियर सुझाव','समय की खिड़कियाँ']
+    : ['Career Destiny Verdict','Job or Business? (7-factor table)','Career Suggestions','Timing Windows'];
+  ['rpt-sec-title-1','rpt-sec-title-2','rpt-sec-title-3','rpt-sec-title-4'].forEach(function(id,i){
+    var el=document.getElementById(id); if(el) el.textContent = titles[i];
+  });
+  var sub2 = document.getElementById('rpt-sec-sub-2');
+  if(sub2) sub2.textContent = lang==='hi' ? 'हर सूत्र का मूल्यांकन और स्पष्टीकरण' : 'Every sutra scored and explained';
+  var sendBtn = document.getElementById('report-send-btn');
+  if(sendBtn && sendBtn.textContent.trim()!=='⏳') sendBtn.textContent = lang==='hi' ? 'भेजें' : 'Send';
+}
+
+var DEFAULT_CHAT_ICONS = ['⏰','💼','✨','🪐','🎯'];
+function renderDefaultChatChips(){
+  var lang = window._lang || 'en';
+  var s = _strings[lang];
+  var qs = [s.q1,s.q2,s.q3,s.q4,s.q5];
+  var wrap = document.getElementById('chat-chips-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = qs.map(function(q,i){
+    return '<div class="chat-chip" onclick="askQuestion(this.querySelector(\'.chat-chip-text\').textContent)">'
+      + '<span class="chat-chip-icon">'+DEFAULT_CHAT_ICONS[i]+'</span>'
+      + '<span class="chat-chip-text">'+q+'</span></div>';
+  }).join('');
+  window._chatChipsMode = 'default';
 }
 
 function onSituationTap(btn, situation){
@@ -2801,14 +2918,18 @@ function showActionButtons(){
 }
 
 function swapChatChips(situation){
-  var qs = SITUATION_CONFIG[situation] ? SITUATION_CONFIG[situation].questions : [];
+  var lang = window._lang || 'en';
+  var cfg = (lang==='hi' && SITUATION_CONFIG_HI[situation]) ? SITUATION_CONFIG_HI[situation] : SITUATION_CONFIG[situation];
+  var qs = cfg ? cfg.questions : [];
   var wrap = document.getElementById('chat-chips-wrap');
   if(!wrap || !qs.length) return;
   var icons = ['⏰','💼','✨','🪐','🎯'];
   wrap.innerHTML = qs.map(function(q, i){
-    return '<div class="chat-chip" onclick="askQuestion(\''+q.replace(/'/g,'\\\'')+'\')">'
-      + '<span class="chat-chip-icon">'+(icons[i]||'❓')+'</span>'+q+'</div>';
+    return '<div class="chat-chip" onclick="askQuestion(this.querySelector(\'.chat-chip-text\').textContent)">'
+      + '<span class="chat-chip-icon">'+(icons[i]||'❓')+'</span>'
+      + '<span class="chat-chip-text">'+q+'</span></div>';
   }).join('');
+  window._chatChipsMode = 'situation';
 }
 
 function startSituationTimeout(){
@@ -3088,6 +3209,59 @@ async function callClaude(userMsg,chartSummary,onChunk,callNum){
   return reply;
 }
 
+// ── Live translation for already-displayed AI content ──────────────
+async function translateText(text, targetLang){
+  if(!text || !text.trim()) return text;
+  try{
+    var r = await fetch(API+"/api/analyze", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({call:"translate", text:text, targetLang:targetLang})
+    });
+    if(!r.ok) return text;
+    var data = await r.json();
+    var out = data.content && data.content[0] && data.content[0].text;
+    return out ? out.trim() : text;
+  } catch(e){ return text; }
+}
+
+function markTranslatable(el, srcText, srcLang, mode){
+  if(!el) return;
+  el.dataset.srcText = srcText;
+  el.dataset.srcLang = srcLang;
+  el.dataset.render = mode || 'text';
+  el.dataset[srcLang==='hi' ? 'textHi' : 'textEn'] = srcText;
+}
+
+function applyTranslatable(el, text){
+  if(el.dataset.render === 'md'){
+    var target = el.querySelector('.rpt') || el;
+    target.innerHTML = mdToHtml(text);
+  } else {
+    el.innerHTML = String(text).replace(/\n/g,'<br>');
+  }
+}
+
+function syncTranslatable(el, targetLang){
+  if(!el || !el.dataset.srcText) return;
+  var cacheKey = targetLang==='hi' ? 'textHi' : 'textEn';
+  if(el.dataset[cacheKey]){
+    applyTranslatable(el, el.dataset[cacheKey]);
+    return;
+  }
+  translateText(el.dataset.srcText, targetLang).then(function(translated){
+    el.dataset[cacheKey] = translated;
+    if((window._lang||'en') === targetLang) applyTranslatable(el, translated);
+  });
+}
+
+function syncAllTranslatables(){
+  var targetLang = window._lang || 'en';
+  document.querySelectorAll('[data-src-text]').forEach(function(el){
+    syncTranslatable(el, targetLang);
+  });
+}
+
 function formatDOB(inp){
   var v = inp.value.replace(/\D/g,'');
   if(v.length > 8) v = v.slice(0,8);
@@ -3163,7 +3337,7 @@ function triggerEmail(){
     // Ask for email in chat
     addRow('agent', renderChatReply(
       "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
-    ));
+    ), null, "To send your report, I need your email address. Please type it below and I'll send the PDF right away.");
     window._awaitingEmail = true;
     document.getElementById('bottom-bar').style.display = 'block';
     document.getElementById('chat-ui').placeholder = 'Enter your email address...';
@@ -3201,7 +3375,7 @@ async function sendReportEmail(email){
 
     // Success
     if(btn){ btn.textContent = '✓ Report Sent!'; btn.style.background = '#1D9E75'; }
-    addRow('agent', renderChatReply('Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).'));
+    addRow('agent', renderChatReply('Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).'), null, 'Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).');
     cdTrack('email_sent_success', {verdict: (window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)?RegExp.$1:'MIXED'});
     setTimeout(function(){
       if(btn){ btn.textContent = '📧 Email My Report'; btn.style.background = ''; btn.disabled = false; }
@@ -3209,7 +3383,7 @@ async function sendReportEmail(email){
 
   } catch(e) {
     if(btn){ btn.textContent = '📧 Email My Report'; btn.disabled = false; }
-    addRow('agent', renderChatReply('Sorry, there was an error sending your report: ' + e.message + '. Please try again.'));
+    addRow('agent', renderChatReply('Sorry, there was an error sending your report: ' + e.message + '. Please try again.'), null, 'Sorry, there was an error sending your report: ' + e.message + '. Please try again.');
     cdTrack('email_sent_error', {error: e.message});
   }
 }
@@ -3632,7 +3806,7 @@ async function sendChat(){
     // Basic email validation
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)){
       addRow('user', emailInput);
-      addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"));
+      addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"), null, "That does not look like a valid email address. Please try again — for example: yourname@gmail.com");
       btn.disabled=false;
       ui.placeholder='Enter your email address...';
       ui.focus();
@@ -3644,7 +3818,7 @@ async function sendChat(){
     window._meta.email = emailInput;
     ui.placeholder='Ask a follow-up question...';
     addRow('user', emailInput);
-    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'));
+    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'), null, 'Got it! Generating and sending your report to **' + emailInput + '**...');
     btn.disabled=false;
     sendReportEmail(emailInput);
     return;
@@ -3665,7 +3839,7 @@ async function sendChat(){
     if(intent === 3 && !window._call3Ready){
       // Timing question — wait for CALL3
       removeLoader();
-      addRow('agent', renderChatReply('Your timing analysis is still generating in the background — give me just a moment...'));
+      addRow('agent', renderChatReply('Your timing analysis is still generating in the background — give me just a moment...'), null, 'Your timing analysis is still generating in the background — give me just a moment...');
       addLoader('Generating timing analysis...');
       var ready = await waitForCall(3);
       removeLoader();
@@ -3673,7 +3847,7 @@ async function sendChat(){
     } else if(intent === 2 && !window._call2Ready){
       // Career question — wait for CALL2
       removeLoader();
-      addRow('agent', renderChatReply('Your career analysis is still generating — one moment...'));
+      addRow('agent', renderChatReply('Your career analysis is still generating — one moment...'), null, 'Your career analysis is still generating — one moment...');
       addLoader('Generating career analysis...');
       var ready2 = await waitForCall(2);
       removeLoader();
@@ -3686,7 +3860,7 @@ async function sendChat(){
 
     var reply=await callClaude(txt, chatContext, null, 4);
     removeLoader();
-    addRow('agent',renderChatReply(reply));
+    addRow('agent',renderChatReply(reply),null,reply);
     setStat('ok','Ready');
   }catch(e){
     removeLoader();
@@ -3726,6 +3900,20 @@ var MOON_TRAITS = {
   'Makar':    {icon:'🏆', headline:'Achieving goals is how you feel secure', detail:'Capricorn Moon means achievement and progress are your emotional fuel.'},
   'Kumbha':   {icon:'🌐', headline:'You work best when you are changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
   'Meena':    {icon:'💫', headline:'Your intuition about people is almost always right', detail:'Pisces Moon means empathy and creativity flow naturally in your work.'}
+};
+var MOON_TRAITS_HI = {
+  'Mesha':    {icon:'⚡', headline:'आपकी भावनाएं तेज़ी से बदलती हैं — और आपकी सबसे अच्छी सोच भी', detail:'मेष राशि का चंद्रमा यानी आप स्पष्ट लक्ष्यों वाले तेज़-रफ़्तार माहौल में सबसे बेहतर काम करते हैं।'},
+  'Vrishabha':{icon:'🌿', headline:'स्थिरता आपको ऊर्जा देती है — अफरा-तफरी आपको थका देती है', detail:'वृषभ राशि का चंद्रमा यानी आपको बेहतरीन काम के लिए सुरक्षा और आराम चाहिए।'},
+  'Mithuna':  {icon:'💬', headline:'आपका दिमाग कभी रुकता नहीं — विविधता ही आपकी ऑक्सीजन है', detail:'मिथुन राशि का चंद्रमा यानी एक जैसा काम आपकी प्रेरणा खत्म कर देता है। आपको मानसिक उत्तेजना चाहिए।'},
+  'Karka':    {icon:'🤝', headline:'आप अपने साथ काम करने वालों की गहराई से परवाह करते हैं', detail:'कर्क राशि का चंद्रमा यानी टीम की संस्कृति और भावनात्मक सुरक्षा वेतन से ज़्यादा मायने रखती है।'},
+  'Simha':    {icon:'🌟', headline:'प्रेरित रहने के लिए आपको पहचान चाहिए', detail:'सिंह राशि का चंद्रमा यानी सराहना और दृश्यता आपको ऊर्जावान और वफ़ादार बनाए रखती है।'},
+  'Kanya':    {icon:'📋', headline:'आप खुद पर सबसे सख्त हैं — और यही नतीजे लाता है', detail:'कन्या राशि का चंद्रमा यानी आपके आंतरिक मापदंड आपसे असाधारण काम करवाते हैं।'},
+  'Tula':     {icon:'🎨', headline:'आपके माहौल में सुंदरता और सामंजस्य मायने रखते हैं', detail:'तुला राशि का चंद्रमा यानी सुंदर परिवेश और निष्पक्ष रिश्ते आपके बेहतरीन काम को बढ़ावा देते हैं।'},
+  'Vrischika':{icon:'🔮', headline:'आप लोगों को सटीक तरीके से पढ़ लेते हैं — हमेशा', detail:'वृश्चिक राशि का चंद्रमा यानी आप अनकहे को महसूस कर लेते हैं। यह एक करियर महाशक्ति है।'},
+  'Dhanu':    {icon:'🌍', headline:'आपको सिर्फ वेतन नहीं, उद्देश्य चाहिए', detail:'धनु राशि का चंद्रमा यानी सार्थक काम आपको पैसे से ज़्यादा प्रेरित करता है।'},
+  'Makar':    {icon:'🏆', headline:'लक्ष्य हासिल करना ही आपकी सुरक्षा का एहसास है', detail:'मकर राशि का चंद्रमा यानी उपलब्धि और प्रगति आपका भावनात्मक ईंधन हैं।'},
+  'Kumbha':   {icon:'🌐', headline:'जब आप कुछ बदल रहे होते हैं तब आप सबसे बेहतर काम करते हैं', detail:'कुंभ राशि का चंद्रमा यानी प्रभाव और नवाचार आपको जोड़े रखते हैं।'},
+  'Meena':    {icon:'💫', headline:'लोगों के बारे में आपका सहज ज्ञान लगभग हमेशा सही होता है', detail:'मीन राशि का चंद्रमा यानी सहानुभूति और रचनात्मकता आपके काम में स्वाभाविक रूप से बहती हैं।'}
 };
 var AK_TRAITS = {
   'Sun':     {icon:'👑', headline:'You are drawn to authority — and authority is drawn to you', detail:'Your career significator points toward leadership, governance, and public recognition.'},
@@ -3786,11 +3974,15 @@ function goToReport(){
 }
 
 function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
+  window._resultsCache = {pre:pre, name:name, jsVerdict:jsVerdict, bizScore:bizScore, jobScore:jobScore};
+  var lang = window._lang || 'en';
   var firstName = name && name !== 'User' ? name.split(' ')[0] : '';
 
   // Greeting
   var greetEl = document.getElementById('rs-greeting-name');
-  if(greetEl) greetEl.textContent = firstName ? 'Hi '+firstName+' —' : 'Your chart —';
+  if(greetEl) greetEl.textContent = firstName
+    ? (lang==='hi' ? 'नमस्ते '+firstName+' —' : 'Hi '+firstName+' —')
+    : (lang==='hi' ? 'आपकी कुंडली —' : 'Your chart —');
 
   // Verdict pill
   var pill = document.getElementById('rs-verdict-pill');
@@ -3798,26 +3990,32 @@ function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
     var raw = jsVerdict.replace('MIXED (leaning Business)','MIXED').replace('MIXED (leaning Job)','MIXED');
     var cls = raw==='BUSINESS'?'biz':raw==='JOB'?'job':'mix';
     pill.className = 'rs-verdict-pill '+cls;
-    pill.textContent = raw+' '+bizScore+':'+jobScore;
+    var rawLabel = lang==='hi' ? (raw==='BUSINESS'?'व्यवसाय':raw==='JOB'?'नौकरी':'मिश्रित') : raw;
+    pill.textContent = rawLabel+' '+bizScore+':'+jobScore;
   }
 
   // Summary — 2 sentences from preCompute
   var summaryEl = document.getElementById('rs-summary');
   if(summaryEl){
-    var akName = pre.amatyakaraka || '';
-    var lagnaSign = window._d1LagnaSign || '';
-    var verdictWord = jsVerdict.includes('BUSINESS') ? 'more suited to business' : jsVerdict.includes('JOB') ? 'more suited to employment' : 'suited to both paths depending on timing';
-    summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job.';
+    if(lang==='hi'){
+      var verdictWordHi = jsVerdict.includes('BUSINESS') ? 'व्यवसाय के लिए अधिक उपयुक्त' : jsVerdict.includes('JOB') ? 'नौकरी के लिए अधिक उपयुक्त' : 'समय के आधार पर दोनों राहों के लिए उपयुक्त';
+      summaryEl.textContent = 'आपकी कुंडली '+verdictWordHi+' है। '+bizScore+' में से 7 कारक व्यवसाय की ओर इशारा करते हैं, '+jobScore+' नौकरी की ओर।';
+    } else {
+      var verdictWord = jsVerdict.includes('BUSINESS') ? 'more suited to business' : jsVerdict.includes('JOB') ? 'more suited to employment' : 'suited to both paths depending on timing';
+      summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job.';
+    }
   }
 
   // Moon trait
   var moonSign = window._moonRashi || '';
-  var moonTrait = MOON_TRAITS[moonSign];
+  var moonTrait = (lang==='hi' && MOON_TRAITS_HI[moonSign]) ? MOON_TRAITS_HI[moonSign] : MOON_TRAITS[moonSign];
   if(moonTrait){
     document.getElementById('rs-moon-trait').style.display = 'block';
     document.getElementById('rs-moon-icon').textContent = moonTrait.icon;
     document.getElementById('rs-moon-headline').textContent = moonTrait.headline;
     document.getElementById('rs-moon-detail').textContent = moonTrait.detail;
+    var moonLabel = document.getElementById('rs-moon-label');
+    if(moonLabel) moonLabel.textContent = lang==='hi' ? 'आपकी कुंडली कहती है' : 'Your chart says';
   }
 }
 
@@ -3993,17 +4191,22 @@ function askQuestion(question){
 }
 
 function updateReportPreview(){
+  var lang = window._lang || 'en';
   // Show loading state if calls not ready
   var c1=document.getElementById('rpt-c1');
   var c2=document.getElementById('rpt-c2');
   var c3=document.getElementById('rpt-c3');
-  if(!window._call1Ready && c1) c1.textContent='Generating your verdict analysis...';
-  if(!window._call2Ready && c2) c2.textContent='Generating career suggestions...';
-  if(!window._call3Ready && c3) c3.textContent='Generating timing windows...';
+  if(!window._call1Ready && c1) c1.textContent = lang==='hi' ? 'आपके निर्णय का विश्लेषण तैयार हो रहा है...' : 'Generating your verdict analysis...';
+  if(!window._call2Ready && c2) c2.textContent = lang==='hi' ? 'करियर सुझाव तैयार हो रहे हैं...' : 'Generating career suggestions...';
+  if(!window._call3Ready && c3) c3.textContent = lang==='hi' ? 'समय की विंडो तैयार हो रही है...' : 'Generating timing windows...';
 
   if(window._reply1){
     var vm=window._reply1.match(/VERDICT:\s*(BUSINESS|JOB|MIXED[^—\n]*)/i);
-    if(vm && c1) c1.textContent=vm[1].trim()+' — 7-factor Sapta Sutri analysis';
+    if(vm && c1){
+      var txt1=vm[1].trim()+' — 7-factor Sapta Sutri analysis';
+      if(c1.dataset.srcText!==txt1) markTranslatable(c1, txt1, window._lang, 'text');
+      syncTranslatable(c1, lang);
+    }
   }
   if(window._reply2){
     var careers=[];
@@ -4011,11 +4214,19 @@ function updateReportPreview(){
       var m=l.match(/^\d+\.\s+\*\*([^*]+)\*\*/);
       if(m&&careers.length<3) careers.push(m[1].trim());
     });
-    if(careers.length && c2) c2.textContent=careers.join(' · ');
+    if(careers.length && c2){
+      var txt2=careers.join(' · ');
+      if(c2.dataset.srcText!==txt2) markTranslatable(c2, txt2, window._lang, 'text');
+      syncTranslatable(c2, lang);
+    }
   }
   if(window._reply3){
     var w=window._reply3.match(/Window 1[^:]*:[\s\S]*?([A-Z][a-z]+ \d{4})/i);
-    if(w && c3) c3.textContent='Starting '+w[1]+' — see full dates in report';
+    if(w && c3){
+      var txt3='Starting '+w[1]+' — see full dates in report';
+      if(c3.dataset.srcText!==txt3) markTranslatable(c3, txt3, window._lang, 'text');
+      syncTranslatable(c3, lang);
+    }
   }
 }
 
@@ -4179,7 +4390,10 @@ function applyLang(){
   var s=_strings[_lang];
   var appTitle=document.getElementById("app-title"); if(appTitle) appTitle.textContent=s.appTitle;
   var hsubEl=document.getElementById("hsub"); if(hsubEl) hsubEl.textContent=s.appSub;
-  var langBtn=document.getElementById("lang-btn"); if(langBtn) langBtn.textContent=s.langBtn;
+  document.querySelectorAll('.lang-switch').forEach(function(sw){
+    sw.setAttribute('data-lang', _lang);
+    sw.setAttribute('aria-checked', _lang==='hi' ? 'true' : 'false');
+  });
   var ft=document.querySelector(".form-title");
   var fs2=document.querySelector(".form-sub");
   if(ft)ft.textContent=s.formTitle;
@@ -4241,12 +4455,34 @@ function applyLang(){
   if(pr) pr.textContent=(_lang==='hi'?'📄 रिपोर्ट':'📄 Report');
 
   window._lang=_lang;
+
+  // ── Refresh dynamic/AI screens so the whole app switches live ──────
+  if(window._resultsCache){
+    var rc=window._resultsCache;
+    populateResultsScreen(rc.pre, rc.name, rc.jsVerdict, rc.bizScore, rc.jobScore);
+  }
+  refreshSituationChips();
+  refreshSituationLabels();
+  refreshActionLabels();
+  refreshReportLabels();
+  var reportScreenEl=document.getElementById('screen-report');
+  if(reportScreenEl && reportScreenEl.style.display!=='none') updateReportPreview();
+  if(window._chatChipsMode==='situation' && window._meta && window._meta.situation){
+    swapChatChips(window._meta.situation);
+  } else {
+    renderDefaultChatChips();
+  }
+  syncAllTranslatables();
 }
 document.addEventListener('DOMContentLoaded', applyLang);
 </script>
 <div class="app">
   <div class="hdr" id="main-hdr">
-    <button id="lang-btn" onclick="toggleLang()">हिंदी</button>
+    <button class="lang-switch" data-lang="en" onclick="toggleLang()" role="switch" aria-checked="false" aria-label="Switch language">
+      <span class="lang-switch-thumb"></span>
+      <span class="lang-switch-label en">EN</span>
+      <span class="lang-switch-label hi">HI</span>
+    </button>
     <div class="dot" id="dot"></div>
     <span class="htitle" id="app-title">Career Destiny</span>
     <span class="hsub" id="hsub"></span>
@@ -4302,8 +4538,11 @@ document.addEventListener('DOMContentLoaded', applyLang);
     <!-- Shared header -->
     <div class="rs-header">
       <button class="rs-back-btn" id="rs-back-btn" onclick="rsBack()">← Back</button>
-      
-      
+      <button class="lang-switch" data-lang="en" onclick="toggleLang()" role="switch" aria-checked="false" aria-label="Switch language" style="margin-left:auto;margin-right:0;">
+        <span class="lang-switch-thumb"></span>
+        <span class="lang-switch-label en">EN</span>
+        <span class="lang-switch-label hi">HI</span>
+      </button>
     </div>
 
     <!-- Scrollable body -->
@@ -4320,7 +4559,7 @@ document.addEventListener('DOMContentLoaded', applyLang);
 
         <!-- Moon trait box -->
         <div class="rs-moon-trait" id="rs-moon-trait" style="display:none">
-          <div class="rs-moon-label">Your chart says</div>
+          <div class="rs-moon-label" id="rs-moon-label">Your chart says</div>
           <div class="rs-moon-icon" id="rs-moon-icon" style="display:none"></div>
           <div class="rs-moon-headline" id="rs-moon-headline"></div>
           <div class="rs-moon-detail" id="rs-moon-detail"></div>
@@ -4343,16 +4582,16 @@ document.addEventListener('DOMContentLoaded', applyLang);
           <button class="rs-action-btn" onclick="goToChat()">
             <span class="rs-action-icon">💬</span>
             <div class="rs-action-body">
-              <div class="rs-action-title">Chat with your chart</div>
-              <div class="rs-action-sub">Ask questions about your career, timing, and destiny</div>
+              <div class="rs-action-title" id="rs-action1-title">Chat with your chart</div>
+              <div class="rs-action-sub" id="rs-action1-sub">Ask questions about your career, timing, and destiny</div>
             </div>
             <span class="rs-action-arrow">›</span>
           </button>
           <button class="rs-action-btn" onclick="goToReport()">
             <span class="rs-action-icon">📄</span>
             <div class="rs-action-body">
-              <div class="rs-action-title">Get your full report</div>
-              <div class="rs-action-sub">Complete 11-section analysis delivered to your email</div>
+              <div class="rs-action-title" id="rs-action2-title">Get your full report</div>
+              <div class="rs-action-sub" id="rs-action2-sub">Complete 11-section analysis delivered to your email</div>
             </div>
             <span class="rs-action-arrow">›</span>
           </button>
@@ -4375,18 +4614,18 @@ document.addEventListener('DOMContentLoaded', applyLang);
       <!-- SCREEN C: Report -->
       <div id="screen-report" style="display:none;padding:20px 20px 40px;">
         <div class="rpt-email-card">
-          <div class="rpt-email-title">📧 Get your full report</div>
-          <div class="rpt-email-sub">Your report will be emailed within 1 minute.</div>
+          <div class="rpt-email-title" id="rpt-email-title">📧 Get your full report</div>
+          <div class="rpt-email-sub" id="rpt-email-sub">Your report will be emailed within 1 minute.</div>
           <div class="rpt-email-row">
             <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com"/>
             <button class="rpt-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
           </div>
         </div>
-        <div class="rpt-sections-label">Sample preview of report sections</div>
-        <div class="rpt-section-row"><span class="rpt-section-num">01</span><div><div class="rpt-section-title">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">03</span><div><div class="rpt-section-title">Job or Business? (7-factor table)</div><div class="rpt-section-sub">Every sutra scored and explained</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">06</span><div><div class="rpt-section-title">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">09</span><div><div class="rpt-section-title">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
+        <div class="rpt-sections-label" id="rpt-sections-label">Sample preview of report sections</div>
+        <div class="rpt-section-row"><span class="rpt-section-num">01</span><div><div class="rpt-section-title" id="rpt-sec-title-1">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">03</span><div><div class="rpt-section-title" id="rpt-sec-title-2">Job or Business? (7-factor table)</div><div class="rpt-section-sub" id="rpt-sec-sub-2">Every sutra scored and explained</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">06</span><div><div class="rpt-section-title" id="rpt-sec-title-3">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">09</span><div><div class="rpt-section-title" id="rpt-sec-title-4">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
       </div><!-- end screen-report -->
 
     </div><!-- end rs-body -->
