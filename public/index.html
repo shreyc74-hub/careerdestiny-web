@@ -125,6 +125,12 @@ body{
   font-family:'DM Sans',sans-serif;
 }
 .signup-btn:hover{background:var(--accent-bg);}
+.header-auth-group{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.login-link{
+  background:none;border:none;color:var(--text-muted);font-size:12px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;flex-shrink:0;padding:4px 0;
+}
+.login-link:hover{color:var(--purple);}
 
 .user-menu{position:relative;flex-shrink:0;}
 .user-menu-trigger{
@@ -3617,7 +3623,10 @@ function renderAuthArea(){
   var user = window._currentUser;
   var lang = window._lang || 'en';
   if(!user){
-    return '<button class="signup-btn" onclick="openAuth(\'signup\')">'+(lang==='hi'?'साइन अप':'Sign up')+'</button>';
+    return '<div class="header-auth-group">'
+      + '<button class="login-link" onclick="openAuth(\'login\')">'+(lang==='hi'?'लॉग इन':'Log in')+'</button>'
+      + '<button class="signup-btn" onclick="openAuth(\'signup\')">'+(lang==='hi'?'साइन अप':'Sign up')+'</button>'
+      + '</div>';
   }
   var displayName = user.name || (user.email ? user.email.split('@')[0] : 'U');
   var initials = displayName.trim().charAt(0).toUpperCase() || 'U';
