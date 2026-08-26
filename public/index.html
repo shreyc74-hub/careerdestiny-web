@@ -1669,17 +1669,11 @@ function preCompute(c){
     // YOGA DETECTION (Rule 12 — 2-6-10-11 Formula + Classical Yogas)
     // =================================================================
     var yogas=[];
-    var sunP=planetsWithHouse.find(function(p){return p.name==='Sun';});
-    var mercP=planetsWithHouse.find(function(p){return p.name==='Mercury';});
     var jupP=planetsWithHouse.find(function(p){return p.name==='Jupiter';});
     var moonP=planetsWithHouse.find(function(p){return p.name==='Moon';});
     var marsP=planetsWithHouse.find(function(p){return p.name==='Mars';});
     var venP=planetsWithHouse.find(function(p){return p.name==='Venus';});
 
-    // Budha-Aditya Yoga: Sun + Mercury same sign
-    if(sunP&&mercP&&sunP.house===mercP.house){
-      yogas.push({name:'Budha-Aditya Yoga',detail:'Sun+Mercury in H'+sunP.house,effect:'Sharp intelligence, communication ability'});
-    }
     // Gajakesari Yoga: Jupiter in kendra from Moon
     if(jupP&&moonP){
       var jupFromMoon=((jupP.house-moonP.house+12)%12)+1;
@@ -1687,10 +1681,8 @@ function preCompute(c){
         yogas.push({name:'Gajakesari Yoga',detail:'Jupiter in H'+jupP.house+', '+jupFromMoon+' houses from Moon',effect:'Authority, recognition, wisdom in career'});
       }
     }
-    // Chandra-Mangal Yoga: Moon + Mars conjunction
-    if(moonP&&marsP&&moonP.house===marsP.house){
-      yogas.push({name:'Chandra-Mangal Yoga',detail:'Moon+Mars in H'+moonP.house,effect:'Commercial drive, income through enterprise'});
-    }
+    // Budha-Aditya and Chandra-Mangal are pushed later, from the fuller
+    // Budh-Aditya/Chandra-Mangal checks further down — see there for why.
     // Dhan Yoga: H2/H5/H9/H11 lords connected (conjunction)
     var dhanLordHouses=[2,5,9,11];
     var dhanLords=dhanLordHouses.map(function(h){
@@ -1719,18 +1711,8 @@ function preCompute(c){
         }
       });
     });
-    // Neecha Bhanga: Debilitated planet + dispositor in kendra
-    planets.forEach(function(p){
-      if(p.name==='Ascendant') return;
-      var d=DIGNITY[p.name];
-      if(!d||p.rasi.name!==d.debil) return;
-      // Find dispositor (lord of the sign planet is in)
-      var dispositorName=getLordOfSign?getLordOfSign(signs.indexOf(p.rasi.name)):'?';
-      var dispositor=planets.find(function(x){return x.name===dispositorName;});
-      if(dispositor&&kendraH.indexOf(dispositor.house||getHouse(dispositor))>-1){
-        yogas.push({name:'Neecha Bhanga Raja Yoga',detail:p.name+' debilitated in '+p.rasi.name+', dispositor '+dispositorName+' in H'+dispositor.position+' (kendra)',effect:'Cancellation of debility — difficult start then strong rise'});
-      }
-    });
+    // Neecha Bhanga Raja Yoga is pushed later, from the fuller multi-condition
+    // check further down — see there for why.
     // 2-6-10-11 Formula (Rule 12)
     var h2idx=(signs.indexOf(lagnaSign)+1)%12; var h6idx=(signs.indexOf(lagnaSign)+5)%12;
     var h10idx=(signs.indexOf(lagnaSign)+9)%12; var h11idx=(signs.indexOf(lagnaSign)+10)%12;
@@ -2177,6 +2159,9 @@ function preCompute(c){
             sevenApart?'Moon in H'+moonP.position+' and Mars in H'+marsP.position+' — mutual 7th aspect':
             'Chandra-Mangal Yoga absent'
         };
+        if(result.chandraMangal.present){
+          yogas.push({name:'Chandra-Mangal Yoga',detail:result.chandraMangal.description,effect:'Commercial drive, income through enterprise'});
+        }
       }
     }catch(e){result.chandraMangalError=e.message;}
 
@@ -2202,6 +2187,9 @@ function preCompute(c){
           '10th house from Lagna has '+(planetsIn10thLagna.length===0?'no planets':planetsIn10thLagna.map(function(p){return p.name;}).join('+'))+' and 10th from Moon has '+(planetsIn10thMoon.length===0?'no planets':planetsIn10thMoon.map(function(p){return p.name;}).join('+')):
           'Malefic planets in 10th house cancel Amala Yoga'
       };
+      if(amalaPresent){
+        yogas.push({name:'Amala Yoga',detail:result.amalaYoga.description,effect:'Clean reputation, ethical career path, respected in profession'});
+      }
     }catch(e){result.amalaYogaError=e.message;}
 
     // VIPARITA RAJA YOGA
@@ -2237,10 +2225,17 @@ function preCompute(c){
         conditions:vipParas,
         description:vipParas.length>0?'Viparita Raja Yoga present — '+vipParas.join('; '):'Viparita Raja Yoga absent'
       };
+      if(vipParas.length>0){
+        yogas.push({name:'Viparita Raja Yoga',detail:result.viparitraRaja.description,effect:'Success through overcoming adversity, competition, or crisis'});
+      }
     }catch(e){result.viparitraRajaError=e.message;}
 
     // DHARMA-KARMA ADHIPATI YOGA
     try{
+      // EXALT is also declared in the Neecha Bhanga block below, but that
+      // runs after this one — declared here too so the exchange check
+      // below doesn't reference it before it exists.
+      var EXALT={Sun:'Mesha',Moon:'Vrishabha',Mars:'Makar',Mercury:'Kanya',Jupiter:'Karka',Venus:'Meena',Saturn:'Tula'};
       var NINTH_TENTH_LORDS={
         'Simha':{9:'Mars',10:'Venus'},
         'Mesha':{9:'Jupiter',10:'Saturn'},
@@ -2284,6 +2279,9 @@ function preCompute(c){
         conditions:dkConditions,
         description:dkConditions.length>0?'Dharma-Karma Adhipati Yoga: '+dkConditions.join('; '):'Dharma-Karma Adhipati Yoga absent — 9th lord ('+lord9name+') and 10th lord ('+lord10name+') not connected'
       };
+      if(dkConditions.length>0){
+        yogas.push({name:'Dharma-Karma Adhipati Yoga',detail:result.dharmaKarma.description,effect:'Powerful career-fulfillment yoga — success aligned with life purpose'});
+      }
     }catch(e){result.dharmaKarmaError=e.message;}
 
     // BUDH-ADITYA YOGA
@@ -2310,6 +2308,9 @@ function preCompute(c){
             !sameHouse?'Sun and Mercury in different houses — yoga absent':
             'Yoga cancelled due to debilitation'
         };
+        if(result.budhAditya.present){
+          yogas.push({name:'Budha-Aditya Yoga',detail:result.budhAditya.description,effect:result.budhAditya.strong?'Sharp intelligence, communication ability — strong form':'Sharp intelligence, communication ability'});
+        }
       }
     }catch(e){result.budhAdityaError=e.message;}
 
@@ -2335,7 +2336,10 @@ function preCompute(c){
         var debilLord=SIGN_LORDS[DEBIL[pname]];
         var debilLordPlanet=planets.find(function(x){return x.name===debilLord;});
         if(debilLordPlanet){
-          var houseFromLagna=debilLordPlanet.position;
+          // .position is the planet's raw zodiac sign (1-12 from Aries), not
+          // its house from Lagna — must offset by the Lagna's own sign first,
+          // the same way the "from Moon" check below already does.
+          var houseFromLagna=((debilLordPlanet.position-lagnaHouse2+12)%12)+1;
           if(KENDRA.indexOf(houseFromLagna)>-1)conditions.push('Lord of debil sign ('+debilLord+') in kendra H'+houseFromLagna+' from Lagna');
           var relativeToMoon=((debilLordPlanet.position-moonHouse+12)%12)+1;
           if(KENDRA.indexOf(relativeToMoon)>-1)conditions.push('Lord of debil sign ('+debilLord+') in kendra from Moon');
@@ -2345,7 +2349,8 @@ function preCompute(c){
         var exaltLord=SIGN_LORDS[exaltSign];
         var exaltLordPlanet=planets.find(function(x){return x.name===exaltLord;});
         if(exaltLordPlanet){
-          if(KENDRA.indexOf(exaltLordPlanet.position)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra H'+exaltLordPlanet.position+' from Lagna');
+          var exaltLordHouseFromLagna=((exaltLordPlanet.position-lagnaHouse2+12)%12)+1;
+          if(KENDRA.indexOf(exaltLordHouseFromLagna)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra H'+exaltLordHouseFromLagna+' from Lagna');
           var relToMoon=((exaltLordPlanet.position-moonHouse+12)%12)+1;
           if(KENDRA.indexOf(relToMoon)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra from Moon');
         }
@@ -2376,6 +2381,9 @@ function preCompute(c){
         }
       });
       result.neechaBhanga=nbry;
+      nbry.forEach(function(nb){
+        yogas.push({name:'Neecha Bhanga Raja Yoga',detail:nb.description,effect:'Cancellation of debility — difficult start then strong rise ('+nb.strength+')'});
+      });
     }catch(e){result.neechaBhangaError=e.message;}
 
     // Gochar: Jupiter and Saturn only
