@@ -4340,18 +4340,22 @@ function triggerEmail(){
   }
   cdTrack('email_report_click', {has_email: (window._meta&&window._meta.email)?'yes':'no'});
   var email = (window._meta && window._meta.email) || '';
-  if(!email){
-    // Ask for email in chat
+  // Always confirm through chat rather than silently reusing a stored
+  // email — someone analyzing a chart for a family member, or wanting the
+  // PDF sent somewhere else this one time, needs a way to say so.
+  window._awaitingEmail = true;
+  document.getElementById('bottom-bar').style.display = 'block';
+  document.getElementById('chat-ui').placeholder = 'Enter your email address...';
+  document.getElementById('chat-ui').focus();
+  if(email){
     addRow('agent', renderChatReply(
-      "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
-    ), null, "To send your report, I need your email address. Please type it below and I'll send the PDF right away.");
-    window._awaitingEmail = true;
-    document.getElementById('bottom-bar').style.display = 'block';
-    document.getElementById('chat-ui').placeholder = 'Enter your email address...';
-    document.getElementById('chat-ui').focus();
+      "I can send your report to **"+email+"** — type **send** to confirm, or type a different email address to use that instead."
+    ), null, "I can send your report to **"+email+"** — type **send** to confirm, or type a different email address to use that instead.");
     return;
   }
-  sendReportEmail(email);
+  addRow('agent', renderChatReply(
+    "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
+  ), null, "To send your report, I need your email address. Please type it below and I'll send the PDF right away.");
 }
 
 async function sendReportEmail(email){
@@ -4912,8 +4916,13 @@ async function sendChat(){
   // Handle email collection flow
   if(window._awaitingEmail){
     var emailInput = txt.trim();
-    // Basic email validation
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)){
+    var existingEmail = window._meta && window._meta.email;
+    // "send"/"yes"/etc confirms the already-known email from triggerEmail()'s
+    // prompt; anything else must be a real address (either a fresh one, or
+    // the reply when no email was known yet).
+    var isConfirm = !!existingEmail && /^(send|yes|confirm|ok|okay|sure|go ahead)\.?$/i.test(emailInput);
+    var finalEmail = isConfirm ? existingEmail : emailInput;
+    if(!isConfirm && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalEmail)){
       addRow('user', emailInput);
       addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"), null, "That does not look like a valid email address. Please try again — for example: yourname@gmail.com");
       btn.disabled=false;
@@ -4921,15 +4930,15 @@ async function sendChat(){
       ui.focus();
       return;
     }
-    // Valid email — store and send
+    // Valid email (or confirmed) — store and send
     window._awaitingEmail = false;
     window._meta = window._meta || {};
-    window._meta.email = emailInput;
+    window._meta.email = finalEmail;
     ui.placeholder='Ask a follow-up question...';
     addRow('user', emailInput);
-    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'), null, 'Got it! Generating and sending your report to **' + emailInput + '**...');
+    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + finalEmail + '**...'), null, 'Got it! Generating and sending your report to **' + finalEmail + '**...');
     btn.disabled=false;
-    sendReportEmail(emailInput);
+    sendReportEmail(finalEmail);
     return;
   }
 
