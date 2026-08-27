@@ -5480,6 +5480,7 @@ document.addEventListener('DOMContentLoaded', function(){
   _submitOnEnter(['signup-email','signup-password','signup-password2'], handleSignUp);
   _submitOnEnter(['login-email','login-password'], handleLogIn);
   _submitOnEnter(['reset-password-new','reset-password-new2'], handleUpdatePassword);
+  _submitOnEnter(['f-name','f-dob','f-time','f-place','f-email'], analyze);
 });
 
 function fixViewportHeight(){
