@@ -583,6 +583,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .rpt-send-btn{padding:10px 18px;background:#534AB7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
 .rpt-send-btn:disabled{opacity:0.6;cursor:not-allowed;}
 .rpt-email-note{font-size:11px;color:#1D9E75;margin-top:8px;}
+.rpt-email-error{font-size:11px;color:#e05050;margin-top:8px;}
 .rpt-sections-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
 .rpt-section-row{display:flex;align-items:baseline;gap:10px;padding:10px 0;border-bottom:1px solid #f0ede6;}
 .rpt-section-num{font-size:11px;font-weight:700;color:#c9a96e;min-width:24px;}
@@ -5393,6 +5394,8 @@ async function sendReportFromPath(){
 
 function sendEmail(reportHtml, email, btn){
   var vm=(window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
+  var errEl = document.getElementById('rpt-email-error');
+  if(errEl){ errEl.style.display='none'; errEl.textContent=''; }
   fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({html:reportHtml,email:email,name:window._meta&&window._meta.name||'',verdict:vm?vm[1]:'MIXED'})
   }).then(function(r){return r.json();}).then(function(d){
@@ -5401,8 +5404,21 @@ function sendEmail(reportHtml, email, btn){
     cdTrack('email_sent_success');
     setTimeout(function(){btn.textContent='Send';btn.style.background='';btn.disabled=false;},4000);
   }).catch(function(e){
+    // Previously this failed completely silently — the button just reverted
+    // to "Send" with only a console.error, so a real failure (Resend down,
+    // PDF render timeout, a dropped request) looked identical to nothing
+    // having happened at all. Show a real message instead of the raw error,
+    // which could leak backend/provider details.
     console.error('Email error:',e);
     btn.textContent='Send';btn.disabled=false;
+    if(errEl){
+      var lang = window._lang||'en';
+      errEl.textContent = lang==='hi'
+        ? 'रिपोर्ट भेजने में समस्या हुई। कृपया कुछ देर बाद फिर कोशिश करें।'
+        : "Couldn't send your report — please try again in a moment.";
+      errEl.style.display='block';
+    }
+    cdTrack('email_sent_error', {error: e.message});
   });
 }
 
@@ -5775,10 +5791,11 @@ document.addEventListener('DOMContentLoaded', applyLang);
           <div class="rpt-email-title" id="rpt-email-title">📧 Get your full report</div>
           <div class="rpt-email-sub" id="rpt-email-sub">Your report will be emailed within 1 minute.</div>
           <div class="rpt-email-row">
-            <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com" oninput="var n=document.getElementById('rpt-email-note'); if(n) n.style.display='none';"/>
+            <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com" oninput="var n=document.getElementById('rpt-email-note'); if(n) n.style.display='none'; var er=document.getElementById('rpt-email-error'); if(er) er.style.display='none';"/>
             <button class="rpt-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
           </div>
           <div class="rpt-email-note" id="rpt-email-note" style="display:none;"></div>
+          <div class="rpt-email-error" id="rpt-email-error" style="display:none;"></div>
         </div>
         <div class="rpt-sections-label" id="rpt-sections-label">Sample preview of report sections</div>
         <div class="rpt-section-row"><span class="rpt-section-num">1</span><div><div class="rpt-section-title" id="rpt-sec-title-1">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
