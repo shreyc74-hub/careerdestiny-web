@@ -582,6 +582,8 @@ input:focus,select:focus{border-color:var(--gold);}
 .rpt-email-inp:focus{border-color:#c9a96e;}
 .rpt-send-btn{padding:10px 18px;background:#534AB7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
 .rpt-send-btn:disabled{opacity:0.6;cursor:not-allowed;}
+.rpt-email-note{font-size:11px;color:#1D9E75;margin-top:8px;}
+.rpt-email-error{font-size:11px;color:#e05050;margin-top:8px;}
 .rpt-sections-label{font-size:10px;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:12px;}
 .rpt-section-row{display:flex;align-items:baseline;gap:10px;padding:10px 0;border-bottom:1px solid #f0ede6;}
 .rpt-section-num{font-size:11px;font-weight:700;color:#c9a96e;min-width:24px;}
@@ -4338,25 +4340,40 @@ function triggerEmail(){
   }
   cdTrack('email_report_click', {has_email: (window._meta&&window._meta.email)?'yes':'no'});
   var email = (window._meta && window._meta.email) || '';
-  if(!email){
-    // Ask for email in chat
+  // Always confirm through chat rather than silently reusing a stored
+  // email — someone analyzing a chart for a family member, or wanting the
+  // PDF sent somewhere else this one time, needs a way to say so.
+  window._awaitingEmail = true;
+  document.getElementById('bottom-bar').style.display = 'block';
+  document.getElementById('chat-ui').placeholder = 'Enter your email address...';
+  document.getElementById('chat-ui').focus();
+  if(email){
     addRow('agent', renderChatReply(
-      "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
-    ), null, "To send your report, I need your email address. Please type it below and I'll send the PDF right away.");
-    window._awaitingEmail = true;
-    document.getElementById('bottom-bar').style.display = 'block';
-    document.getElementById('chat-ui').placeholder = 'Enter your email address...';
-    document.getElementById('chat-ui').focus();
+      "I can send your report to **"+email+"** — type **send** to confirm, or type a different email address to use that instead."
+    ), null, "I can send your report to **"+email+"** — type **send** to confirm, or type a different email address to use that instead.");
     return;
   }
-  sendReportEmail(email);
+  addRow('agent', renderChatReply(
+    "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
+  ), null, "To send your report, I need your email address. Please type it below and I'll send the PDF right away.");
 }
 
 async function sendReportEmail(email){
   var btn = document.getElementById('dl-report-btn');
-  if(btn){ btn.textContent = '⏳ Generating & Sending...'; btn.disabled = true; }
+  if(btn){ btn.disabled = true; }
 
   try {
+    if(!(window._call1Ready && window._call2Ready && window._call3Ready)){
+      if(btn) btn.textContent = window._lang==='hi' ? '⏳ आपका पूरा विश्लेषण तैयार हो रहा है...' : '⏳ Finishing your full analysis...';
+      var allReady = (await Promise.all([waitForCall(1), waitForCall(2), waitForCall(3)])).every(Boolean);
+      if(!allReady){
+        if(btn){ btn.textContent = '📧 Email My Report'; btn.disabled = false; }
+        addRow('agent', renderChatReply('Your analysis is taking longer than expected. Please try again in a moment.'), null, 'Your analysis is taking longer than expected. Please try again in a moment.');
+        return;
+      }
+    }
+    if(btn){ btn.textContent = '⏳ Generating & Sending...'; }
+    window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
     // Build report HTML (same as downloadReport but return instead of open)
     var reportHtml = buildReportHtml(window._meta, window._analysis, window._svgs);
 
@@ -4899,8 +4916,13 @@ async function sendChat(){
   // Handle email collection flow
   if(window._awaitingEmail){
     var emailInput = txt.trim();
-    // Basic email validation
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)){
+    var existingEmail = window._meta && window._meta.email;
+    // "send"/"yes"/etc confirms the already-known email from triggerEmail()'s
+    // prompt; anything else must be a real address (either a fresh one, or
+    // the reply when no email was known yet).
+    var isConfirm = !!existingEmail && /^(send|yes|confirm|ok|okay|sure|go ahead)\.?$/i.test(emailInput);
+    var finalEmail = isConfirm ? existingEmail : emailInput;
+    if(!isConfirm && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalEmail)){
       addRow('user', emailInput);
       addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"), null, "That does not look like a valid email address. Please try again — for example: yourname@gmail.com");
       btn.disabled=false;
@@ -4908,15 +4930,15 @@ async function sendChat(){
       ui.focus();
       return;
     }
-    // Valid email — store and send
+    // Valid email (or confirmed) — store and send
     window._awaitingEmail = false;
     window._meta = window._meta || {};
-    window._meta.email = emailInput;
+    window._meta.email = finalEmail;
     ui.placeholder='Ask a follow-up question...';
     addRow('user', emailInput);
-    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'), null, 'Got it! Generating and sending your report to **' + emailInput + '**...');
+    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + finalEmail + '**...'), null, 'Got it! Generating and sending your report to **' + finalEmail + '**...');
     btn.disabled=false;
-    sendReportEmail(emailInput);
+    sendReportEmail(finalEmail);
     return;
   }
 
@@ -5064,10 +5086,29 @@ function goToReport(){
   document.getElementById('screen-chat').style.display = 'none';
   document.getElementById('chat-input-bar').style.display = 'none';
   document.getElementById('screen-report').style.display = 'block';
-  // Pre-fill email if available
-  var emailMeta = window._meta && window._meta.email;
-  if(emailMeta){ var inp=document.getElementById('report-email-inp'); if(inp&&!inp.value) inp.value=emailMeta; }
+  prefillReportEmail();
   updateReportPreview();
+}
+// Fills the report-email field from the birth-details form's email, if the
+// person gave one, and surfaces a note explaining why — since the report is
+// only ever delivered to whatever address sits in that field, someone who
+// glances past a silently-prefilled field could miss that it's pre-filled
+// with the wrong address (e.g. analyzing a family member's chart under
+// their own account).
+function prefillReportEmail(){
+  var emailMeta = window._meta && window._meta.email;
+  var inp = document.getElementById('report-email-inp');
+  var note = document.getElementById('rpt-email-note');
+  if(emailMeta && inp && !inp.value){
+    inp.value = emailMeta;
+    if(note){
+      var lang = window._lang||'en';
+      note.textContent = lang==='hi'
+        ? '✓ यह वही ईमेल है जो आपने पहले दिया था — कृपया जांच लें कि यह सही है, क्योंकि रिपोर्ट केवल इसी पते पर भेजी जाएगी।'
+        : "✓ This is the email you gave earlier — double-check it's correct, since this is the only address your report will be sent to.";
+      note.style.display = 'block';
+    }
+  }
 }
 
 function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
@@ -5157,9 +5198,7 @@ function switchScreen(screen){
     if(chatBar) chatBar.style.display = 'none';
     if(pillReport) pillReport.classList.add('active');
     if(pillChat) pillChat.classList.remove('active');
-    // Pre-fill email
-    var emailMeta = window._meta && window._meta.email;
-    if(emailMeta){ var inp=document.getElementById('report-email-inp'); if(inp&&!inp.value)inp.value=emailMeta; }
+    prefillReportEmail();
     updateReportPreview();
   }
 }
@@ -5331,7 +5370,7 @@ function updateReportPreview(){
   }
 }
 
-function sendReportFromPath(){
+async function sendReportFromPath(){
   var inp=document.getElementById('report-email-inp');
   var email=inp?inp.value.trim():'';
   var btn=document.getElementById('report-send-btn');
@@ -5340,28 +5379,32 @@ function sendReportFromPath(){
     return;
   }
   if(window._meta) window._meta.email=email;
-  btn.textContent='⏳'; btn.disabled=true;
-  if(!window._analysis) window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
-  var reportHtml=buildReportHtml(window._meta,window._analysis,window._svgs);
-  if(!reportHtml){
-    // Report not ready yet — wait for calls
-    btn.textContent='⏳ Generating...';
-    var waitInterval = setInterval(function(){
-      var analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
-      if(analysis.length > 100){
-        clearInterval(waitInterval);
-        reportHtml = buildReportHtml(window._meta, analysis, window._svgs||{});
-        if(!reportHtml){ btn.textContent='Send'; btn.disabled=false; return; }
-        sendEmail(reportHtml, email, btn);
-      }
-    }, 2000);
-    return;
+  btn.disabled=true;
+  // Wait for CALL1/2/3 to actually finish before building anything — building
+  // early just bakes whatever's missing into the PDF as blank sections, since
+  // buildReportHtml() always returns *some* HTML (the shell renders either
+  // way), so checking its truthiness never actually caught an incomplete report.
+  if(!(window._call1Ready && window._call2Ready && window._call3Ready)){
+    btn.textContent = window._lang==='hi' ? '⏳ आपका पूरा विश्लेषण तैयार हो रहा है...' : '⏳ Finishing your full analysis...';
+    var allReady = (await Promise.all([waitForCall(1), waitForCall(2), waitForCall(3)])).every(Boolean);
+    if(!allReady){
+      btn.textContent = window._lang==='hi' ? 'भेजें' : 'Send';
+      btn.disabled = false;
+      alert(window._lang==='hi' ? 'विश्लेषण में सामान्य से अधिक समय लग रहा है। कृपया थोड़ी देर बाद फिर कोशिश करें।' : 'Your analysis is taking longer than expected. Please try again in a moment.');
+      return;
+    }
   }
+  btn.textContent='⏳';
+  window._analysis=(window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
+  var reportHtml=buildReportHtml(window._meta,window._analysis,window._svgs);
+  if(!reportHtml){ btn.textContent='Send'; btn.disabled=false; return; }
   sendEmail(reportHtml, email, btn);
 }
 
 function sendEmail(reportHtml, email, btn){
   var vm=(window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i);
+  var errEl = document.getElementById('rpt-email-error');
+  if(errEl){ errEl.style.display='none'; errEl.textContent=''; }
   fetch('/api/email',{method:'POST',headers:{'Content-Type':'application/json'},
     body:JSON.stringify({html:reportHtml,email:email,name:window._meta&&window._meta.name||'',verdict:vm?vm[1]:'MIXED'})
   }).then(function(r){return r.json();}).then(function(d){
@@ -5370,8 +5413,21 @@ function sendEmail(reportHtml, email, btn){
     cdTrack('email_sent_success');
     setTimeout(function(){btn.textContent='Send';btn.style.background='';btn.disabled=false;},4000);
   }).catch(function(e){
+    // Previously this failed completely silently — the button just reverted
+    // to "Send" with only a console.error, so a real failure (Resend down,
+    // PDF render timeout, a dropped request) looked identical to nothing
+    // having happened at all. Show a real message instead of the raw error,
+    // which could leak backend/provider details.
     console.error('Email error:',e);
     btn.textContent='Send';btn.disabled=false;
+    if(errEl){
+      var lang = window._lang||'en';
+      errEl.textContent = lang==='hi'
+        ? 'रिपोर्ट भेजने में समस्या हुई। कृपया कुछ देर बाद फिर कोशिश करें।'
+        : "Couldn't send your report — please try again in a moment.";
+      errEl.style.display='block';
+    }
+    cdTrack('email_sent_error', {error: e.message});
   });
 }
 
@@ -5744,15 +5800,17 @@ document.addEventListener('DOMContentLoaded', applyLang);
           <div class="rpt-email-title" id="rpt-email-title">📧 Get your full report</div>
           <div class="rpt-email-sub" id="rpt-email-sub">Your report will be emailed within 1 minute.</div>
           <div class="rpt-email-row">
-            <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com"/>
+            <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com" oninput="var n=document.getElementById('rpt-email-note'); if(n) n.style.display='none'; var er=document.getElementById('rpt-email-error'); if(er) er.style.display='none';"/>
             <button class="rpt-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
           </div>
+          <div class="rpt-email-note" id="rpt-email-note" style="display:none;"></div>
+          <div class="rpt-email-error" id="rpt-email-error" style="display:none;"></div>
         </div>
         <div class="rpt-sections-label" id="rpt-sections-label">Sample preview of report sections</div>
-        <div class="rpt-section-row"><span class="rpt-section-num">01</span><div><div class="rpt-section-title" id="rpt-sec-title-1">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">03</span><div><div class="rpt-section-title" id="rpt-sec-title-2">Job or Business? (7-factor table)</div><div class="rpt-section-sub" id="rpt-sec-sub-2">Every sutra scored and explained</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">06</span><div><div class="rpt-section-title" id="rpt-sec-title-3">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">09</span><div><div class="rpt-section-title" id="rpt-sec-title-4">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">1</span><div><div class="rpt-section-title" id="rpt-sec-title-1">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">2</span><div><div class="rpt-section-title" id="rpt-sec-title-2">Job or Business? (7-factor table)</div><div class="rpt-section-sub" id="rpt-sec-sub-2">Every sutra scored and explained</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">3</span><div><div class="rpt-section-title" id="rpt-sec-title-3">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">4</span><div><div class="rpt-section-title" id="rpt-sec-title-4">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
       </div><!-- end screen-report -->
 
     </div><!-- end rs-body -->
