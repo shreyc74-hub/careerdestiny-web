@@ -1340,7 +1340,7 @@ function downloadReport(meta, analysis, svgs){
       return yogaHtml || mdToHtml(s4);
     })())
   + sectionHtml('07','How You Earn and Work Best', mdToHtml(s5))
-  + (s7 ? sectionHtml('08','Your Strengths and Hidden Talents', mdToHtml(s7)) : '')
+  + sectionHtml('08','Your Strengths and Hidden Talents', s7 ? mdToHtml(s7) : '<p style="color:#888;font-style:italic;">This section couldn\'t be generated for your reading — ask about your strengths and hidden talents in chat.</p>')
   + sectionHtml('09','Your Planetary Period Timeline', (function(){
       // Strip raw markdown table header line from s8 intro text
       var s8intro = s8.split('\n').filter(function(l){
