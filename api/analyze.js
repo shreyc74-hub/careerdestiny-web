@@ -95,7 +95,7 @@ OUTPUT — exactly these four sections:
 ---
 SECTION 4 — PLANETARY COMBINATIONS IN YOUR FAVOUR
 ---
-For each yoga in DETECTED YOGAS section (describe all of them):
+For each yoga in DETECTED YOGAS section, up to a maximum of 6 — if more than 6 are listed, pick the 6 most significant and skip the rest entirely (do not summarize the skipped ones, do not shorten the remaining sections to fit more in):
 [Plain English name] ([Sanskrit name if different])
 What it means for you: [specific to this chart — one sentence]
 Status: Active since [year] OR Activates during [planet] period [year range]
@@ -298,7 +298,13 @@ Example: <t>the translated text goes here</t>`;
     // Use Haiku for CALL2+CALL3 (faster), Sonnet for CALL1 (accuracy)
     const model = (callNum === 1 || callNum === 4) ? 'claude-sonnet-4-6' : 'claude-haiku-4-5-20251001';
     // Reduce max_tokens per call type
-    const maxTokens = callNum === 1 ? 1500 : callNum === 4 ? 800 : 1200;
+    // CALL2 covers 4 full sections including a yoga list of variable length
+    // (up to 6, since the yoga wiring expanded) — 1200 was tight enough that
+    // a chart with several yogas could push Section 4 long enough to cut off
+    // Section 7 entirely before it was ever written. CALL3 stays at 1200;
+    // its 4 sections are more fixed-length (a 5-row table, 3 windows, 3
+    // transit lines, one closing paragraph).
+    const maxTokens = callNum === 1 ? 1500 : callNum === 2 ? 1800 : callNum === 4 ? 800 : 1200;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
