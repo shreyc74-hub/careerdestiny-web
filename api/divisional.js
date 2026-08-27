@@ -6,18 +6,29 @@ const BASE = 'https://api.prokerala.com';
 
 let cachedToken = null;
 let tokenExpiry = 0;
+let tokenPromise = null;
 
 async function getToken() {
   if (cachedToken && Date.now() < tokenExpiry) return cachedToken;
-  const res = await fetch(`${BASE}/token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `grant_type=client_credentials&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
-  });
-  const data = await res.json();
-  cachedToken = data.access_token;
-  tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
-  return cachedToken;
+  // Concurrent requests arriving while the cache is empty/expired share the
+  // same in-flight fetch instead of each firing their own token request.
+  if (tokenPromise) return tokenPromise;
+  tokenPromise = (async () => {
+    try {
+      const res = await fetch(`${BASE}/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `grant_type=client_credentials&client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
+      });
+      const data = await res.json();
+      cachedToken = data.access_token;
+      tokenExpiry = Date.now() + (data.expires_in - 60) * 1000;
+      return cachedToken;
+    } finally {
+      tokenPromise = null;
+    }
+  })();
+  return tokenPromise;
 }
 
 // North Indian chart: map x,y coordinate to house number

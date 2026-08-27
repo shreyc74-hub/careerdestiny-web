@@ -65,22 +65,208 @@ body{
   font-weight:500;
   color:var(--text);
   letter-spacing:0.3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  min-width:0;
 }
 
 .hsub{font-size:11px;color:var(--text-dim);margin-left:auto;text-align:right;}
 
-#lang-btn{
-  margin-left:8px;
-  padding:5px 12px;
+.lang-switch{
+  position:relative;
+  display:flex;
+  align-items:stretch;
+  width:66px;
+  height:26px;
+  margin-right:8px;
+  padding:2px;
   border:1px solid var(--border);
-  border-radius:20px;
-  background:var(--gold-bg);
-  font-size:12px;
-  font-weight:500;
+  border-radius:14px;
+  background:var(--bg-form);
   cursor:pointer;
-  color:var(--gold);
   flex-shrink:0;
   font-family:'DM Sans',sans-serif;
+  -webkit-tap-highlight-color:transparent;
+}
+.lang-switch-thumb{
+  position:absolute;
+  top:2px;
+  left:2px;
+  width:calc(50% - 2px);
+  height:calc(100% - 4px);
+  border-radius:11px;
+  background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  box-shadow:0 1px 3px rgba(0,0,0,0.18);
+  transition:transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+.lang-switch[data-lang="hi"] .lang-switch-thumb{transform:translateX(100%);}
+.lang-switch-label{
+  position:relative;
+  z-index:1;
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.03em;
+  color:var(--text-dim);
+  transition:color 0.22s;
+  pointer-events:none;
+}
+.lang-switch[data-lang="en"] .lang-switch-label.en,
+.lang-switch[data-lang="hi"] .lang-switch-label.hi{color:#fff;}
+
+/* ── Account: sign-up button, user menu, auth screens, nudge modal ── */
+.signup-btn{
+  padding:7px 16px;border:1px solid var(--purple);border-radius:20px;background:transparent;
+  color:var(--purple);font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;
+  font-family:'DM Sans',sans-serif;
+}
+.signup-btn:hover{background:var(--accent-bg);}
+
+.user-menu{position:relative;flex-shrink:0;}
+.user-menu-trigger{
+  display:flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border:1px solid var(--border);
+  border-radius:20px;background:var(--bg-card);cursor:pointer;font-family:'DM Sans',sans-serif;
+  max-width:140px;
+}
+.user-avatar{
+  width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+}
+.user-name{font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.user-chevron{font-size:9px;color:var(--text-dim);flex-shrink:0;transition:transform 0.15s;}
+.user-menu-trigger.open .user-chevron{transform:rotate(180deg);}
+.user-dropdown{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;width:220px;background:var(--bg-card);
+  border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,0,0.15);
+  overflow:hidden;z-index:210;
+}
+.user-dropdown.open{display:block;}
+.user-dropdown-header{padding:14px 16px;border-bottom:1px solid var(--border);}
+.user-dropdown-name{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.user-dropdown-email{font-size:11px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+.user-dropdown-item{
+  display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;background:none;
+  text-align:left;font-size:13px;color:var(--text);cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.user-dropdown-item:hover{background:var(--bg-form);}
+.user-dropdown-item.logout{color:#c0392b;}
+
+/* Full-screen account overlay (Profile / Saved Chats / My Birth Chart) */
+.acct-section{
+  display:none;flex-direction:column;position:fixed;inset:0;background:var(--bg);
+  max-width:480px;margin:0 auto;z-index:200;overflow:hidden;
+}
+.acct-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;}
+.acct-empty{font-size:13px;color:var(--text-muted);text-align:center;padding:40px 20px;line-height:1.6;}
+.chat-list-item{
+  display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);
+  border-radius:10px;margin-bottom:10px;cursor:pointer;background:var(--bg-card);
+}
+.chat-list-item:hover{border-color:var(--gold);}
+.chat-list-body{flex:1;min-width:0;}
+.chat-list-title{font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chat-list-sub{font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chat-list-date{font-size:10px;color:var(--text-dim);flex-shrink:0;}
+.chat-list-del{flex-shrink:0;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:4px;}
+.profile-card{
+  display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border);
+  border-radius:10px;margin-bottom:10px;background:var(--bg-card);
+}
+.profile-avatar{width:36px;height:36px;border-radius:50%;background:var(--gold-bg);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.profile-body{flex:1;min-width:0;}
+.profile-name{font-size:13px;font-weight:600;color:var(--text);}
+.profile-sub{font-size:11px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-actions{display:flex;gap:6px;flex-shrink:0;}
+.profile-use-btn{padding:6px 12px;border:1px solid var(--purple);border-radius:16px;background:transparent;color:var(--purple);font-size:11px;font-weight:600;cursor:pointer;}
+.profile-del-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;padding:4px;}
+.acct-add-btn{width:100%;padding:12px;border:1px dashed var(--gold);border-radius:10px;background:var(--gold-bg);color:var(--gold);font-size:13px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif;}
+
+/* Auth (sign up / log in) */
+#auth-section{
+  display:none;flex-direction:column;position:fixed;inset:0;background:var(--bg);
+  max-width:480px;margin:0 auto;z-index:220;overflow:hidden;
+}
+.auth-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px;}
+.auth-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px 20px;}
+.auth-toggle{
+  position:relative;display:flex;width:100%;max-width:260px;margin:0 auto 24px;
+  padding:3px;border-radius:12px;background:var(--bg-form);border:1px solid var(--border);
+}
+.auth-toggle-thumb{
+  position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);
+  border-radius:9px;background:linear-gradient(135deg,#6C63D6,var(--purple));
+  box-shadow:0 2px 8px rgba(83,74,183,0.35);
+  transition:transform 0.22s cubic-bezier(.4,0,.2,1);
+}
+.auth-toggle[data-active="signup"] .auth-toggle-thumb{transform:translateX(100%);}
+.auth-toggle-seg{
+  position:relative;z-index:1;flex:1;padding:9px 0;border:none;background:none;border-radius:9px;
+  font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:color 0.22s;
+}
+.auth-toggle[data-active="login"] .auth-toggle-seg.login,
+.auth-toggle[data-active="signup"] .auth-toggle-seg.signup{color:#fff;}
+
+.auth-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.auth-sub{font-size:12px;color:var(--text-muted);margin-bottom:18px;}
+.auth-field{margin-bottom:14px;}
+.auth-field label{display:block;font-size:11px;font-weight:600;color:var(--text-muted);letter-spacing:0.3px;margin-bottom:5px;}
+.auth-pw-row{position:relative;}
+.auth-pw-row input{padding-right:44px;}
+.auth-pw-toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;
+  cursor:pointer;font-size:15px;padding:6px;color:var(--text-dim);
+}
+.auth-pw-strength{display:flex;gap:4px;margin-top:6px;}
+.auth-pw-strength-seg{flex:1;height:3px;border-radius:2px;background:var(--border);}
+.auth-pw-strength-seg.on{background:var(--gold);}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:18px 0 6px;color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:0.08em;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-divider-note{font-size:11px;color:var(--text-dim);margin:-2px 0 14px;}
+.auth-agree{display:flex;align-items:flex-start;gap:8px;font-size:11px;color:var(--text-muted);line-height:1.5;margin:6px 0 16px;}
+.auth-agree input{width:auto;margin-top:2px;flex-shrink:0;}
+.auth-agree .auth-link{color:var(--purple);font-weight:600;cursor:pointer;}
+.auth-submit-btn{
+  width:100%;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.auth-submit-btn:disabled{opacity:0.5;cursor:not-allowed;}
+.auth-switch{text-align:center;font-size:12px;color:var(--text-muted);margin-top:16px;}
+.auth-switch a{color:var(--purple);font-weight:600;cursor:pointer;}
+.auth-error{font-size:12px;color:#c0392b;background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 12px;margin-bottom:14px;display:none;}
+.auth-info{font-size:12px;color:#1D4ED8;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;margin-bottom:14px;display:none;}
+.auth-forgot{text-align:right;margin-top:6px;}
+.auth-forgot a{font-size:12px;color:var(--purple);font-weight:600;cursor:pointer;}
+.auth-field-hint{font-size:11.5px;margin-top:6px;display:none;}
+.auth-field-hint.err{color:#c0392b;}
+.auth-field-hint.ok{color:#16a34a;}
+
+/* Save-your-reading nudge modal */
+#save-nudge-overlay{
+  display:none;position:fixed;inset:0;background:rgba(20,10,35,0.6);z-index:230;
+  align-items:center;justify-content:center;padding:20px;
+}
+.nudge-card{width:100%;max-width:340px;background:var(--bg-card);border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.3);}
+.nudge-header{position:relative;background:linear-gradient(135deg,#4338CA,#312E81);padding:26px 22px 22px;color:#fff;}
+.nudge-close{position:absolute;top:12px;right:12px;width:28px;height:28px;border-radius:50%;border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-size:13px;}
+.nudge-icon{font-size:30px;margin-bottom:10px;}
+.nudge-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:600;margin-bottom:6px;}
+.nudge-sub{font-size:12px;line-height:1.6;color:rgba(255,255,255,0.85);}
+.nudge-body{padding:20px 22px 22px;}
+.nudge-bullet{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text);margin-bottom:10px;line-height:1.4;}
+.nudge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:5px;}
+.nudge-cta{width:100%;padding:13px;background:var(--purple);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:14px;font-family:'DM Sans',sans-serif;}
+.nudge-later{width:100%;padding:13px;background:transparent;color:var(--text-muted);border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;margin-top:8px;font-family:'DM Sans',sans-serif;}
+
+.saved-toast{text-align:center;margin:10px 0;}
+.saved-toast span{
+  display:inline-flex;align-items:center;gap:6px;background:#eefaf1;color:#1D9E75;
+  border:1px solid #cdeedd;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;
 }
 
 /* HERO — compact, just text */
@@ -161,19 +347,36 @@ body{
 
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .form-group{display:flex;flex-direction:column;gap:5px;}
+.place-field{position:relative;}
+.place-dropdown-el{
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  right:0;
+  margin-top:4px;
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:8px;
+  max-height:200px;
+  overflow-y:auto;
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
+  z-index:50;
+}
 .form-group.full{grid-column:1/-1;}
 
 label{font-size:11px;font-weight:500;color:var(--text-muted);letter-spacing:0.3px;}
 
 input,select{
   padding:9px 12px;
-  font-size:14px;
+  font-size:16px;
   font-family:'DM Sans',sans-serif;
   border:1px solid var(--border);
   border-radius:8px;
   background:var(--bg-form);
   color:var(--text);
   width:100%;
+  max-width:100%;
   outline:none;
   transition:border-color 0.2s;
 }
@@ -217,7 +420,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-top:2px;}
 .av.a{background:var(--gold);color:#fff;}
 .av.u{background:#3730A3;color:#fff;}
-.bub{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.7;}
+.bub{max-width:85%;padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.7;overflow-wrap:break-word;word-break:break-word;}
 .bub.a{background:#fff;color:var(--text);border-bottom-left-radius:6px;border:none;box-shadow:0 1px 6px rgba(0,0,0,0.08);}
 .bub.u{background:#3730A3;color:#fff;border-bottom-right-radius:6px;font-weight:500;}
 .bub.er{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
@@ -242,7 +445,7 @@ input:focus,select:focus{border-color:var(--gold);}
 .rpt{color:var(--text);}
 .rpt p{color:var(--text-muted);font-size:13px;line-height:1.8;margin-bottom:10px;}
 .rpt strong{color:var(--text);font-weight:600;}
-.rpt table{width:100%;border-collapse:collapse;margin:10px 0;font-size:12px;}
+.rpt table{width:100%;min-width:420px;border-collapse:collapse;margin:10px 0;font-size:12px;}
 .rpt thead th{text-align:left;padding:8px 10px;background:var(--accent-bg);color:var(--purple);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--border);}
 .rpt tbody tr{border-bottom:1px solid var(--border);}
 .rpt tbody tr:nth-child(even){background:#FAFAF8;}
@@ -420,6 +623,7 @@ window._RASHI_HI=_RASHI_HI;
 const API='';
 let hist=[];
 let chartData=null;
+window._currentUser = getCurrentUser();
 
 var M=null; function getM(){ if(!M) M=document.getElementById('msgs'); return M; }
 
@@ -427,7 +631,7 @@ function setStat(s,t){
   // Dot and status text removed — not meaningful to users
 }
 
-function addRow(role,content,type){
+function addRow(role,content,type,rawText){
   const w=document.createElement('div');w.className='row '+(role==='agent'?'agent':'u');
   const av=document.createElement('div');av.className='av '+(role==='agent'?'a':'u');
   const now=new Date();
@@ -436,6 +640,11 @@ function addRow(role,content,type){
   b.className='bub '+(role==='agent'?'a':'u')+(type?' '+type:'');
   if(typeof content==='string')b.innerHTML=content.replace(/\n/g,'<br>');
   else b.appendChild(content);
+
+  if(type!=='er'){
+    if(rawText) markTranslatable(b, rawText, window._lang, typeof content==='string' ? 'text' : 'md');
+    else if(typeof content==='string') markTranslatable(b, content, window._lang, 'text');
+  }
 
   if(role==='agent'){
     av.textContent='✦';
@@ -606,7 +815,7 @@ function mdToHtml(text){
           return '<td>'+txt+'</td>';
         }).join('')+'</tr>';
       }).join('');
-      return '<table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table>';
+      return '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table><thead><tr>'+ths+'</tr></thead><tbody>'+trs+'</tbody></table></div>';
     });
     // Bold
     text = text.replace(/\*\*([^*]+)\*\*/g,'<strong style="">$1</strong>');
@@ -1463,17 +1672,11 @@ function preCompute(c){
     // YOGA DETECTION (Rule 12 — 2-6-10-11 Formula + Classical Yogas)
     // =================================================================
     var yogas=[];
-    var sunP=planetsWithHouse.find(function(p){return p.name==='Sun';});
-    var mercP=planetsWithHouse.find(function(p){return p.name==='Mercury';});
     var jupP=planetsWithHouse.find(function(p){return p.name==='Jupiter';});
     var moonP=planetsWithHouse.find(function(p){return p.name==='Moon';});
     var marsP=planetsWithHouse.find(function(p){return p.name==='Mars';});
     var venP=planetsWithHouse.find(function(p){return p.name==='Venus';});
 
-    // Budha-Aditya Yoga: Sun + Mercury same sign
-    if(sunP&&mercP&&sunP.house===mercP.house){
-      yogas.push({name:'Budha-Aditya Yoga',detail:'Sun+Mercury in H'+sunP.house,effect:'Sharp intelligence, communication ability'});
-    }
     // Gajakesari Yoga: Jupiter in kendra from Moon
     if(jupP&&moonP){
       var jupFromMoon=((jupP.house-moonP.house+12)%12)+1;
@@ -1481,10 +1684,8 @@ function preCompute(c){
         yogas.push({name:'Gajakesari Yoga',detail:'Jupiter in H'+jupP.house+', '+jupFromMoon+' houses from Moon',effect:'Authority, recognition, wisdom in career'});
       }
     }
-    // Chandra-Mangal Yoga: Moon + Mars conjunction
-    if(moonP&&marsP&&moonP.house===marsP.house){
-      yogas.push({name:'Chandra-Mangal Yoga',detail:'Moon+Mars in H'+moonP.house,effect:'Commercial drive, income through enterprise'});
-    }
+    // Budha-Aditya and Chandra-Mangal are pushed later, from the fuller
+    // Budh-Aditya/Chandra-Mangal checks further down — see there for why.
     // Dhan Yoga: H2/H5/H9/H11 lords connected (conjunction)
     var dhanLordHouses=[2,5,9,11];
     var dhanLords=dhanLordHouses.map(function(h){
@@ -1513,18 +1714,8 @@ function preCompute(c){
         }
       });
     });
-    // Neecha Bhanga: Debilitated planet + dispositor in kendra
-    planets.forEach(function(p){
-      if(p.name==='Ascendant') return;
-      var d=DIGNITY[p.name];
-      if(!d||p.rasi.name!==d.debil) return;
-      // Find dispositor (lord of the sign planet is in)
-      var dispositorName=getLordOfSign?getLordOfSign(signs.indexOf(p.rasi.name)):'?';
-      var dispositor=planets.find(function(x){return x.name===dispositorName;});
-      if(dispositor&&kendraH.indexOf(dispositor.house||getHouse(dispositor))>-1){
-        yogas.push({name:'Neecha Bhanga Raja Yoga',detail:p.name+' debilitated in '+p.rasi.name+', dispositor '+dispositorName+' in H'+dispositor.position+' (kendra)',effect:'Cancellation of debility — difficult start then strong rise'});
-      }
-    });
+    // Neecha Bhanga Raja Yoga is pushed later, from the fuller multi-condition
+    // check further down — see there for why.
     // 2-6-10-11 Formula (Rule 12)
     var h2idx=(signs.indexOf(lagnaSign)+1)%12; var h6idx=(signs.indexOf(lagnaSign)+5)%12;
     var h10idx=(signs.indexOf(lagnaSign)+9)%12; var h11idx=(signs.indexOf(lagnaSign)+10)%12;
@@ -1971,6 +2162,9 @@ function preCompute(c){
             sevenApart?'Moon in H'+moonP.position+' and Mars in H'+marsP.position+' — mutual 7th aspect':
             'Chandra-Mangal Yoga absent'
         };
+        if(result.chandraMangal.present){
+          yogas.push({name:'Chandra-Mangal Yoga',detail:result.chandraMangal.description,effect:'Commercial drive, income through enterprise'});
+        }
       }
     }catch(e){result.chandraMangalError=e.message;}
 
@@ -1996,6 +2190,9 @@ function preCompute(c){
           '10th house from Lagna has '+(planetsIn10thLagna.length===0?'no planets':planetsIn10thLagna.map(function(p){return p.name;}).join('+'))+' and 10th from Moon has '+(planetsIn10thMoon.length===0?'no planets':planetsIn10thMoon.map(function(p){return p.name;}).join('+')):
           'Malefic planets in 10th house cancel Amala Yoga'
       };
+      if(amalaPresent){
+        yogas.push({name:'Amala Yoga',detail:result.amalaYoga.description,effect:'Clean reputation, ethical career path, respected in profession'});
+      }
     }catch(e){result.amalaYogaError=e.message;}
 
     // VIPARITA RAJA YOGA
@@ -2031,10 +2228,17 @@ function preCompute(c){
         conditions:vipParas,
         description:vipParas.length>0?'Viparita Raja Yoga present — '+vipParas.join('; '):'Viparita Raja Yoga absent'
       };
+      if(vipParas.length>0){
+        yogas.push({name:'Viparita Raja Yoga',detail:result.viparitraRaja.description,effect:'Success through overcoming adversity, competition, or crisis'});
+      }
     }catch(e){result.viparitraRajaError=e.message;}
 
     // DHARMA-KARMA ADHIPATI YOGA
     try{
+      // EXALT is also declared in the Neecha Bhanga block below, but that
+      // runs after this one — declared here too so the exchange check
+      // below doesn't reference it before it exists.
+      var EXALT={Sun:'Mesha',Moon:'Vrishabha',Mars:'Makar',Mercury:'Kanya',Jupiter:'Karka',Venus:'Meena',Saturn:'Tula'};
       var NINTH_TENTH_LORDS={
         'Simha':{9:'Mars',10:'Venus'},
         'Mesha':{9:'Jupiter',10:'Saturn'},
@@ -2078,6 +2282,9 @@ function preCompute(c){
         conditions:dkConditions,
         description:dkConditions.length>0?'Dharma-Karma Adhipati Yoga: '+dkConditions.join('; '):'Dharma-Karma Adhipati Yoga absent — 9th lord ('+lord9name+') and 10th lord ('+lord10name+') not connected'
       };
+      if(dkConditions.length>0){
+        yogas.push({name:'Dharma-Karma Adhipati Yoga',detail:result.dharmaKarma.description,effect:'Powerful career-fulfillment yoga — success aligned with life purpose'});
+      }
     }catch(e){result.dharmaKarmaError=e.message;}
 
     // BUDH-ADITYA YOGA
@@ -2104,6 +2311,9 @@ function preCompute(c){
             !sameHouse?'Sun and Mercury in different houses — yoga absent':
             'Yoga cancelled due to debilitation'
         };
+        if(result.budhAditya.present){
+          yogas.push({name:'Budha-Aditya Yoga',detail:result.budhAditya.description,effect:result.budhAditya.strong?'Sharp intelligence, communication ability — strong form':'Sharp intelligence, communication ability'});
+        }
       }
     }catch(e){result.budhAdityaError=e.message;}
 
@@ -2129,7 +2339,10 @@ function preCompute(c){
         var debilLord=SIGN_LORDS[DEBIL[pname]];
         var debilLordPlanet=planets.find(function(x){return x.name===debilLord;});
         if(debilLordPlanet){
-          var houseFromLagna=debilLordPlanet.position;
+          // .position is the planet's raw zodiac sign (1-12 from Aries), not
+          // its house from Lagna — must offset by the Lagna's own sign first,
+          // the same way the "from Moon" check below already does.
+          var houseFromLagna=((debilLordPlanet.position-lagnaHouse2+12)%12)+1;
           if(KENDRA.indexOf(houseFromLagna)>-1)conditions.push('Lord of debil sign ('+debilLord+') in kendra H'+houseFromLagna+' from Lagna');
           var relativeToMoon=((debilLordPlanet.position-moonHouse+12)%12)+1;
           if(KENDRA.indexOf(relativeToMoon)>-1)conditions.push('Lord of debil sign ('+debilLord+') in kendra from Moon');
@@ -2139,7 +2352,8 @@ function preCompute(c){
         var exaltLord=SIGN_LORDS[exaltSign];
         var exaltLordPlanet=planets.find(function(x){return x.name===exaltLord;});
         if(exaltLordPlanet){
-          if(KENDRA.indexOf(exaltLordPlanet.position)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra H'+exaltLordPlanet.position+' from Lagna');
+          var exaltLordHouseFromLagna=((exaltLordPlanet.position-lagnaHouse2+12)%12)+1;
+          if(KENDRA.indexOf(exaltLordHouseFromLagna)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra H'+exaltLordHouseFromLagna+' from Lagna');
           var relToMoon=((exaltLordPlanet.position-moonHouse+12)%12)+1;
           if(KENDRA.indexOf(relToMoon)>-1)conditions.push('Exalt sign lord ('+exaltLord+') in kendra from Moon');
         }
@@ -2170,6 +2384,9 @@ function preCompute(c){
         }
       });
       result.neechaBhanga=nbry;
+      nbry.forEach(function(nb){
+        yogas.push({name:'Neecha Bhanga Raja Yoga',detail:nb.description,effect:'Cancellation of debility — difficult start then strong rise ('+nb.strength+')'});
+      });
     }catch(e){result.neechaBhangaError=e.message;}
 
     // Gochar: Jupiter and Saturn only
@@ -2756,16 +2973,97 @@ var SITUATION_QUESTIONS = {
   'Just Exploring': ['What is my biggest career strength?','When is my peak career period?','What will make me wealthy?']
 };
 
+var SITUATION_LABELS_HI = {
+  'Still Studying':'अभी पढ़ाई कर रहे हैं',
+  'Working a Job':'नौकरी कर रहे हैं',
+  'Running Business':'व्यवसाय चला रहे हैं',
+  'Just Exploring':'अभी तलाश कर रहे हैं'
+};
+var SITUATION_CONFIG_HI = {
+  'Still Studying':   { line:'आपकी कुंडली बताती है कि शुरुआत का सबसे अच्छा समय आपकी सोच से भी करीब है।', questions:['कौन सी स्ट्रीम या क्षेत्र मेरे लिए उपयुक्त है?','मैं कमाना कब शुरू करूंगा/करूंगी?','क्या बाद में नौकरी या व्यवसाय में बेहतर करूंगा/करूंगी?'] },
+  'Working a Job':    { line:'आपकी कुंडली में स्पष्ट संकेत है कि यह नौकरी का दौर अस्थायी है या दीर्घकालिक।', questions:['क्या मुझे रुकना चाहिए या अब बदलाव का समय है?','बदलाव के लिए सही समय कब है?','क्या व्यवसाय मेरे लिए एक वास्तविक विकल्प है?'] },
+  'Running Business': { line:'आपकी कुंडली बताती है कि आपके व्यवसाय को क्या रोक रहा है और यह कब खुलेगा।', questions:['मेरा व्यवसाय संघर्ष क्यों कर रहा है?','यह कब बेहतर होगा?','क्या मैं सही व्यवसाय में हूं?'] },
+  'Just Exploring':   { line:'तलाशने का अच्छा समय है — आपकी कुंडली में एक स्पष्ट दिशा आपका इंतज़ार कर रही है।', questions:['मेरी सबसे बड़ी करियर ताकत क्या है?','मेरा सबसे अच्छा करियर दौर कब है?','मुझे धनवान क्या बनाएगा?'] }
+};
+
 function renderSituationChips(){
+  var lang = window._lang || 'en';
   return Object.keys(SITUATION_CONFIG).map(function(key){
     var cfg = SITUATION_CONFIG[key];
+    var label = (lang==='hi' && SITUATION_LABELS_HI[key]) ? SITUATION_LABELS_HI[key] : key;
+    var line = (lang==='hi' && SITUATION_CONFIG_HI[key]) ? SITUATION_CONFIG_HI[key].line : cfg.line;
     return '<div class="rs-situation-item">'
-      + '<button class="rs-situation-chip" onclick="onSituationTap(this,\''+key+'\')">'
+      + '<button class="rs-situation-chip" data-situation="'+key+'" onclick="onSituationTap(this,\''+key+'\')">'
       + '<span class="rs-situation-chip-icon">'+cfg.icon+'</span>'
-      + key + '</button>'
+      + label + '</button>'
       + '<div class="rs-situation-line" id="rs-sit-line-'+key+'">'
-      + '<div class="rs-situation-line-text">'+cfg.line+'</div></div></div>';
+      + '<div class="rs-situation-line-text">'+line+'</div></div></div>';
   }).join('');
+}
+
+function refreshSituationChips(){
+  var sitChips = document.getElementById('rs-situation-chips');
+  if(!sitChips || !sitChips.innerHTML) return;
+  var selected = window._meta && window._meta.situation;
+  sitChips.innerHTML = renderSituationChips();
+  if(selected){
+    var btn = sitChips.querySelector('[data-situation="'+selected+'"]');
+    if(btn){
+      btn.classList.add('selected');
+      var line = document.getElementById('rs-sit-line-'+selected);
+      if(line) line.classList.add('visible');
+    }
+  }
+}
+
+function refreshSituationLabels(){
+  var lang = window._lang || 'en';
+  var t = document.querySelector('.rs-situation-title');
+  var s = document.querySelector('.rs-situation-sub');
+  if(t) t.textContent = lang==='hi' ? 'आपकी वर्तमान स्थिति क्या है?' : 'What is your current situation?';
+  if(s) s.textContent = lang==='hi' ? 'इससे आपका विश्लेषण व्यक्तिगत बनाने में मदद मिलती है' : 'This helps personalise your analysis';
+}
+
+function refreshActionLabels(){
+  var lang = window._lang || 'en';
+  var map = {
+    'rs-action1-title': lang==='hi' ? 'अपनी कुंडली से चैट करें' : 'Chat with your chart',
+    'rs-action1-sub':   lang==='hi' ? 'अपने करियर, समय और भाग्य के बारे में सवाल पूछें' : 'Ask questions about your career, timing, and destiny',
+    'rs-action2-title': lang==='hi' ? 'अपनी पूरी रिपोर्ट पाएं' : 'Get your full report',
+    'rs-action2-sub':   lang==='hi' ? 'पूरा 11-खंड विश्लेषण आपके ईमेल पर भेजा जाएगा' : 'Complete 11-section analysis delivered to your email'
+  };
+  Object.keys(map).forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent = map[id]; });
+}
+
+function refreshReportLabels(){
+  var lang = window._lang || 'en';
+  var lbl = document.getElementById('rpt-sections-label');
+  if(lbl) lbl.textContent = lang==='hi' ? 'रिपोर्ट अनुभागों की झलक' : 'Sample preview of report sections';
+  var titles = lang==='hi'
+    ? ['करियर डेस्टिनी निर्णय','नौकरी या व्यवसाय? (7-कारक तालिका)','करियर सुझाव','समय की खिड़कियाँ']
+    : ['Career Destiny Verdict','Job or Business? (7-factor table)','Career Suggestions','Timing Windows'];
+  ['rpt-sec-title-1','rpt-sec-title-2','rpt-sec-title-3','rpt-sec-title-4'].forEach(function(id,i){
+    var el=document.getElementById(id); if(el) el.textContent = titles[i];
+  });
+  var sub2 = document.getElementById('rpt-sec-sub-2');
+  if(sub2) sub2.textContent = lang==='hi' ? 'हर सूत्र का मूल्यांकन और स्पष्टीकरण' : 'Every sutra scored and explained';
+  var sendBtn = document.getElementById('report-send-btn');
+  if(sendBtn && sendBtn.textContent.trim()!=='⏳') sendBtn.textContent = lang==='hi' ? 'भेजें' : 'Send';
+}
+
+var DEFAULT_CHAT_ICONS = ['⏰','💼','✨','🪐','🎯'];
+function renderDefaultChatChips(){
+  var lang = window._lang || 'en';
+  var s = _strings[lang];
+  var qs = [s.q1,s.q2,s.q3,s.q4,s.q5];
+  var wrap = document.getElementById('chat-chips-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = qs.map(function(q,i){
+    return '<div class="chat-chip" onclick="askQuestion(this.querySelector(\'.chat-chip-text\').textContent)">'
+      + '<span class="chat-chip-icon">'+DEFAULT_CHAT_ICONS[i]+'</span>'
+      + '<span class="chat-chip-text">'+q+'</span></div>';
+  }).join('');
+  window._chatChipsMode = 'default';
 }
 
 function onSituationTap(btn, situation){
@@ -2801,14 +3099,18 @@ function showActionButtons(){
 }
 
 function swapChatChips(situation){
-  var qs = SITUATION_CONFIG[situation] ? SITUATION_CONFIG[situation].questions : [];
+  var lang = window._lang || 'en';
+  var cfg = (lang==='hi' && SITUATION_CONFIG_HI[situation]) ? SITUATION_CONFIG_HI[situation] : SITUATION_CONFIG[situation];
+  var qs = cfg ? cfg.questions : [];
   var wrap = document.getElementById('chat-chips-wrap');
   if(!wrap || !qs.length) return;
   var icons = ['⏰','💼','✨','🪐','🎯'];
   wrap.innerHTML = qs.map(function(q, i){
-    return '<div class="chat-chip" onclick="askQuestion(\''+q.replace(/'/g,'\\\'')+'\')">'
-      + '<span class="chat-chip-icon">'+(icons[i]||'❓')+'</span>'+q+'</div>';
+    return '<div class="chat-chip" onclick="askQuestion(this.querySelector(\'.chat-chip-text\').textContent)">'
+      + '<span class="chat-chip-icon">'+(icons[i]||'❓')+'</span>'
+      + '<span class="chat-chip-text">'+q+'</span></div>';
   }).join('');
+  window._chatChipsMode = 'situation';
 }
 
 function startSituationTimeout(){
@@ -3088,6 +3390,862 @@ async function callClaude(userMsg,chartSummary,onChunk,callNum){
   return reply;
 }
 
+// ── Live translation for already-displayed AI content ──────────────
+async function translateText(text, targetLang){
+  if(!text || !text.trim()) return text;
+  try{
+    var r = await fetch(API+"/api/analyze", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({call:"translate", text:text, targetLang:targetLang})
+    });
+    if(!r.ok) return text;
+    var data = await r.json();
+    var out = data.content && data.content[0] && data.content[0].text;
+    if(!out) return text;
+    var m = out.match(/<t>([\s\S]*)<\/t>/);
+    return m ? m[1].trim() : out.trim();
+  } catch(e){ return text; }
+}
+
+function markTranslatable(el, srcText, srcLang, mode){
+  if(!el) return;
+  el.dataset.srcText = srcText;
+  el.dataset.srcLang = srcLang;
+  el.dataset.render = mode || 'text';
+  el.dataset[srcLang==='hi' ? 'textHi' : 'textEn'] = srcText;
+}
+
+function applyTranslatable(el, text){
+  if(el.dataset.render === 'md'){
+    var target = el.querySelector('.rpt') || el;
+    target.innerHTML = mdToHtml(text);
+  } else {
+    el.innerHTML = String(text).replace(/\n/g,'<br>');
+  }
+}
+
+function syncTranslatable(el, targetLang){
+  if(!el || !el.dataset.srcText) return;
+  var cacheKey = targetLang==='hi' ? 'textHi' : 'textEn';
+  if(el.dataset[cacheKey]){
+    applyTranslatable(el, el.dataset[cacheKey]);
+    return;
+  }
+  translateText(el.dataset.srcText, targetLang).then(function(translated){
+    el.dataset[cacheKey] = translated;
+    if((window._lang||'en') === targetLang) applyTranslatable(el, translated);
+  });
+}
+
+function syncAllTranslatables(){
+  var targetLang = window._lang || 'en';
+  document.querySelectorAll('[data-src-text]').forEach(function(el){
+    syncTranslatable(el, targetLang);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// Account: sign-up/login, saved chats, birth profiles
+// Backed by Supabase — Auth (GoTrue) for sign-up/login, PostgREST for
+// profiles/chat_sessions. Called via plain fetch (no supabase-js) to
+// match the rest of this file. The publishable key is safe to embed —
+// Row Level Security on both tables is what actually restricts each
+// user to their own rows, not secrecy of this key.
+// ══════════════════════════════════════════════════════════════════
+var SUPABASE_URL = 'https://ybuqwggrkbtdubnzeecb.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_K-3ThVzekUIwHWhtZ-jbNg_SK0SNDdn';
+var SB_AUTH = SUPABASE_URL + '/auth/v1';
+var SB_REST = SUPABASE_URL + '/rest/v1';
+var SESSION_KEY = 'cd_session';
+
+function getStoredSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)); }catch(e){ return null; } }
+function setStoredSession(session){
+  try{
+    if(session) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else localStorage.removeItem(SESSION_KEY);
+  }catch(e){}
+}
+function getCurrentUser(){
+  var s = getStoredSession();
+  if(!s || !s.user) return null;
+  return { id: s.user.id, email: s.user.email, name: (s.user.user_metadata && s.user.user_metadata.name) || '' };
+}
+async function _sbAuthFetch(path, body){
+  var r = await fetch(SB_AUTH+path, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},
+    body: JSON.stringify(body)
+  });
+  var data = await r.json();
+  if(!r.ok) throw new Error(data.error_description || data.msg || data.error || 'Authentication failed');
+  return data;
+}
+function _storeAuthResponse(data){
+  setStoredSession({ access_token:data.access_token, refresh_token:data.refresh_token, expires_at:data.expires_at, user:data.user });
+  window._currentUser = getCurrentUser();
+}
+async function ensureValidAccessToken(){
+  var s = getStoredSession();
+  if(!s || !s.access_token) return null;
+  if(s.expires_at && Date.now() < (s.expires_at*1000 - 30000)) return s.access_token;
+  try{
+    var data = await _sbAuthFetch('/token?grant_type=refresh_token', { refresh_token: s.refresh_token });
+    _storeAuthResponse(data);
+    return data.access_token;
+  }catch(e){
+    setStoredSession(null);
+    window._currentUser = null;
+    return null;
+  }
+}
+async function signUp(details){
+  var data = await _sbAuthFetch('/signup', { email:details.email, password:details.password, data:{ name: details.name||'' } });
+  if(data.access_token){
+    _storeAuthResponse(data);
+  } else {
+    // Some project configs return only the user object from /signup even
+    // with email confirmation off — log in right after to get a session.
+    var loginData = await _sbAuthFetch('/token?grant_type=password', { email:details.email, password:details.password });
+    _storeAuthResponse(loginData);
+  }
+  return window._currentUser;
+}
+async function logIn(details){
+  var data = await _sbAuthFetch('/token?grant_type=password', { email:details.email, password:details.password });
+  _storeAuthResponse(data);
+  return window._currentUser;
+}
+function logOut(){
+  var s = getStoredSession();
+  setStoredSession(null);
+  window._currentUser = null;
+  window._chatSessionId = null; window._chatSessionSaved = false;
+  refreshAuthUI();
+  if(s && s.access_token){
+    fetch(SB_AUTH+'/logout', { method:'POST', headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+s.access_token} }).catch(function(){});
+  }
+}
+
+// ── Data access (PostgREST, RLS-scoped by the caller's JWT) ─────────
+async function _sbRest(method, path, body){
+  var token = await ensureValidAccessToken();
+  if(!token) throw new Error('Not signed in');
+  var headers = {'apikey':SUPABASE_ANON_KEY, 'Authorization':'Bearer '+token, 'Content-Type':'application/json'};
+  if(method!=='GET') headers['Prefer']='return=representation';
+  var r = await fetch(SB_REST+path, { method:method, headers:headers, body: body?JSON.stringify(body):undefined });
+  if(!r.ok){ var errText=await r.text(); throw new Error('Supabase error: '+errText.slice(0,200)); }
+  if(r.status===204) return null;
+  return r.json();
+}
+
+async function listProfiles(){
+  if(!getCurrentUser()) return [];
+  try{ return await _sbRest('GET', '/profiles?select=*&order=created_at.asc'); }
+  catch(e){ console.error('listProfiles failed:', e.message); return []; }
+}
+async function saveProfile(profile){
+  var payload = { label:profile.label, name:profile.name||null, dob:profile.dob||null, time:profile.time||null, place:profile.place||null, is_self:!!profile.isSelf };
+  var rows;
+  if(profile.id){
+    rows = await _sbRest('PATCH', '/profiles?id=eq.'+profile.id, payload);
+  } else {
+    rows = await _sbRest('POST', '/profiles', payload);
+  }
+  return rows && rows[0];
+}
+async function deleteProfileById(id){ await _sbRest('DELETE', '/profiles?id=eq.'+id); }
+
+async function listChats(){
+  if(!getCurrentUser()) return [];
+  try{ return await _sbRest('GET', '/chat_sessions?select=*&order=updated_at.desc'); }
+  catch(e){ console.error('listChats failed:', e.message); return []; }
+}
+async function saveChatSession(session){
+  var payload = { title:session.title, subtitle:session.subtitle||null, messages:session.messages, profile_id:session.profileId||null, updated_at:new Date().toISOString() };
+  var rows;
+  if(session.id){
+    rows = await _sbRest('PATCH', '/chat_sessions?id=eq.'+session.id, payload);
+  } else {
+    rows = await _sbRest('POST', '/chat_sessions', payload);
+  }
+  return rows && rows[0];
+}
+async function deleteChatById(id){ await _sbRest('DELETE', '/chat_sessions?id=eq.'+id); }
+
+// ── Leads: every analyze() submission, logged in or not ─────────────
+// Insert-only from the client (anon or authenticated) — no select/update/
+// delete policy exists for public roles, so this is unreadable by users;
+// only the project owner reads it via the Supabase dashboard.
+// user_id is deliberately NOT sent here — it defaults to auth.uid() on the
+// database side (null when anonymous), the same safe pattern profiles/
+// chat_sessions already use. Sending it from the client and trusting it
+// would let anyone submit a lead with an arbitrary, spoofed user_id, since
+// this table's RLS policy has to allow anonymous inserts and so can't rely
+// on `auth.uid() = user_id` alone to reject a client-supplied value.
+async function saveLead(details){
+  try{
+    var token = await ensureValidAccessToken();
+    var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'};
+    if(token) headers['Authorization'] = 'Bearer '+token;
+    await fetch(SB_REST+'/leads', {
+      method:'POST',
+      headers:headers,
+      body: JSON.stringify({
+        profile_id: details.profileId||null,
+        name: details.name||null, email: details.email||null,
+        dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
+        verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
+      })
+    });
+  }catch(e){ console.error('saveLead failed:', e.message); }
+}
+
+// ── Chart analysis cache: skip Prokerala + all 3 Claude calls on repeat
+// visits to the same birth profile. NOTE: this caches raw chart_data
+// wholesale, including today's transits (gochar) — accurate forever for
+// the static parts of the chart (D1/dasha/navamsha/dashamsha/yoga), but
+// "what the skies say right now" (Section 10) will reflect whatever day
+// the cache was written, not today, until the cache is refreshed.
+async function getCachedAnalysis(profileId){
+  if(!getCurrentUser() || !profileId) return null;
+  try{
+    var rows = await _sbRest('GET', '/chart_analyses?profile_id=eq.'+profileId+'&select=*&limit=1');
+    return rows && rows[0] || null;
+  }catch(e){ console.error('getCachedAnalysis failed:', e.message); return null; }
+}
+async function saveChartAnalysis(profileId, data){
+  if(!getCurrentUser() || !profileId) return;
+  try{
+    var existing = await _sbRest('GET', '/chart_analyses?profile_id=eq.'+profileId+'&select=id&limit=1');
+    var payload = {
+      profile_id: profileId, chart_data: data.chartData,
+      reply1: data.reply1||null, reply2: data.reply2||null, reply3: data.reply3||null,
+      verdict: data.verdict||null, biz_score: data.bizScore, job_score: data.jobScore,
+      computed_at: new Date().toISOString()
+    };
+    if(existing && existing[0]){
+      await _sbRest('PATCH', '/chart_analyses?id=eq.'+existing[0].id, payload);
+    } else {
+      await _sbRest('POST', '/chart_analyses', payload);
+    }
+  }catch(e){ console.error('saveChartAnalysis failed:', e.message); }
+}
+// Pure lookup — never writes. Used before starting an analysis to decide
+// whether a cache check is even worth making: only an exact dob+time+place
+// match against something already saved counts, never a fuzzy one.
+async function findMatchingProfile(details){
+  if(!getCurrentUser()) return null;
+  try{
+    var list = await listProfiles();
+    return list.find(function(p){ return p.dob===details.dob && p.time===details.time && p.place===details.place; }) || null;
+  }catch(e){ return null; }
+}
+// Find an existing saved profile matching these exact birth details, or
+// create one — so a logged-in user's analysis is always cacheable even
+// if they typed the form directly instead of picking "Use this profile".
+async function findOrCreateProfileForEntry(details){
+  if(!getCurrentUser()) return null;
+  var match = await findMatchingProfile(details);
+  if(match) return match.id;
+  try{
+    var created = await saveProfile({ label: details.name||'My Chart', name: details.name, dob: details.dob, time: details.time, place: details.place, isSelf:true });
+    return created && created.id;
+  }catch(e){ console.error('findOrCreateProfileForEntry failed:', e.message); return null; }
+}
+// Covers the anonymous-then-sign-up-mid-session gap: analyze() only saves a
+// chart_analyses row if the user was ALREADY logged in when CALL3 finished.
+// Someone who ran an analysis anonymously, chatted a bit, and only then
+// created an account would otherwise have their chat saved (autoSaveChatIfLoggedIn
+// checks _currentUser at call-time) but their underlying chart analysis
+// never cached — call this right after sign-up/login succeeds to catch up.
+async function saveActiveAnalysisIfNeeded(){
+  if(!getCurrentUser() || window._activeProfileId || !chartData || !window._meta || !window._meta.dob) return;
+  try{
+    await waitForCall(3);
+    var profileId = await findOrCreateProfileForEntry({name:window._meta.name, dob:window._meta.dob, time:window._meta.time, place:window._meta.place});
+    if(!profileId) return;
+    window._activeProfileId = profileId;
+    await saveChartAnalysis(profileId, { chartData:chartData, reply1:window._reply1, reply2:window._reply2, reply3:window._reply3, verdict:window._verdict, bizScore:window._bizScore, jobScore:window._jobScore });
+  }catch(e){ console.error('saveActiveAnalysisIfNeeded failed:', e.message); }
+}
+
+// ── Header: Sign up button ↔ user avatar/dropdown ──────────────────
+function renderAuthArea(){
+  var user = window._currentUser;
+  var lang = window._lang || 'en';
+  if(!user){
+    return '<button class="signup-btn" onclick="openAuth(\'signup\')">'+(lang==='hi'?'लॉग इन / साइन अप':'Log in / Sign up')+'</button>';
+  }
+  var displayName = user.name || (user.email ? user.email.split('@')[0] : 'U');
+  var initials = displayName.trim().charAt(0).toUpperCase() || 'U';
+  var firstName = displayName.split(' ')[0];
+  return '<div class="user-menu">'
+    + '<button class="user-menu-trigger" onclick="toggleUserDropdown(this)">'
+    +   '<span class="user-avatar">'+initials+'</span>'
+    +   '<span class="user-name">'+firstName+'</span>'
+    +   '<span class="user-chevron">▾</span>'
+    + '</button>'
+    + '<div class="user-dropdown">'
+    +   '<div class="user-dropdown-header"><div class="user-dropdown-name">'+displayName+'</div><div class="user-dropdown-email">'+(user.email||'')+'</div></div>'
+    +   '<button class="user-dropdown-item" onclick="openProfile()">👤 '+(lang==='hi'?'प्रोफ़ाइल':'Profile')+'</button>'
+    +   '<button class="user-dropdown-item" onclick="openSavedChats()">💬 '+(lang==='hi'?'सहेजी गई चैट':'Saved Chats')+'</button>'
+    +   '<button class="user-dropdown-item" onclick="openMyBirthChart()">🔮 '+(lang==='hi'?'मेरी कुंडली':'My Birth Chart')+'</button>'
+    +   '<button class="user-dropdown-item logout" onclick="handleLogout()">↩ '+(lang==='hi'?'लॉगआउट':'Logout')+'</button>'
+    + '</div></div>';
+}
+function refreshAuthUI(){
+  var html = renderAuthArea();
+  ['auth-area-main','auth-area-rs'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.innerHTML = html;
+  });
+}
+function toggleUserDropdown(btn){
+  var dd = btn.parentElement.querySelector('.user-dropdown');
+  var wasOpen = dd.classList.contains('open');
+  document.querySelectorAll('.user-dropdown.open').forEach(function(d){d.classList.remove('open');});
+  document.querySelectorAll('.user-menu-trigger.open').forEach(function(b){b.classList.remove('open');});
+  if(!wasOpen){ dd.classList.add('open'); btn.classList.add('open'); }
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.user-menu')){
+    document.querySelectorAll('.user-dropdown.open').forEach(function(d){d.classList.remove('open');});
+    document.querySelectorAll('.user-menu-trigger.open').forEach(function(b){b.classList.remove('open');});
+  }
+});
+function handleLogout(){ cdTrack('logout'); logOut(); }
+
+// ── Auth screens (sign up / log in) ─────────────────────────────────
+function openAuth(screen){
+  cdTrack('auth_open', {screen: screen});
+  dismissNudge();
+  document.getElementById('auth-section').style.display='flex';
+  showAuthScreen(screen||'signup');
+}
+function closeAuth(){ document.getElementById('auth-section').style.display='none'; }
+function showAuthScreen(screen){
+  document.getElementById('screen-signup').style.display = screen==='signup' ? 'block' : 'none';
+  document.getElementById('screen-login').style.display = screen==='login' ? 'block' : 'none';
+  document.getElementById('screen-reset-password').style.display = screen==='reset-password' ? 'block' : 'none';
+  document.getElementById('signup-error').style.display='none';
+  document.getElementById('login-error').style.display='none';
+  var infoEl = document.getElementById('login-info'); if(infoEl) infoEl.style.display='none';
+  ['signup-email-hint','signup-pw2-hint','reset-password-pw2-hint'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.style.display='none';
+  });
+  var toggle = document.getElementById('auth-toggle');
+  if(toggle){
+    toggle.style.display = screen==='reset-password' ? 'none' : 'flex';
+    toggle.setAttribute('data-active', screen==='login' ? 'login' : 'signup');
+  }
+}
+function showAuthError(screen, msg){
+  var el = document.getElementById(screen+'-error');
+  if(!el) return;
+  el.textContent = msg; el.style.display='block';
+}
+function togglePwVisibility(id, btn){
+  var el = document.getElementById(id);
+  if(el.type==='password'){ el.type='text'; btn.textContent='🙈'; }
+  else { el.type='password'; btn.textContent='👁'; }
+}
+function computePwStrength(pw){
+  var score=0;
+  if(pw.length>=8) score++;
+  if(pw.length>=12) score++;
+  if(/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if(/[0-9]/.test(pw) || /[^A-Za-z0-9]/.test(pw)) score++;
+  return score;
+}
+function updatePwStrength(){
+  var pw = document.getElementById('signup-password').value;
+  var score = computePwStrength(pw);
+  document.querySelectorAll('#signup-pw-strength .auth-pw-strength-seg').forEach(function(seg,i){
+    seg.classList.toggle('on', i<score);
+  });
+}
+// Live "do these two passwords match" feedback — previously this only
+// surfaced on submit, so a typo went unnoticed until "Create account" failed.
+function checkPwMatch(pwId, pw2Id, hintId){
+  var lang = window._lang||'en';
+  var pw = document.getElementById(pwId), pw2El = document.getElementById(pw2Id), hint = document.getElementById(hintId);
+  if(!pw || !pw2El || !hint) return;
+  var pw2 = pw2El.value;
+  if(!pw2){ hint.style.display='none'; return; }
+  if(pw.value !== pw2){
+    hint.textContent = lang==='hi' ? 'पासवर्ड मेल नहीं खाते।' : 'Passwords do not match.';
+    hint.className = 'auth-field-hint err';
+  } else {
+    hint.textContent = lang==='hi' ? 'पासवर्ड मेल खाते हैं।' : 'Passwords match.';
+    hint.className = 'auth-field-hint ok';
+  }
+  hint.style.display = 'block';
+}
+
+// Live "did you mean gmail.com" feedback for typo'd domains on popular
+// mailbox providers worldwide — catches e.g. gnail.com, yahooo.com, otlook.com.
+var COMMON_EMAIL_DOMAINS = ['gmail.com','yahoo.com','outlook.com','hotmail.com','icloud.com','aol.com','protonmail.com','live.com','msn.com','zoho.com','gmx.com','mail.com','yandex.com','rediffmail.com','qq.com','163.com','naver.com','comcast.net','att.net','verizon.net'];
+function _levenshtein(a, b){
+  var m=a.length, n=b.length;
+  var dp=[]; var i,j;
+  for(i=0;i<=m;i++){ dp.push([i]); }
+  for(j=0;j<=n;j++){ dp[0][j]=j; }
+  for(i=1;i<=m;i++){
+    for(j=1;j<=n;j++){
+      dp[i][j] = a[i-1]===b[j-1] ? dp[i-1][j-1] : 1+Math.min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]);
+    }
+  }
+  return dp[m][n];
+}
+function checkEmailDomainTypo(inputId, hintId){
+  var lang = window._lang||'en';
+  var el = document.getElementById(inputId), hint = document.getElementById(hintId);
+  if(!el || !hint) return;
+  var email = el.value.trim();
+  var at = email.lastIndexOf('@');
+  if(at<0 || at===email.length-1){ hint.style.display='none'; return; }
+  var domain = email.slice(at+1).toLowerCase();
+  if(COMMON_EMAIL_DOMAINS.indexOf(domain)>-1){ hint.style.display='none'; return; }
+  var best=null, bestDist=99;
+  COMMON_EMAIL_DOMAINS.forEach(function(d){
+    var dist=_levenshtein(domain, d);
+    if(dist<bestDist){ bestDist=dist; best=d; }
+  });
+  if(best && bestDist>0 && bestDist<=2){
+    hint.textContent = lang==='hi' ? 'क्या आपका मतलब '+best+' था? कृपया अपना ईमेल दोबारा जांचें।' : 'Did you mean '+best+'? Please check your email address again.';
+    hint.className = 'auth-field-hint err';
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+function _msgsExist(){ var m=document.getElementById('msgs'); return !!(m && m.children.length); }
+async function handleSignUp(){
+  var lang = window._lang||'en';
+  var email = document.getElementById('signup-email').value.trim();
+  var pw = document.getElementById('signup-password').value;
+  var pw2 = document.getElementById('signup-password2').value;
+  var agree = document.getElementById('signup-agree').checked;
+
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAuthError('signup', lang==='hi'?'कृपया मान्य ईमेल दर्ज करें।':'Please enter a valid email address.'); return; }
+  if(pw.length<8){ showAuthError('signup', lang==='hi'?'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।':'Password must be at least 8 characters.'); return; }
+  if(pw!==pw2){ showAuthError('signup', lang==='hi'?'पासवर्ड मेल नहीं खाते।':'Passwords do not match.'); return; }
+  if(!agree){ showAuthError('signup', lang==='hi'?'कृपया जारी रखने के लिए सहमति दें।':'Please agree to continue.'); return; }
+
+  cdTrack('signup_submit');
+  var btn = document.getElementById('signup-submit-btn');
+  btn.disabled = true;
+  try{
+    // Name/DOB/time/place aren't collected at signup anymore — they're
+    // captured naturally the first time this account runs an analysis
+    // (findOrCreateProfileForEntry), so there's nothing to save here.
+    await signUp({name:'', email:email, password:pw});
+    closeAuth();
+    refreshAuthUI();
+    await saveActiveAnalysisIfNeeded();
+    if(_msgsExist()) autoSaveChatIfLoggedIn();
+  }catch(e){
+    showAuthError('signup', e.message || (lang==='hi'?'साइन अप विफल रहा। कृपया पुनः प्रयास करें।':'Sign up failed. Please try again.'));
+  }finally{
+    btn.disabled = false;
+  }
+}
+async function handleLogIn(){
+  var lang = window._lang||'en';
+  var email = document.getElementById('login-email').value.trim();
+  var pw = document.getElementById('login-password').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ showAuthError('login', lang==='hi'?'कृपया मान्य ईमेल दर्ज करें।':'Please enter a valid email address.'); return; }
+  if(!pw){ showAuthError('login', lang==='hi'?'कृपया पासवर्ड दर्ज करें।':'Please enter your password.'); return; }
+  cdTrack('login_submit');
+  var btn = document.getElementById('login-submit-btn');
+  btn.disabled = true;
+  try{
+    await logIn({email:email, password:pw});
+    closeAuth();
+    refreshAuthUI();
+    await saveActiveAnalysisIfNeeded();
+    if(_msgsExist()) autoSaveChatIfLoggedIn();
+  }catch(e){
+    showAuthError('login', e.message || (lang==='hi'?'साइन इन विफल रहा। कृपया अपना ईमेल और पासवर्ड जांचें।':'Sign in failed. Please check your email and password.'));
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+// ── Forgot / reset password ──────────────────────────────────────────
+// Sends Supabase's own reset email; the link it contains brings the user
+// back to this same page with a recovery token in the URL fragment,
+// which checkForPasswordRecovery() picks up on load.
+async function handleForgotPassword(){
+  var lang = window._lang||'en';
+  var email = document.getElementById('login-email').value.trim();
+  document.getElementById('login-error').style.display='none';
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showAuthError('login', lang==='hi'?'पहले ऊपर अपना ईमेल दर्ज करें, फिर "पासवर्ड भूल गए?" पर क्लिक करें।':'Enter your email above first, then click "Forgot password?"');
+    return;
+  }
+  cdTrack('forgot_password_submit');
+  try{
+    await fetch(SB_AUTH+'/recover', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},
+      body: JSON.stringify({ email:email, options:{ redirect_to: window.location.origin+window.location.pathname } })
+    });
+  }catch(e){ /* fall through to the same neutral message either way */ }
+  // Deliberately the same message whether or not the email is registered —
+  // Supabase's own endpoint behaves the same way, to avoid confirming
+  // which emails have accounts.
+  var infoEl = document.getElementById('login-info');
+  infoEl.textContent = lang==='hi' ? 'यदि यह ईमेल पंजीकृत है, तो हमने एक पासवर्ड रीसेट लिंक भेज दिया है।' : "If that email is registered, we've sent a password reset link.";
+  infoEl.style.display='block';
+}
+function _parseRecoveryHash(){
+  var hash = window.location.hash||'';
+  if(hash.indexOf('type=recovery')===-1) return null;
+  var params = new URLSearchParams(hash.replace(/^#/,''));
+  var accessToken = params.get('access_token');
+  if(!accessToken) return null;
+  return {
+    access_token: accessToken,
+    refresh_token: params.get('refresh_token'),
+    expires_at: Math.floor(Date.now()/1000) + (parseInt(params.get('expires_in'),10) || 3600)
+  };
+}
+function checkForPasswordRecovery(){
+  var recovery = _parseRecoveryHash();
+  if(!recovery) return;
+  window._recoverySession = recovery;
+  // Strip the tokens out of the visible URL immediately — they're
+  // sensitive and don't need to sit in the address bar or browser history.
+  history.replaceState(null, '', window.location.pathname+window.location.search);
+  document.getElementById('auth-section').style.display='flex';
+  showAuthScreen('reset-password');
+}
+async function handleUpdatePassword(){
+  var lang = window._lang||'en';
+  var pw = document.getElementById('reset-password-new').value;
+  var pw2 = document.getElementById('reset-password-new2').value;
+  if(pw.length<8){ showAuthError('reset-password', lang==='hi'?'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।':'Password must be at least 8 characters.'); return; }
+  if(pw!==pw2){ showAuthError('reset-password', lang==='hi'?'पासवर्ड मेल नहीं खाते।':'Passwords do not match.'); return; }
+  var recovery = window._recoverySession;
+  if(!recovery){ showAuthError('reset-password', lang==='hi'?'यह रीसेट लिंक समाप्त हो गया है। कृपया एक नया अनुरोध करें।':'This reset link has expired. Please request a new one.'); return; }
+  cdTrack('reset_password_submit');
+  var btn = document.getElementById('reset-password-submit-btn');
+  btn.disabled = true;
+  try{
+    var r = await fetch(SB_AUTH+'/user', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+recovery.access_token},
+      body: JSON.stringify({ password: pw })
+    });
+    var data = await r.json();
+    if(!r.ok) throw new Error(data.error_description || data.msg || 'Could not update password.');
+    _storeAuthResponse({ access_token:recovery.access_token, refresh_token:recovery.refresh_token, expires_at:recovery.expires_at, user:data });
+    window._recoverySession = null;
+    closeAuth();
+    refreshAuthUI();
+  }catch(e){
+    showAuthError('reset-password', e.message || (lang==='hi'?'पासवर्ड अपडेट नहीं हो सका। कृपया पुनः प्रयास करें।':'Could not update password. Please try again.'));
+  }finally{
+    btn.disabled = false;
+  }
+}
+document.addEventListener('DOMContentLoaded', checkForPasswordRecovery);
+
+// ── Save-your-reading nudge modal ────────────────────────────────────
+var NUDGE_MSG_THRESHOLD = 3;
+window._msgsSinceNudge = 0;
+function maybeShowSaveNudge(){
+  if(window._currentUser) return;
+  window._msgsSinceNudge = (window._msgsSinceNudge||0) + 1;
+  if(window._msgsSinceNudge >= NUDGE_MSG_THRESHOLD){
+    window._msgsSinceNudge = 0;
+    showSaveNudge();
+  }
+}
+function showSaveNudge(){ cdTrack('save_nudge_shown'); document.getElementById('save-nudge-overlay').style.display='flex'; }
+function dismissNudge(){ cdTrack('save_nudge_dismissed'); document.getElementById('save-nudge-overlay').style.display='none'; }
+
+// ── Auto-save chat history for logged-in users ──────────────────────
+// Named after whoever's chart this actually is (window._meta.name, set at
+// analyze() time) — not the account holder — so a user with several saved
+// profiles (self, Mom, a friend) gets distinguishable titles in Saved Chats
+// instead of every chat being labeled with their own account name.
+function _sessionTitle(){
+  var lang = window._lang||'en';
+  var prefix = lang==='hi' ? 'करियर रीडिंग' : 'Career Reading';
+  var metaName = window._meta && window._meta.name && window._meta.name!=='User' ? window._meta.name : '';
+  var user = window._currentUser;
+  var accountName = (user && (user.name || (user.email && user.email.split('@')[0]))) || '';
+  var subject = metaName || accountName;
+  return subject ? (prefix+' · '+subject) : prefix;
+}
+async function autoSaveChatIfLoggedIn(){
+  if(!window._currentUser) return;
+  var rows = document.querySelectorAll('#msgs .row');
+  if(!rows.length) return;
+  // Store each bubble's raw markdown source and the language it was
+  // written in (not the flattened, currently-displayed text) so a resumed
+  // chat can be re-rendered with formatting intact and translated
+  // correctly regardless of which language is active when it's reopened.
+  var messages = Array.prototype.map.call(rows, function(row){
+    var isUser = row.classList.contains('u');
+    var bub = row.querySelector('.bub');
+    var text = bub ? (bub.dataset.srcText || bub.textContent) : '';
+    var lang = (bub && bub.dataset.srcLang) || window._lang || 'en';
+    return { role: isUser?'user':'agent', text: text, lang: lang };
+  });
+  var lagna = window._d1LagnaSign ? (window._d1LagnaSign+' Lagna') : '';
+  var title = _sessionTitle();
+  var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages, profileId: window._activeProfileId||null };
+  try{
+    var saved = await saveChatSession(session);
+    if(saved) window._chatSessionId = saved.id;
+    if(!window._chatSessionSaved){
+      window._chatSessionSaved = true;
+      showSavedToast(title);
+    }
+  }catch(e){ console.error('autoSaveChatIfLoggedIn failed:', e.message); }
+}
+function showSavedToast(title){
+  var m = getM();
+  if(!m) return;
+  var w = document.createElement('div');
+  w.className = 'saved-toast';
+  var label = window._lang==='hi' ? 'चैट सहेजी गई: "' : 'Chat auto-saved as "';
+  w.innerHTML = '<span>● '+label+title+'"</span>';
+  m.appendChild(w); m.scrollTop = m.scrollHeight;
+}
+
+// ── Account section: Profile / Saved Chats / My Birth Chart ────────
+function openAccountSection(screen, title){
+  document.getElementById('account-section').style.display='flex';
+  document.getElementById('account-section-title').textContent=title;
+  ['screen-profile','screen-saved-chats','screen-birth-chart'].forEach(function(id){
+    document.getElementById(id).style.display = id===screen ? 'block' : 'none';
+  });
+}
+function closeAccountSection(){ document.getElementById('account-section').style.display='none'; }
+function openProfile(){
+  var lang = window._lang||'en';
+  var user = window._currentUser||{};
+  document.getElementById('profile-name-display').textContent = user.name || (lang==='hi'?'(कोई नाम नहीं)':'(no name set)');
+  document.getElementById('profile-email-display').textContent = user.email || '';
+  document.getElementById('profile-avatar').textContent = (user.name||user.email||'U').trim().charAt(0).toUpperCase();
+  openAccountSection('screen-profile', lang==='hi'?'प्रोफ़ाइल':'Profile');
+}
+function openSavedChats(){
+  renderSavedChatsList();
+  openAccountSection('screen-saved-chats', window._lang==='hi'?'सहेजी गई चैट':'Saved Chats');
+}
+function openMyBirthChart(){
+  renderBirthProfilesList();
+  document.getElementById('add-profile-form').style.display='none';
+  openAccountSection('screen-birth-chart', window._lang==='hi'?'मेरी कुंडली':'My Birth Chart');
+}
+async function renderSavedChatsList(){
+  var lang = window._lang||'en';
+  var el = document.getElementById('saved-chats-list');
+  el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'लोड हो रहा है...':'Loading...')+'</div>';
+  var list = await listChats();
+  if(!list.length){
+    el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'अभी तक कोई सहेजी गई चैट नहीं। अपनी कुंडली से बात शुरू करें — यह अपने आप सहेज दी जाएगी।':'No saved chats yet. Start a conversation with your chart — it will save automatically.')+'</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(c){
+    var date = new Date(c.updated_at||Date.now());
+    var dateStr = date.toLocaleDateString(lang==='hi'?'hi-IN':'en-IN', {day:'numeric',month:'short'});
+    return '<div class="chat-list-item" onclick="resumeChat(\''+c.id+'\')">'
+      + '<div class="chat-list-body">'
+      +   '<div class="chat-list-title">'+(c.title||'Career Reading')+'</div>'
+      +   (c.subtitle ? '<div class="chat-list-sub">'+c.subtitle+'</div>' : '')
+      + '</div>'
+      + '<div class="chat-list-date">'+dateStr+'</div>'
+      + '<button class="chat-list-del" onclick="event.stopPropagation();removeChatEntry(\''+c.id+'\')">🗑</button>'
+      + '</div>';
+  }).join('');
+}
+// Resuming only replays the visible bubbles by default — without this, the
+// chart context (window._chartSummary/_reply1-3/_call*Ready) a follow-up
+// question needs is empty, so sendChat() has nothing to answer from and
+// waitForCall() polls for up to 180s waiting for a "ready" flag that can
+// never turn true in the resumed session.
+async function restoreChatContext(profileId){
+  if(!profileId) return false;
+  try{
+    var cached = await getCachedAnalysis(profileId);
+    if(!cached || !cached.chart_data) return false;
+    var list = await listProfiles();
+    var profile = list.find(function(p){return p.id===profileId;});
+    var name = (profile && (profile.name||profile.label)) || (window._currentUser&&window._currentUser.name) || 'User';
+    var dob = (profile && profile.dob) || '';
+    var time = (profile && profile.time) || '';
+    var place = (profile && profile.place) || '';
+    var email = (window._currentUser && window._currentUser.email) || '';
+    var chart = cached.chart_data;
+    chartData = chart;
+    window._activeProfileId = profileId;
+    window._meta = {name:name, dob:dob, time:time, place:place, email:email};
+    window._chartSummary = buildSummary(chart, window._meta);
+    window._reply1 = cached.reply1||''; window._reply2 = cached.reply2||''; window._reply3 = cached.reply3||'';
+    window._call1Ready = true; window._call2Ready = true; window._call3Ready = true;
+    window._analysis = [window._reply1, window._reply2, window._reply3].join('\n');
+    return true;
+  }catch(e){ console.error('restoreChatContext failed:', e.message); return false; }
+}
+async function resumeChat(id){
+  var list = await listChats();
+  var session = list.find(function(c){return c.id===id;});
+  if(!session) return;
+  cdTrack('resume_saved_chat');
+  window._chatSessionId = session.id;
+  window._chatSessionSaved = true;
+  await restoreChatContext(session.profile_id);
+  closeAccountSection();
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('result-section').style.display='flex';
+  document.getElementById('main-hdr').style.display='none';
+  goToChat();
+  var m=getM(); if(m) m.innerHTML='';
+  (session.messages||[]).forEach(function(msg){
+    var row = (msg.role==='user') ? addRow('user', msg.text) : addRow('agent', renderChatReply(msg.text));
+    var bub = row && row.querySelector('.bub');
+    // Re-tag with the language this message was actually written in (not
+    // whatever language happens to be active right now), then immediately
+    // sync every bubble to the current language below — this is what lets
+    // a resumed chat show correctly whether it was saved in EN or HI.
+    if(bub) markTranslatable(bub, msg.text, msg.lang||'en', msg.role==='user'?'text':'md');
+  });
+  syncAllTranslatables();
+  var chips=document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='none';
+}
+async function removeChatEntry(id){ await deleteChatById(id); renderSavedChatsList(); }
+async function renderBirthProfilesList(){
+  var lang = window._lang||'en';
+  var el = document.getElementById('birth-profiles-list');
+  el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'लोड हो रहा है...':'Loading...')+'</div>';
+  var list = await listProfiles();
+  if(!list.length){
+    el.innerHTML = '<div class="acct-empty">'+(lang==='hi'?'अभी तक कोई प्रोफ़ाइल सहेजी नहीं गई।':'No birth profiles saved yet.')+'</div>';
+    return;
+  }
+  el.innerHTML = list.map(function(p){
+    var initials = (p.label||p.name||'?').trim().charAt(0).toUpperCase();
+    return '<div class="profile-card">'
+      + '<div class="profile-avatar">'+initials+'</div>'
+      + '<div class="profile-body"><div class="profile-name">'+(p.label||p.name||'—')+'</div><div class="profile-sub">'+[p.dob,p.place].filter(Boolean).join(' · ')+'</div></div>'
+      + '<div class="profile-actions">'
+      +   '<button class="profile-use-btn" onclick="useProfile(\''+p.id+'\')">'+(lang==='hi'?'उपयोग करें':'Use')+'</button>'
+      +   '<button class="profile-del-btn" onclick="removeProfileEntry(\''+p.id+'\')">🗑</button>'
+      + '</div></div>';
+  }).join('');
+}
+function showAddProfileForm(){ document.getElementById('add-profile-form').style.display='block'; }
+async function handleSaveProfile(){
+  var lang = window._lang||'en';
+  var name = document.getElementById('ap-name').value.trim();
+  var dob = document.getElementById('ap-dob').value.trim();
+  var time = document.getElementById('ap-time').value;
+  var place = document.getElementById('ap-place').value.trim();
+  if(!name){ alert(lang==='hi'?'कृपया एक नाम दर्ज करें।':'Please enter a name.'); return; }
+  var btn = document.getElementById('ap-save-btn');
+  btn.disabled = true;
+  try{
+    await saveProfile({ label:name, name:name, dob:dob, time:time, place:place });
+    document.getElementById('ap-name').value='';
+    document.getElementById('ap-dob').value='';
+    document.getElementById('ap-time').value='';
+    document.getElementById('ap-place').value='';
+    document.getElementById('add-profile-form').style.display='none';
+    renderBirthProfilesList();
+  }catch(e){
+    alert(e.message || (lang==='hi'?'प्रोफ़ाइल सहेजने में विफल।':'Failed to save profile.'));
+  }finally{
+    btn.disabled = false;
+  }
+}
+async function removeProfileEntry(id){ await deleteProfileById(id); renderBirthProfilesList(); }
+async function useProfile(id){
+  var list = await listProfiles();
+  var p = list.find(function(x){return x.id===id;});
+  if(!p) return;
+  cdTrack('use_saved_profile');
+  reset();
+  closeAccountSection();
+  document.getElementById('f-name').value = p.name || p.label || '';
+  document.getElementById('f-dob').value = p.dob || '';
+  document.getElementById('f-time').value = p.time || '';
+  document.getElementById('f-place').value = p.place || '';
+}
+
+// ── Bilingual text for the account/auth UI ──────────────────────────
+function applyAccountLang(){
+  var lang = window._lang || 'en';
+  var t = lang==='hi' ? {
+    signupTitle:'अपना खाता बनाएं', signupSub:'मुफ़्त में शुरू करें। किसी क्रेडिट कार्ड की आवश्यकता नहीं।',
+    email:'ईमेल पता', password:'पासवर्ड', pwPh:'न्यूनतम 8 अक्षर', retype:'पासवर्ड फिर से लिखें', retypePh:'अपना पासवर्ड दोहराएं',
+    dob:'जन्म तिथि', tob:'जन्म समय', pob:'जन्म स्थान',
+    agree:'मैं ', agreeLink1:'गोपनीयता नीति', agreeMid:' और ', agreeLink2:'सेवा की शर्तों', agreeEnd:' से सहमत हूं। मेरे जन्म डेटा का उपयोग केवल वैदिक विश्लेषण के लिए किया जाएगा।',
+    createAccount:'खाता बनाएं', haveAccount:'पहले से खाता है? ', signIn:'साइन इन करें', toggleLogin:'लॉग इन', toggleSignup:'साइन अप',
+    loginTitle:'वापसी पर स्वागत है', loginSub:'अपनी सहेजी गई रीडिंग देखने के लिए साइन इन करें।',
+    yourPassword:'आपका पासवर्ड', noAccount:'खाता नहीं है? ', signUp2:'साइन अप करें',
+    nudgeTitle:'अपनी करियर रीडिंग सहेजें', nudgeSub:'टैब बंद करने पर आपकी कुंडली की जानकारी खो जाएगी। इसे रखने के लिए मुफ़्त साइन अप करें।',
+    nb1:'अपनी सभी कुंडली रीडिंग सहेजें और देखें', nb2:'कभी भी बातचीत जारी रखें', nb3:'परिवार और दोस्तों की कुंडली विश्लेषण करें',
+    createFree:'मुफ़्त खाता बनाएं', maybeLater:'शायद बाद में',
+    apName:'नाम', apSave:'प्रोफ़ाइल सहेजें',
+    forgotPw:'पासवर्ड भूल गए?', resetTitle:'नया पासवर्ड सेट करें', resetSub:'अपने खाते के लिए एक नया पासवर्ड चुनें।',
+    newPw:'नया पासवर्ड', retypeNewPw:'नया पासवर्ड फिर से लिखें', retypeNewPwPh:'अपना नया पासवर्ड दोहराएं', updatePw:'पासवर्ड अपडेट करें'
+  } : {
+    signupTitle:'Create your account', signupSub:'Start for free. No credit card needed.',
+    email:'Email address', password:'Password', pwPh:'Min. 8 characters', retype:'Retype password', retypePh:'Repeat your password',
+    dob:'Date of Birth', tob:'Time of Birth', pob:'Place of Birth',
+    agree:'I agree to the ', agreeLink1:'Privacy Policy', agreeMid:' and ', agreeLink2:'Terms of Service', agreeEnd:'. My birth data will be used only for Vedic analysis.',
+    createAccount:'Create account', haveAccount:'Already have an account? ', signIn:'Sign in', toggleLogin:'Log in', toggleSignup:'Sign up',
+    loginTitle:'Welcome back', loginSub:'Sign in to see your saved readings.',
+    yourPassword:'Your password', noAccount:"Don't have an account? ", signUp2:'Sign up',
+    nudgeTitle:'Save your career reading', nudgeSub:'Your chart insights will be lost when you close this tab. Sign up free to keep them.',
+    nb1:'Save and revisit all your chart readings', nb2:'Continue conversations anytime', nb3:'Analyze charts for family and friends',
+    createFree:'Create a free account', maybeLater:'Maybe later',
+    apName:'Name', apSave:'Save profile',
+    forgotPw:'Forgot password?', resetTitle:'Set a new password', resetSub:'Choose a new password for your account.',
+    newPw:'New password', retypeNewPw:'Retype new password', retypeNewPwPh:'Repeat your new password', updatePw:'Update password'
+  };
+  var set=function(id,text){ var el=document.getElementById(id); if(el) el.textContent=text; };
+  set('auth-toggle-login',t.toggleLogin); set('auth-toggle-signup',t.toggleSignup);
+  set('signup-title',t.signupTitle); set('signup-sub',t.signupSub);
+  set('signup-email-label',t.email); set('signup-pw-label',t.password); set('signup-pw2-label',t.retype);
+  set('signup-submit-btn',t.createAccount);
+  var pw1=document.getElementById('signup-password'); if(pw1) pw1.placeholder=t.pwPh;
+  var pw2=document.getElementById('signup-password2'); if(pw2) pw2.placeholder=t.retypePh;
+  var agreeEl=document.getElementById('signup-agree-text');
+  if(agreeEl) agreeEl.innerHTML = t.agree+'<span class="auth-link">'+t.agreeLink1+'</span>'+t.agreeMid+'<span class="auth-link">'+t.agreeLink2+'</span>'+t.agreeEnd;
+  var signupSwitch=document.getElementById('signup-switch');
+  if(signupSwitch) signupSwitch.innerHTML = t.haveAccount+'<a onclick="showAuthScreen(\'login\')">'+t.signIn+'</a>';
+
+  set('login-title',t.loginTitle); set('login-sub',t.loginSub);
+  set('login-email-label',t.email); set('login-pw-label',t.password);
+  var lpw=document.getElementById('login-password'); if(lpw) lpw.placeholder=t.yourPassword;
+  set('login-submit-btn',t.signIn);
+  var loginSwitch=document.getElementById('login-switch');
+  if(loginSwitch) loginSwitch.innerHTML = t.noAccount+'<a onclick="showAuthScreen(\'signup\')">'+t.signUp2+'</a>';
+  var forgotEl=document.getElementById('login-forgot');
+  if(forgotEl) forgotEl.innerHTML = '<a onclick="handleForgotPassword()">'+t.forgotPw+'</a>';
+
+  set('reset-password-title',t.resetTitle); set('reset-password-sub',t.resetSub);
+  set('reset-password-new-label',t.newPw); set('reset-password-new2-label',t.retypeNewPw);
+  set('reset-password-submit-btn',t.updatePw);
+  var rpw1=document.getElementById('reset-password-new'); if(rpw1) rpw1.placeholder=t.pwPh;
+  var rpw2=document.getElementById('reset-password-new2'); if(rpw2) rpw2.placeholder=t.retypeNewPwPh;
+
+  set('nudge-title',t.nudgeTitle); set('nudge-sub',t.nudgeSub);
+  set('nudge-b1',t.nb1); set('nudge-b2',t.nb2); set('nudge-b3',t.nb3);
+  set('nudge-cta',t.createFree); set('nudge-later',t.maybeLater);
+
+  set('ap-name-label',t.apName); set('ap-dob-label',t.dob); set('ap-time-label',t.tob); set('ap-place-label',t.pob);
+  set('ap-save-btn',t.apSave);
+}
+
 function formatDOB(inp){
   var v = inp.value.replace(/\D/g,'');
   if(v.length > 8) v = v.slice(0,8);
@@ -3163,7 +4321,7 @@ function triggerEmail(){
     // Ask for email in chat
     addRow('agent', renderChatReply(
       "To send your report, I need your email address. Please type it below and I'll send the PDF right away."
-    ));
+    ), null, "To send your report, I need your email address. Please type it below and I'll send the PDF right away.");
     window._awaitingEmail = true;
     document.getElementById('bottom-bar').style.display = 'block';
     document.getElementById('chat-ui').placeholder = 'Enter your email address...';
@@ -3201,7 +4359,7 @@ async function sendReportEmail(email){
 
     // Success
     if(btn){ btn.textContent = '✓ Report Sent!'; btn.style.background = '#1D9E75'; }
-    addRow('agent', renderChatReply('Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).'));
+    addRow('agent', renderChatReply('Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).'), null, 'Your Career Destiny Report has been sent to **' + email + '**. Check your inbox (and spam folder just in case).');
     cdTrack('email_sent_success', {verdict: (window._analysis||'').match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)?RegExp.$1:'MIXED'});
     setTimeout(function(){
       if(btn){ btn.textContent = '📧 Email My Report'; btn.style.background = ''; btn.disabled = false; }
@@ -3209,7 +4367,7 @@ async function sendReportEmail(email){
 
   } catch(e) {
     if(btn){ btn.textContent = '📧 Email My Report'; btn.disabled = false; }
-    addRow('agent', renderChatReply('Sorry, there was an error sending your report: ' + e.message + '. Please try again.'));
+    addRow('agent', renderChatReply('Sorry, there was an error sending your report: ' + e.message + '. Please try again.'), null, 'Sorry, there was an error sending your report: ' + e.message + '. Please try again.');
     cdTrack('email_sent_error', {error: e.message});
   }
 }
@@ -3227,34 +4385,53 @@ function triggerDownload_old(){
   }
 }
 
-var _placeTimer=null;var _selectedCoords=null;var _selectedPlaceName=null;
-function searchPlace(val){
-  _selectedCoords=null;_selectedPlaceName=null;
+var _placeTimer=null;
+function getSelectedPlaceCoords(inputEl){
+  if(!inputEl || inputEl.dataset.selectedPlace !== inputEl.value || !inputEl.dataset.selectedLat) return null;
+  return {
+    lat: parseFloat(inputEl.dataset.selectedLat),
+    lon: parseFloat(inputEl.dataset.selectedLon),
+    name: inputEl.dataset.selectedName,
+    coordinates: inputEl.dataset.selectedLat+','+inputEl.dataset.selectedLon
+  };
+}
+function searchPlace(inputEl){
+  var val = inputEl.value;
+  delete inputEl.dataset.selectedPlace; delete inputEl.dataset.selectedLat; delete inputEl.dataset.selectedLon;
   if(_placeTimer)clearTimeout(_placeTimer);
-  if(!val||val.length<3){hidePlaceDropdown();return;}
+  if(!val||val.length<3){hidePlaceDropdown(inputEl);return;}
   _placeTimer=setTimeout(function(){
     fetch(API+"/api/geocode?place="+encodeURIComponent(val)+"&limit=5").then(function(r){return r.json();}).then(function(data){
-      if(data.error||!data.length){hidePlaceDropdown();return;}
-      showPlaceDropdown(data);
-    }).catch(function(){hidePlaceDropdown();});
+      if(data.error||!data.length){hidePlaceDropdown(inputEl);return;}
+      showPlaceDropdown(inputEl,data);
+    }).catch(function(){hidePlaceDropdown(inputEl);});
   },400);
 }
-function showPlaceDropdown(results){
-  var dd=document.getElementById("place-dropdown");
+function showPlaceDropdown(inputEl,results){
+  var dd=inputEl.nextElementSibling;
+  if(!dd) return;
   dd.innerHTML="";
   results.forEach(function(r){
     var item=document.createElement("div");
     item.style.cssText="padding:10px 12px;cursor:pointer;font-size:13px;color:#1a1a1a;border-bottom:0.5px solid #eee;line-height:1.4;";
     item.innerHTML="<div style=\"font-weight:500;\">"+r.short_name+"</div><div style=\"font-size:11px;color:#888;margin-top:2px;\">"+r.display_name.slice(0,60)+"</div>";
-    item.addEventListener("mousedown",function(e){e.preventDefault();document.getElementById("f-place").value=r.short_name;_selectedCoords={lat:r.lat,lon:r.lon,name:r.display_name,coordinates:r.lat+","+r.lon};_selectedPlaceName=r.short_name;hidePlaceDropdown();});
+    item.addEventListener("mousedown",function(e){
+      e.preventDefault();
+      inputEl.value=r.short_name;
+      var glat=parseFloat(r.lat),glon=parseFloat(r.lon);
+      inputEl.dataset.selectedLat=glat; inputEl.dataset.selectedLon=glon;
+      inputEl.dataset.selectedName=r.display_name; inputEl.dataset.selectedPlace=r.short_name;
+      hidePlaceDropdown(inputEl);
+    });
     item.addEventListener("mouseover",function(){this.style.background="#f5f0e8";});
     item.addEventListener("mouseout",function(){this.style.background="";});
     dd.appendChild(item);
   });
   dd.style.display="block";
 }
-function hidePlaceDropdown(){
-  setTimeout(function(){var dd=document.getElementById("place-dropdown");if(dd)dd.style.display="none";},150);
+function hidePlaceDropdown(inputEl){
+  var dd = inputEl && inputEl.nextElementSibling;
+  setTimeout(function(){if(dd)dd.style.display="none";},150);
 }
 function collectData(meta, verdict, analysis){
   try{
@@ -3313,16 +4490,41 @@ async function analyze(){
   // Set greeting immediately
   var greetEl = document.getElementById('rs-greeting-name');
   if(greetEl) greetEl.textContent = name && name!=='User' ? 'Hi '+name.split(' ')[0]+' —' : 'Your chart —';
+
+  // If this exact dob+time+place was already analyzed for this logged-in
+  // user, skip Prokerala + all 3 Claude calls and load the saved result
+  // instantly. Any other combination (never searched, or a different
+  // detail) falls straight through to the normal flow below.
+  window._activeProfileId = null;
+  if(getCurrentUser()){
+    var matchedProfile = await findMatchingProfile({dob:dob, time:time, place:place});
+    if(matchedProfile){
+      window._activeProfileId = matchedProfile.id;
+      var cachedAnalysis = await getCachedAnalysis(matchedProfile.id);
+      if(cachedAnalysis && cachedAnalysis.chart_data){
+        cdTrack('analysis_cache_hit');
+        loadFromCachedAnalysis(cachedAnalysis, name, email, dob, time, place);
+        return;
+      }
+    }
+  }
+
   setStat('ld','Fetching chart...');
 
   try{
-    var coords=await geocode(place);
+    var coords=getSelectedPlaceCoords(document.getElementById('f-place')) || await geocode(place);
     var dt=parseDT(parseDOBToISO(dob),time);
     var hl=document.getElementById('rs-loading-text');
     if(hl) hl.textContent='Locating '+place.split(',')[0]+'...';
 
     var chart=await fetchChart(dt,coords);
     chartData=chart;
+    // Resolve (or create) the saved profile now, before CALL1, so the lead
+    // captured below and the cached-analysis save at the end both link to
+    // the same profile row instead of leaving leads.profile_id null.
+    if(getCurrentUser() && !window._activeProfileId){
+      window._activeProfileId = await findOrCreateProfileForEntry({name:name,dob:dob,time:time,place:place});
+    }
     window._meta={name:name,dob:dob,time:time,place:place,email:email,coords:coords};
     if(hl) hl.textContent='Charts ready. Running rule engine...';
     var summary=buildSummary(chart,{name:name,dob:dob,time:time,place:place,email:email,coords:coords});
@@ -3349,6 +4551,10 @@ async function analyze(){
     });
     var saturnOverride = pre.sutra3 && pre.sutra3.indicates==='Job';
     var jsVerdict = saturnOverride && bizScore<7 ? (bizScore>=5?'MIXED (leaning Business)':'MIXED (leaning Job)') : bizScore>=6?'BUSINESS':jobScore>=6?'JOB':bizScore>jobScore?'MIXED (leaning Business)':jobScore>bizScore?'MIXED (leaning Job)':'MIXED';
+    // Exposed on window so a sign-up/login that happens later in this same
+    // session (after this analysis already ran anonymously) can still save
+    // it — see saveActiveAnalysisIfNeeded().
+    window._verdict = jsVerdict; window._bizScore = bizScore; window._jobScore = jobScore;
     scoresBlock += '\nSCORE: '+bizScore+' of 7 point toward Business. '+jobScore+' point toward Job.\n';
     scoresBlock += 'JS VERDICT: '+jsVerdict+'\n';
     scoresBlock += '\nOTHER PRE-COMPUTED VALUES:\n';
@@ -3458,6 +4664,7 @@ async function analyze(){
         cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
         var verdictMatch = window._reply1.match(/VERDICT:\s*([A-Z]+)/i);
         collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictMatch?verdictMatch[1]:'MIXED', window._reply1);
+        saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:verdictMatch?verdictMatch[1]:'MIXED', bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
         updateReportPreview();
       }catch(e){ console.log('CALL1 error:',e.message); window._call1Ready=true; }
 
@@ -3493,6 +4700,12 @@ async function analyze(){
         window._analysis = (window._reply1||'')+'\n'+(window._reply2||'')+'\n'+(window._reply3||'');
         cdTrack('analysis_complete', {verdict:(window._analysis.match(/VERDICT:\s*(BUSINESS|JOB|MIXED)/i)||[])[1]||'MIXED'});
         updateReportPreview();
+        // Cache this analysis for the logged-in user so their next visit
+        // to this exact birth profile skips Prokerala + Claude entirely.
+        // _activeProfileId was already resolved before CALL1 above.
+        if(getCurrentUser() && window._activeProfileId){
+          saveChartAnalysis(window._activeProfileId, { chartData:chart, reply1:window._reply1, reply2:window._reply2, reply3:window._reply3, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore });
+        }
       }catch(e){ console.log('CALL3 error:',e.message); window._call3Ready=true; }
     }
 
@@ -3508,6 +4721,41 @@ async function analyze(){
     setStat('er','Error');
   }
   document.getElementById('analyze-btn').disabled=false;
+}
+
+// Instant path for a birth profile already analyzed before by this
+// logged-in user — no Prokerala or Claude calls, just render from cache.
+function loadFromCachedAnalysis(cached, name, email, dob, time, place){
+  var chart = cached.chart_data;
+  chartData = chart;
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('result-section').style.display='flex';
+  document.getElementById('main-hdr').style.display='none';
+
+  var pre = preCompute(chart);
+  var bizScore = cached.biz_score!=null ? cached.biz_score : 0;
+  var jobScore = cached.job_score!=null ? cached.job_score : 0;
+  var jsVerdict = cached.verdict || 'MIXED';
+
+  window._meta = {name:name, dob:dob, time:time, place:place, email:email};
+  window._chartSummary = buildSummary(chart, {name:name, dob:dob, time:time, place:place, email:email});
+  window._reply1 = cached.reply1||''; window._reply2 = cached.reply2||''; window._reply3 = cached.reply3||'';
+  window._call1Ready = true; window._call2Ready = true; window._call3Ready = true;
+  window._analysis = [window._reply1, window._reply2, window._reply3].join('\n');
+
+  var d1LagnaSign = (chart.planets&&chart.planets.data&&chart.planets.data.planet_position||[]).find(function(p){return p.name==='Ascendant';});
+  window._d1Lagna = d1LagnaSign ? (d1LagnaSign.rasi&&d1LagnaSign.rasi.name||'?') : '?';
+
+  showResultsScreen(pre, name, jsVerdict, bizScore, jobScore);
+  updateReportPreview();
+  document.getElementById('analyze-btn').disabled=false;
+
+  // SVGs for the emailed PDF aren't cached — re-geocode and fetch them in
+  // the background so "Get my full report" still has real chart images.
+  (getSelectedPlaceCoords(document.getElementById('f-place')) ? Promise.resolve(getSelectedPlaceCoords(document.getElementById('f-place'))) : geocode(place))
+    .then(function(coords){ return fetchChartSVGs(parseDT(parseDOBToISO(dob),time), coords); })
+    .then(function(svgs){ window._svgs=svgs; })
+    .catch(function(){ window._svgs={d1:'',d9:'',d10:'',gochar:''}; });
 }
 function showRegenButton(reply1, partialReply2){
   var row=document.createElement('div');row.className='row agent';row.id='regen-row';
@@ -3632,7 +4880,7 @@ async function sendChat(){
     // Basic email validation
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)){
       addRow('user', emailInput);
-      addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"));
+      addRow('agent', renderChatReply("That does not look like a valid email address. Please try again — for example: yourname@gmail.com"), null, "That does not look like a valid email address. Please try again — for example: yourname@gmail.com");
       btn.disabled=false;
       ui.placeholder='Enter your email address...';
       ui.focus();
@@ -3644,7 +4892,7 @@ async function sendChat(){
     window._meta.email = emailInput;
     ui.placeholder='Ask a follow-up question...';
     addRow('user', emailInput);
-    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'));
+    addRow('agent', renderChatReply('Got it! Generating and sending your report to **' + emailInput + '**...'), null, 'Got it! Generating and sending your report to **' + emailInput + '**...');
     btn.disabled=false;
     sendReportEmail(emailInput);
     return;
@@ -3665,7 +4913,7 @@ async function sendChat(){
     if(intent === 3 && !window._call3Ready){
       // Timing question — wait for CALL3
       removeLoader();
-      addRow('agent', renderChatReply('Your timing analysis is still generating in the background — give me just a moment...'));
+      addRow('agent', renderChatReply('Your timing analysis is still generating in the background — give me just a moment...'), null, 'Your timing analysis is still generating in the background — give me just a moment...');
       addLoader('Generating timing analysis...');
       var ready = await waitForCall(3);
       removeLoader();
@@ -3673,7 +4921,7 @@ async function sendChat(){
     } else if(intent === 2 && !window._call2Ready){
       // Career question — wait for CALL2
       removeLoader();
-      addRow('agent', renderChatReply('Your career analysis is still generating — one moment...'));
+      addRow('agent', renderChatReply('Your career analysis is still generating — one moment...'), null, 'Your career analysis is still generating — one moment...');
       addLoader('Generating career analysis...');
       var ready2 = await waitForCall(2);
       removeLoader();
@@ -3686,8 +4934,9 @@ async function sendChat(){
 
     var reply=await callClaude(txt, chatContext, null, 4);
     removeLoader();
-    addRow('agent',renderChatReply(reply));
+    addRow('agent',renderChatReply(reply),null,reply);
     setStat('ok','Ready');
+    if(window._currentUser){ autoSaveChatIfLoggedIn(); } else { maybeShowSaveNudge(); }
   }catch(e){
     removeLoader();
     addRow('agent','Error: '+e.message,'er');
@@ -3726,6 +4975,20 @@ var MOON_TRAITS = {
   'Makar':    {icon:'🏆', headline:'Achieving goals is how you feel secure', detail:'Capricorn Moon means achievement and progress are your emotional fuel.'},
   'Kumbha':   {icon:'🌐', headline:'You work best when you are changing something', detail:'Aquarius Moon means impact and innovation keep you engaged.'},
   'Meena':    {icon:'💫', headline:'Your intuition about people is almost always right', detail:'Pisces Moon means empathy and creativity flow naturally in your work.'}
+};
+var MOON_TRAITS_HI = {
+  'Mesha':    {icon:'⚡', headline:'आपकी भावनाएं तेज़ी से बदलती हैं — और आपकी सबसे अच्छी सोच भी', detail:'मेष राशि का चंद्रमा यानी आप स्पष्ट लक्ष्यों वाले तेज़-रफ़्तार माहौल में सबसे बेहतर काम करते हैं।'},
+  'Vrishabha':{icon:'🌿', headline:'स्थिरता आपको ऊर्जा देती है — अफरा-तफरी आपको थका देती है', detail:'वृषभ राशि का चंद्रमा यानी आपको बेहतरीन काम के लिए सुरक्षा और आराम चाहिए।'},
+  'Mithuna':  {icon:'💬', headline:'आपका दिमाग कभी रुकता नहीं — विविधता ही आपकी ऑक्सीजन है', detail:'मिथुन राशि का चंद्रमा यानी एक जैसा काम आपकी प्रेरणा खत्म कर देता है। आपको मानसिक उत्तेजना चाहिए।'},
+  'Karka':    {icon:'🤝', headline:'आप अपने साथ काम करने वालों की गहराई से परवाह करते हैं', detail:'कर्क राशि का चंद्रमा यानी टीम की संस्कृति और भावनात्मक सुरक्षा वेतन से ज़्यादा मायने रखती है।'},
+  'Simha':    {icon:'🌟', headline:'प्रेरित रहने के लिए आपको पहचान चाहिए', detail:'सिंह राशि का चंद्रमा यानी सराहना और दृश्यता आपको ऊर्जावान और वफ़ादार बनाए रखती है।'},
+  'Kanya':    {icon:'📋', headline:'आप खुद पर सबसे सख्त हैं — और यही नतीजे लाता है', detail:'कन्या राशि का चंद्रमा यानी आपके आंतरिक मापदंड आपसे असाधारण काम करवाते हैं।'},
+  'Tula':     {icon:'🎨', headline:'आपके माहौल में सुंदरता और सामंजस्य मायने रखते हैं', detail:'तुला राशि का चंद्रमा यानी सुंदर परिवेश और निष्पक्ष रिश्ते आपके बेहतरीन काम को बढ़ावा देते हैं।'},
+  'Vrischika':{icon:'🔮', headline:'आप लोगों को सटीक तरीके से पढ़ लेते हैं — हमेशा', detail:'वृश्चिक राशि का चंद्रमा यानी आप अनकहे को महसूस कर लेते हैं। यह एक करियर महाशक्ति है।'},
+  'Dhanu':    {icon:'🌍', headline:'आपको सिर्फ वेतन नहीं, उद्देश्य चाहिए', detail:'धनु राशि का चंद्रमा यानी सार्थक काम आपको पैसे से ज़्यादा प्रेरित करता है।'},
+  'Makar':    {icon:'🏆', headline:'लक्ष्य हासिल करना ही आपकी सुरक्षा का एहसास है', detail:'मकर राशि का चंद्रमा यानी उपलब्धि और प्रगति आपका भावनात्मक ईंधन हैं।'},
+  'Kumbha':   {icon:'🌐', headline:'जब आप कुछ बदल रहे होते हैं तब आप सबसे बेहतर काम करते हैं', detail:'कुंभ राशि का चंद्रमा यानी प्रभाव और नवाचार आपको जोड़े रखते हैं।'},
+  'Meena':    {icon:'💫', headline:'लोगों के बारे में आपका सहज ज्ञान लगभग हमेशा सही होता है', detail:'मीन राशि का चंद्रमा यानी सहानुभूति और रचनात्मकता आपके काम में स्वाभाविक रूप से बहती हैं।'}
 };
 var AK_TRAITS = {
   'Sun':     {icon:'👑', headline:'You are drawn to authority — and authority is drawn to you', detail:'Your career significator points toward leadership, governance, and public recognition.'},
@@ -3786,11 +5049,15 @@ function goToReport(){
 }
 
 function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
+  window._resultsCache = {pre:pre, name:name, jsVerdict:jsVerdict, bizScore:bizScore, jobScore:jobScore};
+  var lang = window._lang || 'en';
   var firstName = name && name !== 'User' ? name.split(' ')[0] : '';
 
   // Greeting
   var greetEl = document.getElementById('rs-greeting-name');
-  if(greetEl) greetEl.textContent = firstName ? 'Hi '+firstName+' —' : 'Your chart —';
+  if(greetEl) greetEl.textContent = firstName
+    ? (lang==='hi' ? 'नमस्ते '+firstName+' —' : 'Hi '+firstName+' —')
+    : (lang==='hi' ? 'आपकी कुंडली —' : 'Your chart —');
 
   // Verdict pill
   var pill = document.getElementById('rs-verdict-pill');
@@ -3798,26 +5065,32 @@ function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
     var raw = jsVerdict.replace('MIXED (leaning Business)','MIXED').replace('MIXED (leaning Job)','MIXED');
     var cls = raw==='BUSINESS'?'biz':raw==='JOB'?'job':'mix';
     pill.className = 'rs-verdict-pill '+cls;
-    pill.textContent = raw+' '+bizScore+':'+jobScore;
+    var rawLabel = lang==='hi' ? (raw==='BUSINESS'?'व्यवसाय':raw==='JOB'?'नौकरी':'मिश्रित') : raw;
+    pill.textContent = rawLabel+' '+bizScore+':'+jobScore;
   }
 
   // Summary — 2 sentences from preCompute
   var summaryEl = document.getElementById('rs-summary');
   if(summaryEl){
-    var akName = pre.amatyakaraka || '';
-    var lagnaSign = window._d1LagnaSign || '';
-    var verdictWord = jsVerdict.includes('BUSINESS') ? 'more suited to business' : jsVerdict.includes('JOB') ? 'more suited to employment' : 'suited to both paths depending on timing';
-    summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job.';
+    if(lang==='hi'){
+      var verdictWordHi = jsVerdict.includes('BUSINESS') ? 'व्यवसाय के लिए अधिक उपयुक्त' : jsVerdict.includes('JOB') ? 'नौकरी के लिए अधिक उपयुक्त' : 'समय के आधार पर दोनों राहों के लिए उपयुक्त';
+      summaryEl.textContent = 'आपकी कुंडली '+verdictWordHi+' है। '+bizScore+' में से 7 कारक व्यवसाय की ओर इशारा करते हैं, '+jobScore+' नौकरी की ओर।';
+    } else {
+      var verdictWord = jsVerdict.includes('BUSINESS') ? 'more suited to business' : jsVerdict.includes('JOB') ? 'more suited to employment' : 'suited to both paths depending on timing';
+      summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job.';
+    }
   }
 
   // Moon trait
   var moonSign = window._moonRashi || '';
-  var moonTrait = MOON_TRAITS[moonSign];
+  var moonTrait = (lang==='hi' && MOON_TRAITS_HI[moonSign]) ? MOON_TRAITS_HI[moonSign] : MOON_TRAITS[moonSign];
   if(moonTrait){
     document.getElementById('rs-moon-trait').style.display = 'block';
     document.getElementById('rs-moon-icon').textContent = moonTrait.icon;
     document.getElementById('rs-moon-headline').textContent = moonTrait.headline;
     document.getElementById('rs-moon-detail').textContent = moonTrait.detail;
+    var moonLabel = document.getElementById('rs-moon-label');
+    if(moonLabel) moonLabel.textContent = lang==='hi' ? 'आपकी कुंडली कहती है' : 'Your chart says';
   }
 }
 
@@ -3993,17 +5266,22 @@ function askQuestion(question){
 }
 
 function updateReportPreview(){
+  var lang = window._lang || 'en';
   // Show loading state if calls not ready
   var c1=document.getElementById('rpt-c1');
   var c2=document.getElementById('rpt-c2');
   var c3=document.getElementById('rpt-c3');
-  if(!window._call1Ready && c1) c1.textContent='Generating your verdict analysis...';
-  if(!window._call2Ready && c2) c2.textContent='Generating career suggestions...';
-  if(!window._call3Ready && c3) c3.textContent='Generating timing windows...';
+  if(!window._call1Ready && c1) c1.textContent = lang==='hi' ? 'आपके निर्णय का विश्लेषण तैयार हो रहा है...' : 'Generating your verdict analysis...';
+  if(!window._call2Ready && c2) c2.textContent = lang==='hi' ? 'करियर सुझाव तैयार हो रहे हैं...' : 'Generating career suggestions...';
+  if(!window._call3Ready && c3) c3.textContent = lang==='hi' ? 'समय की विंडो तैयार हो रही है...' : 'Generating timing windows...';
 
   if(window._reply1){
     var vm=window._reply1.match(/VERDICT:\s*(BUSINESS|JOB|MIXED[^—\n]*)/i);
-    if(vm && c1) c1.textContent=vm[1].trim()+' — 7-factor Sapta Sutri analysis';
+    if(vm && c1){
+      var txt1=vm[1].trim()+' — 7-factor Sapta Sutri analysis';
+      if(c1.dataset.srcText!==txt1) markTranslatable(c1, txt1, window._lang, 'text');
+      syncTranslatable(c1, lang);
+    }
   }
   if(window._reply2){
     var careers=[];
@@ -4011,11 +5289,19 @@ function updateReportPreview(){
       var m=l.match(/^\d+\.\s+\*\*([^*]+)\*\*/);
       if(m&&careers.length<3) careers.push(m[1].trim());
     });
-    if(careers.length && c2) c2.textContent=careers.join(' · ');
+    if(careers.length && c2){
+      var txt2=careers.join(' · ');
+      if(c2.dataset.srcText!==txt2) markTranslatable(c2, txt2, window._lang, 'text');
+      syncTranslatable(c2, lang);
+    }
   }
   if(window._reply3){
     var w=window._reply3.match(/Window 1[^:]*:[\s\S]*?([A-Z][a-z]+ \d{4})/i);
-    if(w && c3) c3.textContent='Starting '+w[1]+' — see full dates in report';
+    if(w && c3){
+      var txt3='Starting '+w[1]+' — see full dates in report';
+      if(c3.dataset.srcText!==txt3) markTranslatable(c3, txt3, window._lang, 'text');
+      syncTranslatable(c3, lang);
+    }
   }
 }
 
@@ -4088,11 +5374,30 @@ function reset(){
   window._reply1=null; window._reply2=null; window._reply3=null;
   window._analysis=null; window._chartData=null; chartData=null;
   window._call1Ready=false; window._call2Ready=false; window._call3Ready=false;
+  // A new analysis is a new conversation — without this, autosave would
+  // PATCH the previous chat's saved row (matched by the stale session id)
+  // instead of creating a fresh one, silently overwriting it.
+  window._chatSessionId=null; window._chatSessionSaved=false;
 }
 
-var _chatUi=document.getElementById('chat-ui');
-if(_chatUi) _chatUi.addEventListener('keydown',function(e){
-  if(e.key==='Enter')sendChat();
+document.addEventListener('DOMContentLoaded', function(){
+  var _chatUi=document.getElementById('chat-ui');
+  if(_chatUi) _chatUi.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){ e.preventDefault(); sendChat(); }
+  });
+  // None of the auth screens are wrapped in a <form>, so Enter did nothing
+  // in any of their inputs — wire each group to its submit handler.
+  function _submitOnEnter(fieldIds, submitFn){
+    fieldIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.addEventListener('keydown', function(e){
+        if(e.key==='Enter'){ e.preventDefault(); submitFn(); }
+      });
+    });
+  }
+  _submitOnEnter(['signup-email','signup-password','signup-password2'], handleSignUp);
+  _submitOnEnter(['login-email','login-password'], handleLogIn);
+  _submitOnEnter(['reset-password-new','reset-password-new2'], handleUpdatePassword);
 });
 
 function fixViewportHeight(){
@@ -4103,7 +5408,7 @@ var SYSTEM_1_CLIENT='You are an expert Vedic Jyotish practitioner. The chart dat
 
 var SYSTEM_2_CLIENT='You are an expert Vedic Jyotish practitioner. Use PRE-COMPUTED values from chart data directly — do not recalculate Sutra 1, Sutra 3, Indu Lagna, Amatyakaraka or Dasha. Provide detailed analysis. FORMAT:\n\n| Principle | What Your Chart Shows | Indicates |\n|-----------|----------------------|-----------|\n[7 sutras]\n\n| Planet | D9 Sign | Key Insight |\n|--------|---------|-------------|\n[Saturn Jupiter Mercury Mars Lagna only]\n\n| Planet | D10 House | Career Significance |\n|--------|-----------|-------------------|\n[Sun Saturn D10 Lagna only]\n\n| Period | Planet | From | To | Significance |\n|--------|--------|------|----|--------------|\n[use ONLY provided dasha data]\n\n| Transit | Position | Effect |\n|---------|----------|--------|\n[Jupiter and Saturn only]\n\nCareer Obstacles: [1-2 lines]\n\nFinal Verdict: [3-4 complete sentences. NEVER end mid-sentence.]\n\nRules: never mention book or author. Always complete Final Verdict.';
 
-var _lang="hi";
+var _lang="en";
 var _strings={
   en:{
     appTitle:"Career Destiny",
@@ -4114,6 +5419,7 @@ var _strings={
     namePlaceholder:"e.g. Rahul Sharma",
     dobLabel:"Date of Birth",
     timeLabel:"Time of Birth",
+    timeHint:"🕐 Tap to set hour, minute & AM/PM — no seconds needed",
     placeLabel:"Place of Birth",
     placePlaceholder:"e.g. Ghaziabad, Uttar Pradesh",
     genderLabel:"Gender",
@@ -4146,6 +5452,7 @@ var _strings={
     namePlaceholder:"जैसे राहुल शर्मा",
     dobLabel:"जन्म तिथि",
     timeLabel:"जन्म समय",
+    timeHint:"🕐 घंटा, मिनट और AM/PM चुनने के लिए टैप करें — सेकंड की आवश्यकता नहीं",
     placeLabel:"जन्म स्थान",
     placePlaceholder:"जैसे गाजियाबाद, उत्तर प्रदेश",
     genderLabel:"लिंग",
@@ -4179,7 +5486,10 @@ function applyLang(){
   var s=_strings[_lang];
   var appTitle=document.getElementById("app-title"); if(appTitle) appTitle.textContent=s.appTitle;
   var hsubEl=document.getElementById("hsub"); if(hsubEl) hsubEl.textContent=s.appSub;
-  var langBtn=document.getElementById("lang-btn"); if(langBtn) langBtn.textContent=s.langBtn;
+  document.querySelectorAll('.lang-switch').forEach(function(sw){
+    sw.setAttribute('data-lang', _lang);
+    sw.setAttribute('aria-checked', _lang==='hi' ? 'true' : 'false');
+  });
   var ft=document.querySelector(".form-title");
   var fs2=document.querySelector(".form-sub");
   if(ft)ft.textContent=s.formTitle;
@@ -4198,6 +5508,7 @@ function applyLang(){
   if(np)np.placeholder=s.namePlaceholder;
   if(dl)dl.textContent=s.dobLabel;
   if(tl)tl.textContent=s.timeLabel;
+  var thEl=document.getElementById('f-time-hint'); if(thEl&&s.timeHint) thEl.textContent=s.timeHint;
   if(pl)pl.textContent=s.placeLabel;
   if(pp)pp.placeholder=s.placePlaceholder;
   if(gl)gl.textContent=s.genderLabel;
@@ -4241,14 +5552,39 @@ function applyLang(){
   if(pr) pr.textContent=(_lang==='hi'?'📄 रिपोर्ट':'📄 Report');
 
   window._lang=_lang;
+
+  // ── Refresh dynamic/AI screens so the whole app switches live ──────
+  if(window._resultsCache){
+    var rc=window._resultsCache;
+    populateResultsScreen(rc.pre, rc.name, rc.jsVerdict, rc.bizScore, rc.jobScore);
+  }
+  refreshSituationChips();
+  refreshSituationLabels();
+  refreshActionLabels();
+  refreshReportLabels();
+  var reportScreenEl=document.getElementById('screen-report');
+  if(reportScreenEl && reportScreenEl.style.display!=='none') updateReportPreview();
+  if(window._chatChipsMode==='situation' && window._meta && window._meta.situation){
+    swapChatChips(window._meta.situation);
+  } else {
+    renderDefaultChatChips();
+  }
+  syncAllTranslatables();
+  refreshAuthUI();
+  applyAccountLang();
 }
+document.addEventListener('DOMContentLoaded', applyLang);
 </script>
 <div class="app">
   <div class="hdr" id="main-hdr">
     <div class="dot" id="dot"></div>
     <span class="htitle" id="app-title">Career Destiny</span>
-    <span class="hsub" id="hsub"></span>
-    
+    <button class="lang-switch" data-lang="en" onclick="toggleLang()" role="switch" aria-checked="false" aria-label="Switch language" style="margin-left:auto;margin-right:0;">
+      <span class="lang-switch-thumb"></span>
+      <span class="lang-switch-label en">EN</span>
+      <span class="lang-switch-label hi">HI</span>
+    </button>
+    <div id="auth-area-main"></div>
   </div>
 
   <!-- Birth Details Form -->
@@ -4277,11 +5613,13 @@ function applyLang(){
       </div>
       <div class="form-group">
         <label for="f-time">Time of Birth</label>
-        <input type="time" id="f-time" required onfocus="cdTrack('field_focus',{field:'time'})"/>
+        <input type="time" id="f-time" step="60" required onfocus="cdTrack('field_focus',{field:'time'})"/>
+        <div style="font-size:11px;color:#aaa;margin-top:4px;" id="f-time-hint">🕐 Tap to set hour, minute &amp; AM/PM — no seconds needed</div>
       </div>
-      <div class="form-group">
+      <div class="form-group place-field">
         <label for="f-place">Place of Birth</label>
-        <input type="text" id="f-place" onfocus="cdTrack('field_focus',{field:'place'})" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+        <input type="text" id="f-place" autocomplete="off" onfocus="cdTrack('field_focus',{field:'place'})" oninput="searchPlace(this)" onblur="hidePlaceDropdown(this)" placeholder="e.g. Ghaziabad, Uttar Pradesh" required/>
+        <div class="place-dropdown-el"></div>
       </div>
       <div class="form-group full">
         <label for="f-email">Email Address <span style="font-size:11px;color:#888;font-weight:400;">(optional)</span></label>
@@ -4300,8 +5638,12 @@ function applyLang(){
     <!-- Shared header -->
     <div class="rs-header">
       <button class="rs-back-btn" id="rs-back-btn" onclick="rsBack()">← Back</button>
-      
-      
+      <button class="lang-switch" data-lang="en" onclick="toggleLang()" role="switch" aria-checked="false" aria-label="Switch language" style="margin-left:auto;margin-right:0;">
+        <span class="lang-switch-thumb"></span>
+        <span class="lang-switch-label en">EN</span>
+        <span class="lang-switch-label hi">HI</span>
+      </button>
+      <div id="auth-area-rs"></div>
     </div>
 
     <!-- Scrollable body -->
@@ -4318,7 +5660,7 @@ function applyLang(){
 
         <!-- Moon trait box -->
         <div class="rs-moon-trait" id="rs-moon-trait" style="display:none">
-          <div class="rs-moon-label">Your chart says</div>
+          <div class="rs-moon-label" id="rs-moon-label">Your chart says</div>
           <div class="rs-moon-icon" id="rs-moon-icon" style="display:none"></div>
           <div class="rs-moon-headline" id="rs-moon-headline"></div>
           <div class="rs-moon-detail" id="rs-moon-detail"></div>
@@ -4341,16 +5683,16 @@ function applyLang(){
           <button class="rs-action-btn" onclick="goToChat()">
             <span class="rs-action-icon">💬</span>
             <div class="rs-action-body">
-              <div class="rs-action-title">Chat with your chart</div>
-              <div class="rs-action-sub">Ask questions about your career, timing, and destiny</div>
+              <div class="rs-action-title" id="rs-action1-title">Chat with your chart</div>
+              <div class="rs-action-sub" id="rs-action1-sub">Ask questions about your career, timing, and destiny</div>
             </div>
             <span class="rs-action-arrow">›</span>
           </button>
           <button class="rs-action-btn" onclick="goToReport()">
             <span class="rs-action-icon">📄</span>
             <div class="rs-action-body">
-              <div class="rs-action-title">Get your full report</div>
-              <div class="rs-action-sub">Complete 11-section analysis delivered to your email</div>
+              <div class="rs-action-title" id="rs-action2-title">Get your full report</div>
+              <div class="rs-action-sub" id="rs-action2-sub">Complete 11-section analysis delivered to your email</div>
             </div>
             <span class="rs-action-arrow">›</span>
           </button>
@@ -4373,18 +5715,18 @@ function applyLang(){
       <!-- SCREEN C: Report -->
       <div id="screen-report" style="display:none;padding:20px 20px 40px;">
         <div class="rpt-email-card">
-          <div class="rpt-email-title">📧 Get your full report</div>
-          <div class="rpt-email-sub">Your report will be emailed within 1 minute.</div>
+          <div class="rpt-email-title" id="rpt-email-title">📧 Get your full report</div>
+          <div class="rpt-email-sub" id="rpt-email-sub">Your report will be emailed within 1 minute.</div>
           <div class="rpt-email-row">
             <input type="email" class="rpt-email-inp" id="report-email-inp" placeholder="your@email.com"/>
             <button class="rpt-send-btn" id="report-send-btn" onclick="sendReportFromPath()">Send</button>
           </div>
         </div>
-        <div class="rpt-sections-label">Sample preview of report sections</div>
-        <div class="rpt-section-row"><span class="rpt-section-num">01</span><div><div class="rpt-section-title">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">03</span><div><div class="rpt-section-title">Job or Business? (7-factor table)</div><div class="rpt-section-sub">Every sutra scored and explained</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">06</span><div><div class="rpt-section-title">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
-        <div class="rpt-section-row"><span class="rpt-section-num">09</span><div><div class="rpt-section-title">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
+        <div class="rpt-sections-label" id="rpt-sections-label">Sample preview of report sections</div>
+        <div class="rpt-section-row"><span class="rpt-section-num">01</span><div><div class="rpt-section-title" id="rpt-sec-title-1">Career Destiny Verdict</div><div class="rpt-section-sub" id="rpt-c1">Job vs Business — 7-factor Sapta Sutri analysis</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">03</span><div><div class="rpt-section-title" id="rpt-sec-title-2">Job or Business? (7-factor table)</div><div class="rpt-section-sub" id="rpt-sec-sub-2">Every sutra scored and explained</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">06</span><div><div class="rpt-section-title" id="rpt-sec-title-3">Career Suggestions</div><div class="rpt-section-sub" id="rpt-c2">Specific roles and business types for your chart</div></div></div>
+        <div class="rpt-section-row"><span class="rpt-section-num">09</span><div><div class="rpt-section-title" id="rpt-sec-title-4">Timing Windows</div><div class="rpt-section-sub" id="rpt-c3">When your best career window opens</div></div></div>
       </div><!-- end screen-report -->
 
     </div><!-- end rs-body -->
@@ -4416,6 +5758,182 @@ function applyLang(){
     <div id="report-screen" style="display:none"></div>
 
   </div>
+
+  <!-- ── Auth: Sign up / Log in ─────────────────────────────────────── -->
+  <div id="auth-section">
+    <div class="rs-header">
+      <button class="rs-back-btn" onclick="closeAuth()">← Back</button>
+      <span class="htitle" style="margin-left:8px;">Career Destiny</span>
+    </div>
+    <div class="auth-body">
+      <div class="auth-card">
+
+        <div class="auth-toggle" id="auth-toggle" data-active="signup">
+          <div class="auth-toggle-thumb"></div>
+          <button class="auth-toggle-seg login" id="auth-toggle-login" onclick="showAuthScreen('login')">Log in</button>
+          <button class="auth-toggle-seg signup" id="auth-toggle-signup" onclick="showAuthScreen('signup')">Sign up</button>
+        </div>
+
+        <div id="screen-signup">
+          <div class="auth-title" id="signup-title">Create your account</div>
+          <div class="auth-sub" id="signup-sub">Start for free. No credit card needed.</div>
+          <div class="auth-error" id="signup-error"></div>
+
+          <div class="auth-field">
+            <label id="signup-email-label">Email address</label>
+            <input type="email" id="signup-email" placeholder="your@email.com" onblur="checkEmailDomainTypo('signup-email','signup-email-hint')"/>
+            <div class="auth-field-hint" id="signup-email-hint"></div>
+          </div>
+          <div class="auth-field">
+            <label id="signup-pw-label">Password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="signup-password" placeholder="Min. 8 characters" oninput="updatePwStrength();checkPwMatch('signup-password','signup-password2','signup-pw2-hint')"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password',this)">👁</button>
+            </div>
+            <div class="auth-pw-strength" id="signup-pw-strength">
+              <div class="auth-pw-strength-seg"></div><div class="auth-pw-strength-seg"></div>
+              <div class="auth-pw-strength-seg"></div><div class="auth-pw-strength-seg"></div>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label id="signup-pw2-label">Retype password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="signup-password2" placeholder="Repeat your password" oninput="checkPwMatch('signup-password','signup-password2','signup-pw2-hint')"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('signup-password2',this)">👁</button>
+            </div>
+            <div class="auth-field-hint" id="signup-pw2-hint"></div>
+          </div>
+
+          <label class="auth-agree">
+            <input type="checkbox" id="signup-agree"/>
+            <span id="signup-agree-text">I agree to the <span class="auth-link">Privacy Policy</span> and <span class="auth-link">Terms of Service</span>. My birth data will be used only for Vedic analysis.</span>
+          </label>
+
+          <button class="auth-submit-btn" id="signup-submit-btn" onclick="handleSignUp()">Create account</button>
+          <div class="auth-switch" id="signup-switch">Already have an account? <a onclick="showAuthScreen('login')">Sign in</a></div>
+        </div>
+
+        <div id="screen-login" style="display:none">
+          <div class="auth-title" id="login-title">Welcome back</div>
+          <div class="auth-sub" id="login-sub">Sign in to see your saved readings.</div>
+          <div class="auth-error" id="login-error"></div>
+
+          <div class="auth-info" id="login-info"></div>
+
+          <div class="auth-field">
+            <label id="login-email-label">Email address</label>
+            <input type="email" id="login-email" placeholder="your@email.com"/>
+          </div>
+          <div class="auth-field">
+            <label id="login-pw-label">Password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="login-password" placeholder="Your password"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('login-password',this)">👁</button>
+            </div>
+            <div class="auth-forgot" id="login-forgot"><a onclick="handleForgotPassword()">Forgot password?</a></div>
+          </div>
+
+          <button class="auth-submit-btn" id="login-submit-btn" onclick="handleLogIn()">Sign in</button>
+          <div class="auth-switch" id="login-switch">Don't have an account? <a onclick="showAuthScreen('signup')">Sign up</a></div>
+        </div>
+
+        <div id="screen-reset-password" style="display:none">
+          <div class="auth-title" id="reset-password-title">Set a new password</div>
+          <div class="auth-sub" id="reset-password-sub">Choose a new password for your account.</div>
+          <div class="auth-error" id="reset-password-error"></div>
+
+          <div class="auth-field">
+            <label id="reset-password-new-label">New password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="reset-password-new" placeholder="Min. 8 characters" oninput="checkPwMatch('reset-password-new','reset-password-new2','reset-password-pw2-hint')"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('reset-password-new',this)">👁</button>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label id="reset-password-new2-label">Retype new password</label>
+            <div class="auth-pw-row">
+              <input type="password" id="reset-password-new2" placeholder="Repeat your new password" oninput="checkPwMatch('reset-password-new','reset-password-new2','reset-password-pw2-hint')"/>
+              <button type="button" class="auth-pw-toggle" onclick="togglePwVisibility('reset-password-new2',this)">👁</button>
+            </div>
+            <div class="auth-field-hint" id="reset-password-pw2-hint"></div>
+          </div>
+
+          <button class="auth-submit-btn" id="reset-password-submit-btn" onclick="handleUpdatePassword()">Update password</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Save-your-reading nudge modal ──────────────────────────────── -->
+  <div id="save-nudge-overlay">
+    <div class="nudge-card">
+      <div class="nudge-header">
+        <button class="nudge-close" onclick="dismissNudge()">✕</button>
+        <div class="nudge-icon">🔮</div>
+        <div class="nudge-title" id="nudge-title">Save your career reading</div>
+        <div class="nudge-sub" id="nudge-sub">Your chart insights will be lost when you close this tab. Sign up free to keep them.</div>
+      </div>
+      <div class="nudge-body">
+        <div class="nudge-bullet"><span class="nudge-dot"></span><span id="nudge-b1">Save and revisit all your chart readings</span></div>
+        <div class="nudge-bullet"><span class="nudge-dot"></span><span id="nudge-b2">Continue conversations anytime</span></div>
+        <div class="nudge-bullet"><span class="nudge-dot"></span><span id="nudge-b3">Analyze charts for family and friends</span></div>
+        <button class="nudge-cta" id="nudge-cta" onclick="openAuth('signup')">Create a free account</button>
+        <button class="nudge-later" id="nudge-later" onclick="dismissNudge()">Maybe later</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Account: Profile / Saved Chats / My Birth Chart ────────────── -->
+  <div class="acct-section" id="account-section">
+    <div class="rs-header">
+      <button class="rs-back-btn" onclick="closeAccountSection()">← Back</button>
+      <span class="htitle" id="account-section-title" style="margin-left:8px;">Profile</span>
+    </div>
+    <div class="acct-body">
+
+      <div id="screen-profile">
+        <div class="profile-card">
+          <div class="profile-avatar" id="profile-avatar">U</div>
+          <div class="profile-body">
+            <div class="profile-name" id="profile-name-display">—</div>
+            <div class="profile-sub" id="profile-email-display">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="screen-saved-chats" style="display:none">
+        <div id="saved-chats-list"></div>
+      </div>
+
+      <div id="screen-birth-chart" style="display:none">
+        <div id="birth-profiles-list"></div>
+        <button class="acct-add-btn" id="add-profile-btn" onclick="showAddProfileForm()">+ Add a birth profile</button>
+        <div id="add-profile-form" style="display:none;margin-top:14px;">
+          <div class="auth-field">
+            <label id="ap-name-label">Name</label>
+            <input type="text" id="ap-name" placeholder="e.g. Mom"/>
+          </div>
+          <div class="auth-field">
+            <label id="ap-dob-label">Date of Birth</label>
+            <input type="text" id="ap-dob" placeholder="DD/MM/YYYY" maxlength="10" oninput="formatDOB(this)" onkeydown="handleDOBKey(event,this)"/>
+          </div>
+          <div class="auth-field">
+            <label id="ap-time-label">Time of Birth</label>
+            <input type="time" id="ap-time" step="60"/>
+          </div>
+          <div class="auth-field place-field">
+            <label id="ap-place-label">Place of Birth</label>
+            <input type="text" id="ap-place" autocomplete="off" oninput="searchPlace(this)" onblur="hidePlaceDropdown(this)" placeholder="e.g. Ghaziabad, Uttar Pradesh"/>
+            <div class="place-dropdown-el"></div>
+          </div>
+          <button class="auth-submit-btn" id="ap-save-btn" onclick="handleSaveProfile()">Save profile</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 </body>
