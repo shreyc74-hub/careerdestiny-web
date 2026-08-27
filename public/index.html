@@ -3586,9 +3586,9 @@ async function deleteChatById(id){ await _sbRest('DELETE', '/chat_sessions?id=eq
 async function saveLead(details){
   try{
     var token = await ensureValidAccessToken();
-    var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'};
+    var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json', 'Prefer':'return=representation'};
     if(token) headers['Authorization'] = 'Bearer '+token;
-    await fetch(SB_REST+'/leads', {
+    var res = await fetch(SB_REST+'/leads', {
       method:'POST',
       headers:headers,
       body: JSON.stringify({
@@ -3598,7 +3598,28 @@ async function saveLead(details){
         verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
       })
     });
+    var rows = await res.json();
+    // Stashed so an anonymous chat (which has no chat_sessions row to write
+    // to — that table requires a real logged-in owner) can still be logged
+    // against this lead via saveLeadMessage() below.
+    window._leadId = rows && rows[0] && rows[0].id;
   }catch(e){ console.error('saveLead failed:', e.message); }
+}
+// Logs one message of an anonymous visitor's chat against their lead row,
+// so a conversation that never turns into a signed-up account isn't lost
+// entirely — chat_sessions can't hold it (RLS ties every row to a real
+// auth.uid()), but the lead it came from can still show what was asked.
+// No-ops for logged-in users, who already get the full experience via
+// autoSaveChatIfLoggedIn()/chat_sessions.
+async function saveLeadMessage(role, text){
+  if(getCurrentUser() || !window._leadId) return;
+  try{
+    await fetch(SB_REST+'/lead_messages', {
+      method:'POST',
+      headers:{'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ lead_id: window._leadId, role: role, text: text })
+    });
+  }catch(e){ console.error('saveLeadMessage failed:', e.message); }
 }
 
 // ── Chart analysis cache: skip Prokerala + all 3 Claude calls on repeat
@@ -4496,6 +4517,7 @@ async function analyze(){
   // instantly. Any other combination (never searched, or a different
   // detail) falls straight through to the normal flow below.
   window._activeProfileId = null;
+  window._leadId = null; // a new analysis means a new lead, if one gets created below
   if(getCurrentUser()){
     var matchedProfile = await findMatchingProfile({dob:dob, time:time, place:place});
     if(matchedProfile){
@@ -4936,7 +4958,7 @@ async function sendChat(){
     removeLoader();
     addRow('agent',renderChatReply(reply),null,reply);
     setStat('ok','Ready');
-    if(window._currentUser){ autoSaveChatIfLoggedIn(); } else { maybeShowSaveNudge(); }
+    if(window._currentUser){ autoSaveChatIfLoggedIn(); } else { saveLeadMessage('user', txt); saveLeadMessage('agent', reply); maybeShowSaveNudge(); }
   }catch(e){
     removeLoader();
     addRow('agent','Error: '+e.message,'er');
