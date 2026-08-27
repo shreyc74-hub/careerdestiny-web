@@ -5070,14 +5070,18 @@ function populateResultsScreen(pre, name, jsVerdict, bizScore, jobScore){
   }
 
   // Summary — 2 sentences from preCompute
+  // Sutra 7 (Indu Lagna) is the one factor that can abstain ("Neutral") rather
+  // than voting Business or Job, so bizScore+jobScore is sometimes 6, not 7 —
+  // call that out explicitly instead of silently showing a total that looks short.
+  var neutralCount = 7 - bizScore - jobScore;
   var summaryEl = document.getElementById('rs-summary');
   if(summaryEl){
     if(lang==='hi'){
       var verdictWordHi = jsVerdict.includes('BUSINESS') ? 'व्यवसाय के लिए अधिक उपयुक्त' : jsVerdict.includes('JOB') ? 'नौकरी के लिए अधिक उपयुक्त' : 'समय के आधार पर दोनों राहों के लिए उपयुक्त';
-      summaryEl.textContent = 'आपकी कुंडली '+verdictWordHi+' है। '+bizScore+' में से 7 कारक व्यवसाय की ओर इशारा करते हैं, '+jobScore+' नौकरी की ओर।';
+      summaryEl.textContent = 'आपकी कुंडली '+verdictWordHi+' है। '+bizScore+' में से 7 कारक व्यवसाय की ओर इशारा करते हैं, '+jobScore+' नौकरी की ओर'+(neutralCount>0?', और '+neutralCount+' तटस्थ रहे।':'।');
     } else {
       var verdictWord = jsVerdict.includes('BUSINESS') ? 'more suited to business' : jsVerdict.includes('JOB') ? 'more suited to employment' : 'suited to both paths depending on timing';
-      summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job.';
+      summaryEl.textContent = 'Your chart is '+verdictWord+'. '+bizScore+' of 7 factors point toward Business, '+jobScore+' toward Job'+(neutralCount>0?', and '+neutralCount+' stayed neutral.':'.');
     }
   }
 
