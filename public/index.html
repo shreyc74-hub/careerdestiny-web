@@ -3729,7 +3729,7 @@ function toggleUserDropdown(btn){
   var wasOpen = dd.classList.contains('open');
   document.querySelectorAll('.user-dropdown.open').forEach(function(d){d.classList.remove('open');});
   document.querySelectorAll('.user-menu-trigger.open').forEach(function(b){b.classList.remove('open');});
-  if(!wasOpen){ dd.classList.add('open'); btn.classList.add('open'); }
+  if(!wasOpen){ dd.classList.add('open'); btn.classList.add('open'); cdTrack('user_menu_open'); }
 }
 document.addEventListener('click', function(e){
   if(!e.target.closest('.user-menu')){
@@ -3746,7 +3746,12 @@ function openAuth(screen){
   document.getElementById('auth-section').style.display='flex';
   showAuthScreen(screen||'signup');
 }
-function closeAuth(){ document.getElementById('auth-section').style.display='none'; }
+function closeAuth(){ cdTrack('auth_close'); document.getElementById('auth-section').style.display='none'; }
+// Thin wrapper so the toggle segments / "Sign in"·"Sign up" switch links get
+// their own event, distinct from openAuth()'s auth_open (which also calls
+// showAuthScreen internally — tracking inside showAuthScreen itself would
+// double-count every openAuth() call).
+function switchAuthScreen(screen){ cdTrack('auth_screen_switch', {screen:screen}); showAuthScreen(screen); }
 function showAuthScreen(screen){
   document.getElementById('screen-signup').style.display = screen==='signup' ? 'block' : 'none';
   document.getElementById('screen-login').style.display = screen==='login' ? 'block' : 'none';
@@ -4049,8 +4054,9 @@ function openAccountSection(screen, title){
     document.getElementById(id).style.display = id===screen ? 'block' : 'none';
   });
 }
-function closeAccountSection(){ document.getElementById('account-section').style.display='none'; }
+function closeAccountSection(){ cdTrack('account_section_close'); document.getElementById('account-section').style.display='none'; }
 function openProfile(){
+  cdTrack('profile_open');
   var lang = window._lang||'en';
   var user = window._currentUser||{};
   document.getElementById('profile-name-display').textContent = user.name || (lang==='hi'?'(कोई नाम नहीं)':'(no name set)');
@@ -4059,10 +4065,12 @@ function openProfile(){
   openAccountSection('screen-profile', lang==='hi'?'प्रोफ़ाइल':'Profile');
 }
 function openSavedChats(){
+  cdTrack('saved_chats_open');
   renderSavedChatsList();
   openAccountSection('screen-saved-chats', window._lang==='hi'?'सहेजी गई चैट':'Saved Chats');
 }
 function openMyBirthChart(){
+  cdTrack('birth_chart_open');
   renderBirthProfilesList();
   document.getElementById('add-profile-form').style.display='none';
   openAccountSection('screen-birth-chart', window._lang==='hi'?'मेरी कुंडली':'My Birth Chart');
@@ -4143,7 +4151,7 @@ async function resumeChat(id){
   syncAllTranslatables();
   var chips=document.getElementById('chat-chips-wrap'); if(chips) chips.style.display='none';
 }
-async function removeChatEntry(id){ await deleteChatById(id); renderSavedChatsList(); }
+async function removeChatEntry(id){ cdTrack('chat_delete'); await deleteChatById(id); renderSavedChatsList(); }
 async function renderBirthProfilesList(){
   var lang = window._lang||'en';
   var el = document.getElementById('birth-profiles-list');
@@ -4164,8 +4172,9 @@ async function renderBirthProfilesList(){
       + '</div></div>';
   }).join('');
 }
-function showAddProfileForm(){ document.getElementById('add-profile-form').style.display='block'; }
+function showAddProfileForm(){ cdTrack('add_profile_form_open'); document.getElementById('add-profile-form').style.display='block'; }
 async function handleSaveProfile(){
+  cdTrack('profile_save_click');
   var lang = window._lang||'en';
   var name = document.getElementById('ap-name').value.trim();
   var dob = document.getElementById('ap-dob').value.trim();
@@ -4188,7 +4197,7 @@ async function handleSaveProfile(){
     btn.disabled = false;
   }
 }
-async function removeProfileEntry(id){ await deleteProfileById(id); renderBirthProfilesList(); }
+async function removeProfileEntry(id){ cdTrack('profile_delete'); await deleteProfileById(id); renderBirthProfilesList(); }
 async function useProfile(id){
   var list = await listProfiles();
   var p = list.find(function(x){return x.id===id;});
@@ -4244,14 +4253,14 @@ function applyAccountLang(){
   var agreeEl=document.getElementById('signup-agree-text');
   if(agreeEl) agreeEl.innerHTML = t.agree+'<span class="auth-link">'+t.agreeLink1+'</span>'+t.agreeMid+'<span class="auth-link">'+t.agreeLink2+'</span>'+t.agreeEnd;
   var signupSwitch=document.getElementById('signup-switch');
-  if(signupSwitch) signupSwitch.innerHTML = t.haveAccount+'<a onclick="showAuthScreen(\'login\')">'+t.signIn+'</a>';
+  if(signupSwitch) signupSwitch.innerHTML = t.haveAccount+'<a onclick="switchAuthScreen(\'login\')">'+t.signIn+'</a>';
 
   set('login-title',t.loginTitle); set('login-sub',t.loginSub);
   set('login-email-label',t.email); set('login-pw-label',t.password);
   var lpw=document.getElementById('login-password'); if(lpw) lpw.placeholder=t.yourPassword;
   set('login-submit-btn',t.signIn);
   var loginSwitch=document.getElementById('login-switch');
-  if(loginSwitch) loginSwitch.innerHTML = t.noAccount+'<a onclick="showAuthScreen(\'signup\')">'+t.signUp2+'</a>';
+  if(loginSwitch) loginSwitch.innerHTML = t.noAccount+'<a onclick="switchAuthScreen(\'signup\')">'+t.signUp2+'</a>';
   var forgotEl=document.getElementById('login-forgot');
   if(forgotEl) forgotEl.innerHTML = '<a onclick="handleForgotPassword()">'+t.forgotPw+'</a>';
 
@@ -4813,6 +4822,7 @@ function showRegenButton(reply1, partialReply2){
   btn.style.cssText='padding:9px 18px;background:#534AB7;color:white;border:none;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;width:100%;';
   btn.textContent='Regenerate Detailed Analysis';
   btn.onclick=async function(){
+    cdTrack('regenerate_analysis_click');
     btn.disabled=true;btn.textContent='Generating...';
     try{
       var r2=await callClaude('Now provide the complete Sapta Sutri analysis, dasha timeline, transits and final verdict for this chart.',null,null,2);
@@ -4848,6 +4858,7 @@ function showDownloadButton(){
     dlBtn.style.cssText='padding:11px 20px;background:#534AB7;color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:4px;';
     dlBtn.textContent='📧 Email My Report';
     dlBtn.onclick=function(){
+      cdTrack('legacy_download_report_click');
       downloadReport(window._meta,window._analysis,window._svgs);
       dlBtn.textContent='Downloaded! Click to download again';
       dlBtn.style.background='#1D9E75';
@@ -4864,8 +4875,8 @@ function showDownloadButton(){
         var nBtn=document.createElement('button');
         nBtn.textContent='No, thank you';
         nBtn.style.cssText='flex:1;padding:10px;background:#f5f5f0;color:#555;border:1px solid #ddd;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;';
-        yBtn.onclick=function(){ yn.remove();  addRow('agent','Great! Ask me anything about your chart.'); addQuick(['Explain Sutra 3 (Saturn)','What does my Dasha indicate?','What profession suits me?','What do Gochar transits say?']); };
-        nBtn.onclick=function(){ yn.remove(); addRow('agent','Thank you! Wishing you clarity and success. Namaste \uD83D\uDE4F'); };
+        yBtn.onclick=function(){ cdTrack('post_report_discuss_click',{answer:'yes'}); yn.remove();  addRow('agent','Great! Ask me anything about your chart.'); addQuick(['Explain Sutra 3 (Saturn)','What does my Dasha indicate?','What profession suits me?','What do Gochar transits say?']); };
+        nBtn.onclick=function(){ cdTrack('post_report_discuss_click',{answer:'no'}); yn.remove(); addRow('agent','Thank you! Wishing you clarity and success. Namaste \uD83D\uDE4F'); };
         yn.appendChild(yBtn); yn.appendChild(nBtn);
         askBub.appendChild(yn);
         askRow.appendChild(askAv); askRow.appendChild(askBub);
@@ -5063,6 +5074,7 @@ var LAGNA_TRAITS_HI = {
 var _rsCurrentScreen = 'results';
 
 function rsBack(){
+  cdTrack('results_back_click', {from: _rsCurrentScreen});
   if(_rsCurrentScreen === 'results'){
     reset();
   } else {
@@ -5379,6 +5391,7 @@ function updateReportPreview(){
 }
 
 async function sendReportFromPath(){
+  cdTrack('report_send_click');
   var inp=document.getElementById('report-email-inp');
   var email=inp?inp.value.trim():'';
   var btn=document.getElementById('report-send-btn');
@@ -5570,6 +5583,7 @@ var _strings={
 };
 function toggleLang(){
   _lang=_lang==="en"?"hi":"en";
+  cdTrack('language_toggle', {to: _lang});
   applyLang();
 }
 function applyLang(){
@@ -5863,8 +5877,8 @@ document.addEventListener('DOMContentLoaded', applyLang);
 
         <div class="auth-toggle" id="auth-toggle" data-active="signup">
           <div class="auth-toggle-thumb"></div>
-          <button class="auth-toggle-seg login" id="auth-toggle-login" onclick="showAuthScreen('login')">Log in</button>
-          <button class="auth-toggle-seg signup" id="auth-toggle-signup" onclick="showAuthScreen('signup')">Sign up</button>
+          <button class="auth-toggle-seg login" id="auth-toggle-login" onclick="switchAuthScreen('login')">Log in</button>
+          <button class="auth-toggle-seg signup" id="auth-toggle-signup" onclick="switchAuthScreen('signup')">Sign up</button>
         </div>
 
         <div id="screen-signup">
@@ -5903,7 +5917,7 @@ document.addEventListener('DOMContentLoaded', applyLang);
           </label>
 
           <button class="auth-submit-btn" id="signup-submit-btn" onclick="handleSignUp()">Create account</button>
-          <div class="auth-switch" id="signup-switch">Already have an account? <a onclick="showAuthScreen('login')">Sign in</a></div>
+          <div class="auth-switch" id="signup-switch">Already have an account? <a onclick="switchAuthScreen('login')">Sign in</a></div>
         </div>
 
         <div id="screen-login" style="display:none">
@@ -5927,7 +5941,7 @@ document.addEventListener('DOMContentLoaded', applyLang);
           </div>
 
           <button class="auth-submit-btn" id="login-submit-btn" onclick="handleLogIn()">Sign in</button>
-          <div class="auth-switch" id="login-switch">Don't have an account? <a onclick="showAuthScreen('signup')">Sign up</a></div>
+          <div class="auth-switch" id="login-switch">Don't have an account? <a onclick="switchAuthScreen('signup')">Sign up</a></div>
         </div>
 
         <div id="screen-reset-password" style="display:none">
