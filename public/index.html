@@ -4789,6 +4789,14 @@ function loadFromCachedAnalysis(cached, name, email, dob, time, place){
   updateReportPreview();
   document.getElementById('analyze-btn').disabled=false;
 
+  // Log this as a lead touchpoint too, even though nothing was recomputed —
+  // a cache hit means they came back and looked at this chart again, which
+  // is exactly the "revisit" signal the lead_revisits DB trigger tracks.
+  // Without this, only fresh (non-cached) analyses would ever count as a
+  // revisit, so a logged-in user re-checking their own saved profile would
+  // silently not be counted.
+  saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
+
   // SVGs for the emailed PDF aren't cached — re-geocode and fetch them in
   // the background so "Get my full report" still has real chart images.
   (getSelectedPlaceCoords(document.getElementById('f-place')) ? Promise.resolve(getSelectedPlaceCoords(document.getElementById('f-place'))) : geocode(place))
