@@ -1430,14 +1430,12 @@ function downloadReport(meta, analysis, svgs){
 
 
 
-  // If building for email, capture html and return without opening window
-
-
-  // If building for email, capture html and return without opening window
-
-
-  // If building for email, capture html and return without opening window
-
+  // If building for email, capture html and return without opening a tab —
+  // buildReportHtml() reads this back via window._reportHtmlResult.
+  if(window._buildingForEmail){
+    window._reportHtmlResult = html;
+    return;
+  }
 
   var w = window.open('','_blank');
   if(!w){ alert('Please allow popups for this site.'); return; }
