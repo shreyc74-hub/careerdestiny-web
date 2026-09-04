@@ -1430,14 +1430,12 @@ function downloadReport(meta, analysis, svgs){
 
 
 
-  // If building for email, capture html and return without opening window
-
-
-  // If building for email, capture html and return without opening window
-
-
-  // If building for email, capture html and return without opening window
-
+  // If building for email, capture html and return without opening a tab —
+  // buildReportHtml() reads this back via window._reportHtmlResult.
+  if(window._buildingForEmail){
+    window._reportHtmlResult = html;
+    return;
+  }
 
   var w = window.open('','_blank');
   if(!w){ alert('Please allow popups for this site.'); return; }
@@ -3600,6 +3598,11 @@ async function saveLead(details){
         verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
       })
     });
+    if(!res.ok){
+      var errBody = await res.text();
+      console.error('saveLead rejected by server:', res.status, errBody);
+      return;
+    }
     var rows = await res.json();
     // Stashed so an anonymous chat (which has no chat_sessions row to write
     // to — that table requires a real logged-in owner) can still be logged
