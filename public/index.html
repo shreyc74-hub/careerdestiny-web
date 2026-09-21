@@ -3484,6 +3484,13 @@ async function _sbAuthFetch(path, body){
 function _storeAuthResponse(data){
   setStoredSession({ access_token:data.access_token, refresh_token:data.refresh_token, expires_at:data.expires_at, user:data.user });
   window._currentUser = getCurrentUser();
+  // Keeps the header in sync even when this runs from a silent background
+  // token refresh (ensureValidAccessToken(), triggered by things like
+  // saveLead() on every analyze()) rather than an explicit login/signup —
+  // without this, window._currentUser flips to logged-in while the header
+  // still shows "Login / Sign up" until some unrelated screen switch
+  // happens to re-render it.
+  if(typeof refreshAuthUI === 'function') refreshAuthUI();
 }
 async function ensureValidAccessToken(){
   var s = getStoredSession();
