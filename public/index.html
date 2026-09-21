@@ -3602,15 +3602,25 @@ async function deleteChatById(id){ await _sbRest('DELETE', '/chat_sessions?id=eq
 // would let anyone submit a lead with an arbitrary, spoofed user_id, since
 // this table's RLS policy has to allow anonymous inserts and so can't rely
 // on `auth.uid() = user_id` alone to reject a client-supplied value.
+// The id is generated client-side and sent explicitly, and the response
+// is never read back (no Prefer: return=representation) — since this
+// table intentionally has no SELECT policy for any role (so a random
+// visitor can't read other people's leads), asking Postgres to hand the
+// inserted row back after the insert has nothing to succeed against, and
+// gets rejected with the same RLS error as an invalid insert, even
+// though the insert itself is perfectly valid. Knowing the id up front
+// sidesteps that entirely.
 async function saveLead(details){
   try{
+    var leadId = crypto.randomUUID();
     var token = await ensureValidAccessToken();
-    var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json', 'Prefer':'return=representation'};
+    var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'};
     if(token) headers['Authorization'] = 'Bearer '+token;
     var res = await fetch(SB_REST+'/leads', {
       method:'POST',
       headers:headers,
       body: JSON.stringify({
+        id: leadId,
         profile_id: details.profileId||null,
         name: details.name||null, email: details.email||null,
         dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
@@ -3622,11 +3632,10 @@ async function saveLead(details){
       console.error('saveLead rejected by server:', res.status, errBody);
       return;
     }
-    var rows = await res.json();
     // Stashed so an anonymous chat (which has no chat_sessions row to write
     // to — that table requires a real logged-in owner) can still be logged
     // against this lead via saveLeadMessage() below.
-    window._leadId = rows && rows[0] && rows[0].id;
+    window._leadId = leadId;
   }catch(e){ console.error('saveLead failed:', e.message); }
 }
 // Logs one message of an anonymous visitor's chat against their lead row,
