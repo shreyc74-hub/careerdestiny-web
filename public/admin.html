@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CareerDestiny — Admin</title>
+<style>
+  :root{ --bg:#f6f5f2; --card:#fff; --ink:#1a1a1a; --muted:#777; --line:#e6e3dc; --accent:#1D9E75; --err:#c0392b; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);}
+  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px;}
+  .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .hdr h1{font-size:18px;font-weight:600;margin:0;}
+  .hdr .sub{font-size:12px;color:var(--muted);}
+  button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;background:var(--ink);color:#fff;}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;width:100%;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;}
+  .login-box{max-width:360px;margin:80px auto;}
+  .login-box h2{margin-top:0;font-size:16px;}
+  .login-box input{margin-bottom:10px;}
+  .error{color:var(--err);font-size:13px;margin-top:8px;}
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab{padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:13px;cursor:pointer;}
+  .tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .stat .n{font-size:24px;font-weight:700;}
+  .stat .l{font-size:12px;color:var(--muted);margin-top:4px;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+  th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;}
+  tr:hover td{background:#faf9f6;}
+  .table-wrap{overflow-x:auto;}
+  .loading,.empty{padding:30px;text-align:center;color:var(--muted);font-size:13px;}
+  .clickable{cursor:pointer;color:var(--accent);}
+  .msg-row{padding:8px 0;border-bottom:1px solid var(--line);}
+  .msg-role{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:0.03em;}
+  .msg-text{font-size:13px;margin-top:2px;white-space:pre-wrap;}
+  .back-link{font-size:13px;color:var(--accent);cursor:pointer;margin-bottom:10px;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="loading">Loading…</div>
+</div>
+
+<script>
+var SESSION_KEY = 'cd_session';
+var SUPABASE_URL = 'https://ybuqwggrkbtdubnzeecb.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXF3Z2dya2J0ZHVibnplZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NDIzOTcsImV4cCI6MjEwMzMxODM5N30.LOw-zbFjhVjvNVJcjeeMzJF2mFrUXb-tm10XcgAE8zg';
+var SB_AUTH = SUPABASE_URL + '/auth/v1';
+
+function getStoredSession(){ try{ return JSON.parse(localStorage.getItem(SESSION_KEY)); }catch(e){ return null; } }
+function setStoredSession(s){ try{ if(s) localStorage.setItem(SESSION_KEY, JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY); }catch(e){} }
+
+async function ensureValidAccessToken(){
+  var s = getStoredSession();
+  if(!s || !s.access_token) return null;
+  if(s.expires_at && Date.now() < (s.expires_at*1000 - 30000)) return s.access_token;
+  try{
+    var r = await fetch(SB_AUTH+'/token?grant_type=refresh_token', {
+      method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},
+      body: JSON.stringify({ refresh_token: s.refresh_token })
+    });
+    var data = await r.json();
+    if(!r.ok) throw new Error('refresh failed');
+    setStoredSession({ access_token:data.access_token, refresh_token:data.refresh_token, expires_at:data.expires_at, user:data.user });
+    return data.access_token;
+  }catch(e){ setStoredSession(null); return null; }
+}
+
+async function adminFetch(action, extraParams){
+  var token = await ensureValidAccessToken();
+  if(!token) throw new Error('not-logged-in');
+  var qs = 'action=' + encodeURIComponent(action) + (extraParams||'');
+  var r = await fetch('/api/admin?' + qs, { headers:{ 'Authorization':'Bearer '+token } });
+  var data = await r.json();
+  if(!r.ok) throw new Error(data.error || ('HTTP '+r.status));
+  return data;
+}
+
+var app = document.getElementById('app');
+
+async function boot(){
+  var token = await ensureValidAccessToken();
+  if(!token){ renderLogin(); return; }
+  try{
+    var overview = await adminFetch('overview');
+    renderDashboard(overview);
+  }catch(e){
+    if(e.message === 'not-logged-in'){ renderLogin(); }
+    else { renderLogin('You are logged in, but not authorized to view this page.'); }
+  }
+}
+
+function renderLogin(err){
+  app.innerHTML =
+    '<div class="login-box card">'
+    + '<h2>CareerDestiny Admin</h2>'
+    + '<input type="email" id="li-email" placeholder="Email"/>'
+    + '<input type="password" id="li-pw" placeholder="Password"/>'
+    + '<button onclick="doLogin()" style="width:100%;">Log in</button>'
+    + (err ? '<div class="error">'+err+'</div>' : '<div class="error" id="li-err"></div>')
+    + '</div>';
+}
+
+async function doLogin(){
+  var email = document.getElementById('li-email').value.trim();
+  var pw = document.getElementById('li-pw').value;
+  var errEl = document.getElementById('li-err');
+  try{
+    var r = await fetch(SB_AUTH+'/token?grant_type=password', {
+      method:'POST', headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON_KEY},
+      body: JSON.stringify({ email:email, password:pw })
+    });
+    var data = await r.json();
+    if(!r.ok) throw new Error(data.error_description || data.msg || 'Login failed');
+    setStoredSession({ access_token:data.access_token, refresh_token:data.refresh_token, expires_at:data.expires_at, user:data.user });
+    boot();
+  }catch(e){
+    if(errEl) errEl.textContent = e.message;
+  }
+}
+
+function logOut(){ setStoredSession(null); renderLogin(); }
+
+var TABS = [
+  {id:'overview', label:'Overview'},
+  {id:'leads', label:'Leads'},
+  {id:'chat_sessions', label:'Chat Sessions'},
+  {id:'lead_revisits', label:'Revisits'},
+  {id:'lead_messages', label:'Anonymous Chats'}
+];
+
+function renderDashboard(overview){
+  app.innerHTML =
+    '<div class="hdr">'
+    + '<div><h1>CareerDestiny Admin</h1><div class="sub">Live data via service-role, admin-only</div></div>'
+    + '<button class="ghost" onclick="logOut()">Log out</button>'
+    + '</div>'
+    + '<div class="tabs" id="tabs"></div>'
+    + '<div id="tab-content"></div>';
+  var tabsEl = document.getElementById('tabs');
+  TABS.forEach(function(t){
+    var b = document.createElement('div');
+    b.className = 'tab' + (t.id==='overview' ? ' active' : '');
+    b.textContent = t.label;
+    b.onclick = function(){ switchTab(t.id); };
+    b.dataset.tab = t.id;
+    tabsEl.appendChild(b);
+  });
+  renderOverview(overview);
+}
+
+function switchTab(id){
+  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab===id); });
+  var content = document.getElementById('tab-content');
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  if(id==='overview'){
+    adminFetch('overview').then(renderOverview).catch(showErr);
+  } else if(id==='lead_messages'){
+    renderLeadMessagesList();
+  } else {
+    adminFetch(id).then(function(rows){ renderTable(rows, id); }).catch(showErr);
+  }
+}
+
+function showErr(e){
+  document.getElementById('tab-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
+}
+
+function renderOverview(o){
+  var content = document.getElementById('tab-content');
+  var stats = [
+    {n:o.totalLeads, l:'Total leads'},
+    {n:o.leadsLast24h, l:'Leads (last 24h)'},
+    {n:o.totalChatSessions, l:'Saved chat sessions'},
+    {n:o.totalChartAnalyses, l:'Cached chart analyses'},
+    {n:o.totalRevisitProfiles, l:'Revisit-tracked profiles'},
+    {n:o.totalRevisits, l:'Total visits tracked'},
+    {n:o.totalLeadMessages, l:'Anonymous chat messages'}
+  ];
+  content.innerHTML = '<div class="stat-grid">' + stats.map(function(s){
+    return '<div class="stat"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';
+  }).join('') + '</div>';
+}
+
+function renderTable(rows, tabId){
+  var content = document.getElementById('tab-content');
+  if(!rows || !rows.length){ content.innerHTML = '<div class="empty">No rows yet.</div>'; return; }
+  var cols = Object.keys(rows[0]);
+  var html = '<div class="card table-wrap"><table><thead><tr>' + cols.map(function(c){return '<th>'+c+'</th>';}).join('') + '</tr></thead><tbody>';
+  rows.forEach(function(row){
+    html += '<tr>' + cols.map(function(c){
+      var v = row[c];
+      if(v && typeof v === 'object') v = JSON.stringify(v).slice(0,80);
+      if(v === null || v === undefined) v = '';
+      return '<td title="'+String(v).replace(/"/g,'&quot;')+'">'+String(v)+'</td>';
+    }).join('') + '</tr>';
+  });
+  html += '</tbody></table></div>';
+  content.innerHTML = html;
+}
+
+async function renderLeadMessagesList(){
+  var content = document.getElementById('tab-content');
+  try{
+    var leads = await adminFetch('leads');
+    var messages = await adminFetch('lead_messages');
+    var counts = {};
+    messages.forEach(function(m){ counts[m.lead_id] = (counts[m.lead_id]||0) + 1; });
+    var withMsgs = leads.filter(function(l){ return counts[l.id]; });
+    if(!withMsgs.length){ content.innerHTML = '<div class="empty">No anonymous chat messages yet.</div>'; return; }
+    var html = '<div class="card table-wrap"><table><thead><tr><th>Name</th><th>Place</th><th>Messages</th><th>Created</th></tr></thead><tbody>';
+    withMsgs.forEach(function(l){
+      html += '<tr class="clickable" onclick="renderLeadMessagesDetail(\''+l.id+'\',\''+(l.name||'').replace(/'/g,"\\'")+'\')">'
+        + '<td>'+(l.name||'—')+'</td><td>'+(l.place_of_birth||'')+'</td><td>'+counts[l.id]+'</td><td>'+l.created_at+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+async function renderLeadMessagesDetail(leadId, name){
+  var content = document.getElementById('tab-content');
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  try{
+    var messages = await adminFetch('lead_messages', '&lead_id='+encodeURIComponent(leadId));
+    var html = '<span class="back-link" onclick="renderLeadMessagesList()">&larr; Back to list</span>'
+      + '<div class="card"><h3 style="margin-top:0;">'+(name||'Anonymous')+'</h3>';
+    messages.forEach(function(m){
+      html += '<div class="msg-row"><div class="msg-role">'+m.role+'</div><div class="msg-text">'+(m.text||'').replace(/</g,'&lt;')+'</div></div>';
+    });
+    html += '</div>';
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+boot();
+</script>
+</body>
+</html>
