@@ -3454,7 +3454,7 @@ function syncAllTranslatables(){
 // user to their own rows, not secrecy of this key.
 // ══════════════════════════════════════════════════════════════════
 var SUPABASE_URL = 'https://ybuqwggrkbtdubnzeecb.supabase.co';
-var SUPABASE_ANON_KEY = 'sb_publishable_K-3ThVzekUIwHWhtZ-jbNg_SK0SNDdn';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlidXF3Z2dya2J0ZHVibnplZWNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NDIzOTcsImV4cCI6MjEwMzMxODM5N30.LOw-zbFjhVjvNVJcjeeMzJF2mFrUXb-tm10XcgAE8zg';
 var SB_AUTH = SUPABASE_URL + '/auth/v1';
 var SB_REST = SUPABASE_URL + '/rest/v1';
 var SESSION_KEY = 'cd_session';
@@ -3484,6 +3484,13 @@ async function _sbAuthFetch(path, body){
 function _storeAuthResponse(data){
   setStoredSession({ access_token:data.access_token, refresh_token:data.refresh_token, expires_at:data.expires_at, user:data.user });
   window._currentUser = getCurrentUser();
+  // Keeps the header in sync even when this runs from a silent background
+  // token refresh (ensureValidAccessToken(), triggered by things like
+  // saveLead() on every analyze()) rather than an explicit login/signup —
+  // without this, window._currentUser flips to logged-in while the header
+  // still shows "Login / Sign up" until some unrelated screen switch
+  // happens to re-render it.
+  if(typeof refreshAuthUI === 'function') refreshAuthUI();
 }
 async function ensureValidAccessToken(){
   var s = getStoredSession();
@@ -3619,11 +3626,15 @@ async function saveLead(details){
 async function saveLeadMessage(role, text){
   if(getCurrentUser() || !window._leadId) return;
   try{
-    await fetch(SB_REST+'/lead_messages', {
+    var res = await fetch(SB_REST+'/lead_messages', {
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'},
       body: JSON.stringify({ lead_id: window._leadId, role: role, text: text })
     });
+    if(!res.ok){
+      var errBody = await res.text();
+      console.error('saveLeadMessage rejected by server:', res.status, errBody);
+    }
   }catch(e){ console.error('saveLeadMessage failed:', e.message); }
 }
 
@@ -4032,7 +4043,11 @@ async function autoSaveChatIfLoggedIn(){
   var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages, profileId: window._activeProfileId||null };
   try{
     var saved = await saveChatSession(session);
-    if(saved) window._chatSessionId = saved.id;
+    if(!saved){
+      console.error('autoSaveChatIfLoggedIn: save returned no row — not confirmed saved');
+      return;
+    }
+    window._chatSessionId = saved.id;
     if(!window._chatSessionSaved){
       window._chatSessionSaved = true;
       showSavedToast(title);
