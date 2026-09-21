@@ -5,24 +5,29 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>CareerDestiny — Admin</title>
 <style>
-  :root{ --bg:#f6f5f2; --card:#fff; --ink:#1a1a1a; --muted:#777; --line:#e6e3dc; --accent:#1D9E75; --err:#c0392b; }
+  :root{ --bg:#f6f5f2; --card:#fff; --ink:#1a1a1a; --muted:#777; --line:#e6e3dc; --accent:#1D9E75; --err:#c0392b; --sidebar:#faf9f6; }
   *{box-sizing:border-box;}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);}
-  .wrap{max-width:1100px;margin:0 auto;padding:24px 16px 60px;}
-  .hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
-  .hdr h1{font-size:18px;font-weight:600;margin:0;}
-  .hdr .sub{font-size:12px;color:var(--muted);}
+  html,body{margin:0;height:100%;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);}
+  #app{min-height:100vh;}
+  .layout{display:flex;min-height:100vh;}
+  .sidebar{width:240px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:16px 12px;}
+  .sidebar-brand{font-size:15px;font-weight:600;padding:8px 10px 4px;}
+  .sidebar-sub{font-size:11px;color:var(--muted);padding:0 10px 16px;}
+  .nav-list{display:flex;flex-direction:column;gap:2px;}
+  .nav-item{padding:9px 12px;border-radius:8px;font-size:13.5px;cursor:pointer;color:var(--ink);}
+  .nav-item:hover{background:#efece4;}
+  .nav-item.active{background:var(--ink);color:#fff;}
+  .sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);}
+  .main{flex:1;min-width:0;padding:28px 36px;overflow-y:auto;}
+  .main-title{font-size:16px;font-weight:600;margin:0 0 18px;}
   button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;background:var(--ink);color:#fff;}
-  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);width:100%;}
   input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;width:100%;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;}
   .login-box{max-width:360px;margin:80px auto;}
   .login-box h2{margin-top:0;font-size:16px;}
   .login-box input{margin-bottom:10px;}
   .error{color:var(--err);font-size:13px;margin-top:8px;}
-  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
-  .tab{padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:13px;cursor:pointer;}
-  .tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
   .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
   .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
   .stat .n{font-size:24px;font-weight:700;}
@@ -38,10 +43,14 @@
   .msg-role{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:0.03em;}
   .msg-text{font-size:13px;margin-top:2px;white-space:pre-wrap;}
   .back-link{font-size:13px;color:var(--accent);cursor:pointer;margin-bottom:10px;display:inline-block;}
+  .nav-section-label{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);padding:14px 12px 4px;}
+  .placeholder-banner{background:#fff8e6;border:1px solid #f0dca0;color:#8a6d1d;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:18px;line-height:1.5;}
+  .disabled-btn{opacity:0.45;cursor:not-allowed;pointer-events:none;}
+  .mock{opacity:0.55;}
 </style>
 </head>
 <body>
-<div class="wrap" id="app">
+<div id="app">
   <div class="loading">Loading…</div>
 </div>
 
@@ -132,38 +141,95 @@ var TABS = [
   {id:'lead_revisits', label:'Revisits'},
   {id:'lead_messages', label:'Anonymous Chats'}
 ];
+// Not built yet — previews only, so future scope is visible without
+// pretending these are functional. See renderPlaceholder().
+var PLACEHOLDER_TABS = [
+  {id:'guest_approvals', label:'Guest Approvals'},
+  {id:'coupons', label:'Coupons & Tokens'}
+];
 
 function renderDashboard(overview){
   app.innerHTML =
-    '<div class="hdr">'
-    + '<div><h1>CareerDestiny Admin</h1><div class="sub">Live data via service-role, admin-only</div></div>'
-    + '<button class="ghost" onclick="logOut()">Log out</button>'
+    '<div class="layout">'
+    + '<div class="sidebar">'
+    +   '<div class="sidebar-brand">CareerDestiny</div>'
+    +   '<div class="sidebar-sub">Admin</div>'
+    +   '<div class="nav-list" id="tabs"></div>'
+    +   '<div class="nav-section-label">Coming soon</div>'
+    +   '<div class="nav-list" id="tabs-placeholder"></div>'
+    +   '<div class="sidebar-footer"><button class="ghost" onclick="logOut()">Log out</button></div>'
     + '</div>'
-    + '<div class="tabs" id="tabs"></div>'
-    + '<div id="tab-content"></div>';
+    + '<div class="main">'
+    +   '<h2 class="main-title" id="main-title">Overview</h2>'
+    +   '<div id="tab-content"></div>'
+    + '</div>'
+    + '</div>';
   var tabsEl = document.getElementById('tabs');
   TABS.forEach(function(t){
     var b = document.createElement('div');
-    b.className = 'tab' + (t.id==='overview' ? ' active' : '');
+    b.className = 'nav-item' + (t.id==='overview' ? ' active' : '');
     b.textContent = t.label;
     b.onclick = function(){ switchTab(t.id); };
     b.dataset.tab = t.id;
     tabsEl.appendChild(b);
   });
+  var placeholderEl = document.getElementById('tabs-placeholder');
+  PLACEHOLDER_TABS.forEach(function(t){
+    var b = document.createElement('div');
+    b.className = 'nav-item';
+    b.textContent = t.label;
+    b.onclick = function(){ switchTab(t.id); };
+    b.dataset.tab = t.id;
+    placeholderEl.appendChild(b);
+  });
   renderOverview(overview);
 }
 
 function switchTab(id){
-  document.querySelectorAll('.tab').forEach(function(t){ t.classList.toggle('active', t.dataset.tab===id); });
+  document.querySelectorAll('.nav-item').forEach(function(t){ t.classList.toggle('active', t.dataset.tab===id); });
+  var titleEl = document.getElementById('main-title');
+  var t = TABS.find(function(x){return x.id===id;}) || PLACEHOLDER_TABS.find(function(x){return x.id===id;});
+  if(titleEl && t){ titleEl.textContent = t.label; }
   var content = document.getElementById('tab-content');
   content.innerHTML = '<div class="loading">Loading…</div>';
-  if(id==='overview'){
+  if(id==='guest_approvals' || id==='coupons'){
+    renderPlaceholder(id);
+  } else if(id==='overview'){
     adminFetch('overview').then(renderOverview).catch(showErr);
   } else if(id==='lead_messages'){
     renderLeadMessagesList();
   } else {
     adminFetch(id).then(function(rows){ renderTable(rows, id); }).catch(showErr);
   }
+}
+
+function renderPlaceholder(id){
+  var content = document.getElementById('tab-content');
+  var banner = '<div class="placeholder-banner">🚧 Not built yet — this is a preview of the planned layout, using sample data, so you can see the shape of it before we design it for real.</div>';
+  var mockup = '';
+  if(id === 'guest_approvals'){
+    mockup =
+      '<div class="card mock">'
+      + '<div style="font-size:13px;color:var(--muted);margin-bottom:10px;">Pending requests</div>'
+      + '<table><thead><tr><th>Name</th><th>Email</th><th>Requested</th><th>Action</th></tr></thead><tbody>'
+      + '<tr><td>Aditi Sharma</td><td>aditi@example.com</td><td>2h ago</td><td><button class="disabled-btn" style="background:var(--accent);">Approve</button> <button class="disabled-btn ghost" style="width:auto;display:inline-block;">Reject</button></td></tr>'
+      + '<tr><td>Rohan Mehta</td><td>rohan@example.com</td><td>5h ago</td><td><button class="disabled-btn" style="background:var(--accent);">Approve</button> <button class="disabled-btn ghost" style="width:auto;display:inline-block;">Reject</button></td></tr>'
+      + '</tbody></table>'
+      + '</div>';
+  } else if(id === 'coupons'){
+    mockup =
+      '<div class="card mock" style="display:flex;justify-content:space-between;align-items:center;">'
+      + '<div style="font-size:13px;color:var(--muted);">Create and manage token coupon codes</div>'
+      + '<button class="disabled-btn">+ New coupon</button>'
+      + '</div>'
+      + '<div class="card mock">'
+      + '<table><thead><tr><th>Code</th><th>Tokens</th><th>Redeemed</th><th>Expires</th><th>Status</th></tr></thead><tbody>'
+      + '<tr><td>LAUNCH100</td><td>100</td><td>0 / 50</td><td>31 Dec 2026</td><td>Active</td></tr>'
+      + '<tr><td>FRIENDS50</td><td>50</td><td>3 / 20</td><td>—</td><td>Active</td></tr>'
+      + '</tbody></table>'
+      + '</div>';
+  }
+  content.innerHTML = banner + mockup;
 }
 
 function showErr(e){
