@@ -3626,11 +3626,15 @@ async function saveLead(details){
 async function saveLeadMessage(role, text){
   if(getCurrentUser() || !window._leadId) return;
   try{
-    await fetch(SB_REST+'/lead_messages', {
+    var res = await fetch(SB_REST+'/lead_messages', {
       method:'POST',
       headers:{'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'},
       body: JSON.stringify({ lead_id: window._leadId, role: role, text: text })
     });
+    if(!res.ok){
+      var errBody = await res.text();
+      console.error('saveLeadMessage rejected by server:', res.status, errBody);
+    }
   }catch(e){ console.error('saveLeadMessage failed:', e.message); }
 }
 
