@@ -17,33 +17,41 @@
   .nav-item{padding:9px 12px;border-radius:8px;font-size:13.5px;cursor:pointer;color:var(--ink);}
   .nav-item:hover{background:#efece4;}
   .nav-item.active{background:var(--ink);color:#fff;}
+  .nav-section-label{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);padding:14px 12px 4px;}
   .sidebar-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);}
   .main{flex:1;min-width:0;padding:28px 36px;overflow-y:auto;}
   .main-title{font-size:16px;font-weight:600;margin:0 0 18px;}
   button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;background:var(--ink);color:#fff;}
   button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);width:100%;}
-  input{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:8px;width:100%;}
+  input{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;}
   .login-box{max-width:360px;margin:80px auto;}
   .login-box h2{margin-top:0;font-size:16px;}
-  .login-box input{margin-bottom:10px;}
+  .login-box input{width:100%;margin-bottom:10px;}
   .error{color:var(--err);font-size:13px;margin-top:8px;}
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;transition:border-color .15s;}
+  .stat:hover{border-color:var(--ink);}
   .stat .n{font-size:24px;font-weight:700;}
   .stat .l{font-size:12px;color:var(--muted);margin-top:4px;}
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
   th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.03em;}
-  tr:hover td{background:#faf9f6;}
+  tr.clickable-row{cursor:pointer;}
+  tr.clickable-row:hover td{background:#faf9f6;}
   .table-wrap{overflow-x:auto;}
   .loading,.empty{padding:30px;text-align:center;color:var(--muted);font-size:13px;}
   .clickable{cursor:pointer;color:var(--accent);}
   .msg-row{padding:8px 0;border-bottom:1px solid var(--line);}
   .msg-role{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:0.03em;}
   .msg-text{font-size:13px;margin-top:2px;white-space:pre-wrap;}
-  .back-link{font-size:13px;color:var(--accent);cursor:pointer;margin-bottom:10px;display:inline-block;}
-  .nav-section-label{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);padding:14px 12px 4px;}
+  .back-link{font-size:13px;color:var(--accent);cursor:pointer;margin-bottom:14px;display:inline-block;}
+  .toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+  .toolbar input[type="text"]{flex:1;min-width:180px;}
+  .filter-chip{padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);font-size:12.5px;cursor:pointer;color:var(--ink);}
+  .filter-chip.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+  .badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;background:#eef3f0;color:var(--accent);}
+  .badge.zero{background:#f0efec;color:var(--muted);}
   .placeholder-banner{background:#fff8e6;border:1px solid #f0dca0;color:#8a6d1d;border-radius:10px;padding:12px 16px;font-size:13px;margin-bottom:18px;line-height:1.5;}
   .disabled-btn{opacity:0.45;cursor:not-allowed;pointer-events:none;}
   .mock{opacity:0.55;}
@@ -134,12 +142,18 @@ async function doLogin(){
 
 function logOut(){ setStoredSession(null); renderLogin(); }
 
+// Visible in the sidebar
 var TABS = [
   {id:'overview', label:'Overview'},
   {id:'leads', label:'Leads'},
+  {id:'users', label:'Users'},
   {id:'chat_sessions', label:'Chat Sessions'},
-  {id:'lead_revisits', label:'Revisits'},
-  {id:'lead_messages', label:'Anonymous Chats'}
+  {id:'lead_revisits', label:'Revisits'}
+];
+// Reachable only by clicking an Overview card — a real view, just not
+// important enough to take up permanent sidebar space.
+var EXTRA_VIEWS = [
+  {id:'chart_analyses', label:'Cached Chart Analyses'}
 ];
 // Not built yet — previews only, so future scope is visible without
 // pretending these are functional. See renderPlaceholder().
@@ -185,24 +199,261 @@ function renderDashboard(overview){
   renderOverview(overview);
 }
 
+function tabLabel(id){
+  var all = TABS.concat(EXTRA_VIEWS).concat(PLACEHOLDER_TABS);
+  var t = all.find(function(x){return x.id===id;});
+  return t ? t.label : id;
+}
+
 function switchTab(id){
   document.querySelectorAll('.nav-item').forEach(function(t){ t.classList.toggle('active', t.dataset.tab===id); });
   var titleEl = document.getElementById('main-title');
-  var t = TABS.find(function(x){return x.id===id;}) || PLACEHOLDER_TABS.find(function(x){return x.id===id;});
-  if(titleEl && t){ titleEl.textContent = t.label; }
+  if(titleEl){ titleEl.textContent = tabLabel(id); }
   var content = document.getElementById('tab-content');
   content.innerHTML = '<div class="loading">Loading…</div>';
   if(id==='guest_approvals' || id==='coupons'){
     renderPlaceholder(id);
   } else if(id==='overview'){
     adminFetch('overview').then(renderOverview).catch(showErr);
-  } else if(id==='lead_messages'){
-    renderLeadMessagesList();
-  } else {
-    adminFetch(id).then(function(rows){ renderTable(rows, id); }).catch(showErr);
+  } else if(id==='leads'){
+    renderLeadsTab();
+  } else if(id==='users'){
+    renderUsersTab();
+  } else if(id==='chat_sessions'){
+    renderChatSessionsTab();
+  } else if(id==='lead_revisits'){
+    adminFetch('lead_revisits').then(renderRevisitsTable).catch(showErr);
+  } else if(id==='chart_analyses'){
+    adminFetch('chart_analyses').then(renderChartAnalysesTable).catch(showErr);
   }
 }
 
+function showErr(e){
+  document.getElementById('tab-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
+}
+
+function fmtDate(s){
+  if(!s) return '—';
+  try{ return new Date(s).toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return s; }
+}
+
+// ── Overview ─────────────────────────────────────────────────────────
+function renderOverview(o){
+  var content = document.getElementById('tab-content');
+  var stats = [
+    {n:o.totalLeads, l:'Total leads', go:'leads'},
+    {n:o.leadsLast24h, l:'Leads (last 24h)', go:'leads', filter:'24h'},
+    {n:o.totalUsers, l:'Signed-up users', go:'users'},
+    {n:o.totalChatSessions, l:'Saved chat sessions', go:'chat_sessions'},
+    {n:o.totalChartAnalyses, l:'Cached chart analyses', go:'chart_analyses'},
+    {n:o.totalRevisitProfiles, l:'Revisit-tracked profiles', go:'lead_revisits'},
+    {n:o.totalRevisits, l:'Total visits tracked', go:'lead_revisits'},
+    {n:o.totalLeadMessages, l:'Anonymous chat messages', go:'leads', filter:'chatted'}
+  ];
+  content.innerHTML = '<div class="stat-grid">' + stats.map(function(s, i){
+    return '<div class="stat" data-idx="'+i+'"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';
+  }).join('') + '</div>';
+  content.querySelectorAll('.stat').forEach(function(el){
+    var s = stats[+el.dataset.idx];
+    el.onclick = function(){ switchTab(s.go); if(s.go==='leads' && s.filter){ setTimeout(function(){ applyLeadsFilter(s.filter); }, 60); } };
+  });
+}
+
+// ── Leads (with search + filters, folds in anonymous chat messages) ──
+var _leadsCache = null, _leadMessageCounts = null, _leadsFilter = 'all', _leadsSearch = '';
+
+async function renderLeadsTab(){
+  var content = document.getElementById('tab-content');
+  try{
+    var leads = await adminFetch('leads');
+    var messages = await adminFetch('lead_messages');
+    var counts = {};
+    messages.forEach(function(m){ counts[m.lead_id] = (counts[m.lead_id]||0) + 1; });
+    _leadsCache = leads; _leadMessageCounts = counts;
+    content.innerHTML =
+      '<div class="toolbar">'
+      + '<input type="text" id="leads-search" placeholder="Search name, email, or place…"/>'
+      + '<div class="filter-chip" data-f="all">All</div>'
+      + '<div class="filter-chip" data-f="24h">Last 24h</div>'
+      + '<div class="filter-chip" data-f="7d">Last 7 days</div>'
+      + '<div class="filter-chip" data-f="chatted">Has chat</div>'
+      + '</div>'
+      + '<div id="leads-table"></div>';
+    document.getElementById('leads-search').oninput = function(){ _leadsSearch = this.value.toLowerCase(); renderLeadsTable(); };
+    content.querySelectorAll('.filter-chip').forEach(function(chip){
+      chip.onclick = function(){ applyLeadsFilter(chip.dataset.f); };
+    });
+    applyLeadsFilter('all');
+  }catch(e){ showErr(e); }
+}
+
+function applyLeadsFilter(f){
+  _leadsFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(function(c){ c.classList.toggle('active', c.dataset.f===f); });
+  renderLeadsTable();
+}
+
+function renderLeadsTable(){
+  var wrap = document.getElementById('leads-table');
+  if(!wrap || !_leadsCache) return;
+  var now = Date.now();
+  var rows = _leadsCache.filter(function(l){
+    if(_leadsFilter==='24h' && now - new Date(l.created_at).getTime() > 24*60*60*1000) return false;
+    if(_leadsFilter==='7d' && now - new Date(l.created_at).getTime() > 7*24*60*60*1000) return false;
+    if(_leadsFilter==='chatted' && !_leadMessageCounts[l.id]) return false;
+    if(_leadsSearch){
+      var hay = ((l.name||'')+' '+(l.email||'')+' '+(l.place_of_birth||'')).toLowerCase();
+      if(hay.indexOf(_leadsSearch) === -1) return false;
+    }
+    return true;
+  });
+  if(!rows.length){ wrap.innerHTML = '<div class="empty">No matching leads.</div>'; return; }
+  var html = '<div class="card table-wrap"><table><thead><tr>'
+    + '<th>Name</th><th>Email</th><th>DOB</th><th>Time</th><th>Place</th><th>Verdict</th><th>Biz</th><th>Job</th><th>Messages</th><th>Created</th>'
+    + '</tr></thead><tbody>';
+  rows.forEach(function(l){
+    var mc = _leadMessageCounts[l.id] || 0;
+    html += '<tr class="clickable-row" onclick="renderLeadDetail(\''+l.id+'\')">'
+      + '<td>'+(l.name||'—')+'</td><td>'+(l.email||'—')+'</td><td>'+(l.dob||'')+'</td><td>'+(l.time_of_birth||'')+'</td>'
+      + '<td>'+(l.place_of_birth||'')+'</td><td>'+(l.verdict||'')+'</td><td>'+(l.biz_score!=null?l.biz_score:'')+'</td><td>'+(l.job_score!=null?l.job_score:'')+'</td>'
+      + '<td>'+(mc ? '<span class="badge">'+mc+'</span>' : '<span class="badge zero">0</span>')+'</td>'
+      + '<td>'+fmtDate(l.created_at)+'</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  wrap.innerHTML = html;
+}
+
+async function renderLeadDetail(leadId){
+  var content = document.getElementById('tab-content');
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  var lead = _leadsCache.find(function(l){ return l.id===leadId; });
+  try{
+    var messages = (_leadMessageCounts[leadId]) ? await adminFetch('lead_messages', '&lead_id='+encodeURIComponent(leadId)) : [];
+    var html = '<span class="back-link" onclick="renderLeadsTab()">&larr; Back to Leads</span>'
+      + '<div class="card">'
+      +   '<h3 style="margin-top:0;">'+(lead.name||'—')+'</h3>'
+      +   '<div style="font-size:13px;color:var(--muted);line-height:1.8;">'
+      +     'Email: '+(lead.email||'—')+'<br/>'
+      +     'DOB: '+(lead.dob||'—')+' at '+(lead.time_of_birth||'—')+'<br/>'
+      +     'Place: '+(lead.place_of_birth||'—')+'<br/>'
+      +     'Verdict: '+(lead.verdict||'—')+' (Biz '+lead.biz_score+' / Job '+lead.job_score+')<br/>'
+      +     'Submitted: '+fmtDate(lead.created_at)
+      +   '</div>'
+      + '</div>';
+    if(messages.length){
+      html += '<div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Conversation</div>';
+      messages.forEach(function(m){
+        html += '<div class="msg-row"><div class="msg-role">'+m.role+'</div><div class="msg-text">'+(m.text||'').replace(/</g,'&lt;')+'</div></div>';
+      });
+      html += '</div>';
+    }
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+// ── Users (signed-up accounts, mapped to their profiles + chats) ────
+async function renderUsersTab(){
+  var content = document.getElementById('tab-content');
+  try{
+    var users = await adminFetch('users');
+    if(!users.length){ content.innerHTML = '<div class="empty">No signed-up users yet.</div>'; return; }
+    var html = '<div class="card table-wrap"><table><thead><tr><th>Email</th><th>Signed up</th><th>Last sign-in</th></tr></thead><tbody>';
+    users.forEach(function(u){
+      html += '<tr class="clickable-row" onclick="renderUserDetail(\''+u.id+'\',\''+(u.email||'').replace(/'/g,"\\'")+'\')">'
+        + '<td>'+(u.email||'—')+'</td><td>'+fmtDate(u.created_at)+'</td><td>'+fmtDate(u.last_sign_in_at)+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+async function renderUserDetail(userId, email){
+  var content = document.getElementById('tab-content');
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  try{
+    var detail = await adminFetch('user_detail', '&user_id='+encodeURIComponent(userId));
+    var html = '<span class="back-link" onclick="renderUsersTab()">&larr; Back to Users</span>'
+      + '<div class="card"><h3 style="margin-top:0;">'+email+'</h3></div>';
+    html += '<div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Birth chart profiles ('+detail.profiles.length+')</div>';
+    if(!detail.profiles.length){ html += '<div class="empty" style="padding:10px 0;">None yet.</div>'; }
+    else{
+      html += '<table><thead><tr><th>Label</th><th>Name</th><th>DOB</th><th>Place</th></tr></thead><tbody>';
+      detail.profiles.forEach(function(p){
+        html += '<tr><td>'+(p.label||'—')+'</td><td>'+(p.name||'—')+'</td><td>'+(p.dob||'—')+'</td><td>'+(p.place||'—')+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    html += '</div>';
+    html += '<div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:8px;">Saved chats ('+detail.chatSessions.length+')</div>';
+    if(!detail.chatSessions.length){ html += '<div class="empty" style="padding:10px 0;">None yet.</div>'; }
+    else{
+      html += '<table><thead><tr><th>Title</th><th>Updated</th></tr></thead><tbody>';
+      detail.chatSessions.forEach(function(c){
+        html += '<tr class="clickable-row" onclick="renderChatSessionDetail(\''+c.id+'\')"><td>'+(c.title||'—')+'</td><td>'+fmtDate(c.updated_at)+'</td></tr>';
+      });
+      html += '</tbody></table>';
+    }
+    html += '</div>';
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+// ── Chat sessions (logged-in users' saved chats) ─────────────────────
+async function renderChatSessionsTab(){
+  var content = document.getElementById('tab-content');
+  try{
+    var rows = await adminFetch('chat_sessions');
+    if(!rows.length){ content.innerHTML = '<div class="empty">No saved chats yet.</div>'; return; }
+    var html = '<div class="card table-wrap"><table><thead><tr><th>Title</th><th>Subtitle</th><th>Updated</th></tr></thead><tbody>';
+    rows.forEach(function(c){
+      html += '<tr class="clickable-row" onclick="renderChatSessionDetail(\''+c.id+'\')"><td>'+(c.title||'—')+'</td><td>'+(c.subtitle||'—')+'</td><td>'+fmtDate(c.updated_at)+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+async function renderChatSessionDetail(id){
+  var content = document.getElementById('tab-content');
+  content.innerHTML = '<div class="loading">Loading…</div>';
+  try{
+    var session = await adminFetch('chat_session_detail', '&id='+encodeURIComponent(id));
+    var html = '<span class="back-link" onclick="switchTab(\'chat_sessions\')">&larr; Back to Chat Sessions</span>'
+      + '<div class="card"><h3 style="margin-top:0;">'+(session.title||'—')+'</h3>';
+    (session.messages||[]).forEach(function(m){
+      html += '<div class="msg-row"><div class="msg-role">'+m.role+'</div><div class="msg-text">'+(m.text||'').replace(/</g,'&lt;')+'</div></div>';
+    });
+    html += '</div>';
+    content.innerHTML = html;
+  }catch(e){ showErr(e); }
+}
+
+// ── Revisits ─────────────────────────────────────────────────────────
+function renderRevisitsTable(rows){
+  var content = document.getElementById('tab-content');
+  if(!rows.length){ content.innerHTML = '<div class="empty">No revisit data yet.</div>'; return; }
+  var html = '<div class="card table-wrap"><table><thead><tr><th>DOB</th><th>Time</th><th>Place</th><th>Visits</th><th>Revisits &gt;6h</th><th>First seen</th><th>Last seen</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    html += '<tr><td>'+(r.dob||'')+'</td><td>'+(r.time_of_birth||'')+'</td><td>'+(r.place_of_birth||'')+'</td>'
+      + '<td>'+r.visit_count+'</td><td>'+(r.revisits_after_6h||0)+'</td><td>'+fmtDate(r.first_seen_at)+'</td><td>'+fmtDate(r.last_seen_at)+'</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  content.innerHTML = html;
+}
+
+// ── Cached chart analyses (secondary view, reached from Overview only) ─
+function renderChartAnalysesTable(rows){
+  var content = document.getElementById('tab-content');
+  if(!rows.length){ content.innerHTML = '<div class="empty">No cached analyses yet.</div>'; return; }
+  var html = '<div class="card table-wrap"><table><thead><tr><th>Verdict</th><th>Biz</th><th>Job</th><th>Computed</th></tr></thead><tbody>';
+  rows.forEach(function(r){
+    html += '<tr><td>'+(r.verdict||'')+'</td><td>'+(r.biz_score!=null?r.biz_score:'')+'</td><td>'+(r.job_score!=null?r.job_score:'')+'</td><td>'+fmtDate(r.computed_at)+'</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  content.innerHTML = html;
+}
+
+// ── Placeholders (not built) ────────────────────────────────────────
 function renderPlaceholder(id){
   var content = document.getElementById('tab-content');
   var banner = '<div class="placeholder-banner">🚧 Not built yet — this is a preview of the planned layout, using sample data, so you can see the shape of it before we design it for real.</div>';
@@ -230,77 +481,6 @@ function renderPlaceholder(id){
       + '</div>';
   }
   content.innerHTML = banner + mockup;
-}
-
-function showErr(e){
-  document.getElementById('tab-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
-}
-
-function renderOverview(o){
-  var content = document.getElementById('tab-content');
-  var stats = [
-    {n:o.totalLeads, l:'Total leads'},
-    {n:o.leadsLast24h, l:'Leads (last 24h)'},
-    {n:o.totalChatSessions, l:'Saved chat sessions'},
-    {n:o.totalChartAnalyses, l:'Cached chart analyses'},
-    {n:o.totalRevisitProfiles, l:'Revisit-tracked profiles'},
-    {n:o.totalRevisits, l:'Total visits tracked'},
-    {n:o.totalLeadMessages, l:'Anonymous chat messages'}
-  ];
-  content.innerHTML = '<div class="stat-grid">' + stats.map(function(s){
-    return '<div class="stat"><div class="n">'+s.n+'</div><div class="l">'+s.l+'</div></div>';
-  }).join('') + '</div>';
-}
-
-function renderTable(rows, tabId){
-  var content = document.getElementById('tab-content');
-  if(!rows || !rows.length){ content.innerHTML = '<div class="empty">No rows yet.</div>'; return; }
-  var cols = Object.keys(rows[0]);
-  var html = '<div class="card table-wrap"><table><thead><tr>' + cols.map(function(c){return '<th>'+c+'</th>';}).join('') + '</tr></thead><tbody>';
-  rows.forEach(function(row){
-    html += '<tr>' + cols.map(function(c){
-      var v = row[c];
-      if(v && typeof v === 'object') v = JSON.stringify(v).slice(0,80);
-      if(v === null || v === undefined) v = '';
-      return '<td title="'+String(v).replace(/"/g,'&quot;')+'">'+String(v)+'</td>';
-    }).join('') + '</tr>';
-  });
-  html += '</tbody></table></div>';
-  content.innerHTML = html;
-}
-
-async function renderLeadMessagesList(){
-  var content = document.getElementById('tab-content');
-  try{
-    var leads = await adminFetch('leads');
-    var messages = await adminFetch('lead_messages');
-    var counts = {};
-    messages.forEach(function(m){ counts[m.lead_id] = (counts[m.lead_id]||0) + 1; });
-    var withMsgs = leads.filter(function(l){ return counts[l.id]; });
-    if(!withMsgs.length){ content.innerHTML = '<div class="empty">No anonymous chat messages yet.</div>'; return; }
-    var html = '<div class="card table-wrap"><table><thead><tr><th>Name</th><th>Place</th><th>Messages</th><th>Created</th></tr></thead><tbody>';
-    withMsgs.forEach(function(l){
-      html += '<tr class="clickable" onclick="renderLeadMessagesDetail(\''+l.id+'\',\''+(l.name||'').replace(/'/g,"\\'")+'\')">'
-        + '<td>'+(l.name||'—')+'</td><td>'+(l.place_of_birth||'')+'</td><td>'+counts[l.id]+'</td><td>'+l.created_at+'</td></tr>';
-    });
-    html += '</tbody></table></div>';
-    content.innerHTML = html;
-  }catch(e){ showErr(e); }
-}
-
-async function renderLeadMessagesDetail(leadId, name){
-  var content = document.getElementById('tab-content');
-  content.innerHTML = '<div class="loading">Loading…</div>';
-  try{
-    var messages = await adminFetch('lead_messages', '&lead_id='+encodeURIComponent(leadId));
-    var html = '<span class="back-link" onclick="renderLeadMessagesList()">&larr; Back to list</span>'
-      + '<div class="card"><h3 style="margin-top:0;">'+(name||'Anonymous')+'</h3>';
-    messages.forEach(function(m){
-      html += '<div class="msg-row"><div class="msg-role">'+m.role+'</div><div class="msg-text">'+(m.text||'').replace(/</g,'&lt;')+'</div></div>';
-    });
-    html += '</div>';
-    content.innerHTML = html;
-  }catch(e){ showErr(e); }
 }
 
 boot();
