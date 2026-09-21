@@ -4032,7 +4032,11 @@ async function autoSaveChatIfLoggedIn(){
   var session = { id: window._chatSessionId, title: title, subtitle: lagna, messages: messages, profileId: window._activeProfileId||null };
   try{
     var saved = await saveChatSession(session);
-    if(saved) window._chatSessionId = saved.id;
+    if(!saved){
+      console.error('autoSaveChatIfLoggedIn: save returned no row — not confirmed saved');
+      return;
+    }
+    window._chatSessionId = saved.id;
     if(!window._chatSessionSaved){
       window._chatSessionSaved = true;
       showSavedToast(title);
