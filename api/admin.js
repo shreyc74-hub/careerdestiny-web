@@ -94,10 +94,30 @@ module.exports = async (req, res) => {
         return res.status(200).json(await sbAdmin('/chart_analyses?select=id,profile_id,verdict,biz_score,job_score,computed_at&order=computed_at.desc&limit=300'));
       }
       case 'users': {
-        const data = await sbAuthAdmin('/users?per_page=1000');
-        const users = (data.users || []).map(u => ({
-          id: u.id, email: u.email, created_at: u.created_at, last_sign_in_at: u.last_sign_in_at || null
-        })).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        // One extra query for ALL profiles, grouped by owner here, rather
+        // than one query per user — a user can have several profiles
+        // (their own chart plus family members'), so there's no single
+        // "the" birth details to show inline; a count plus a preview of
+        // the earliest one (usually their own) is the useful middle
+        // ground between showing nothing and showing every profile.
+        const [authData, allProfiles] = await Promise.all([
+          sbAuthAdmin('/users?per_page=1000'),
+          sbAdmin('/profiles?select=user_id,name,dob,place,created_at&order=created_at.asc')
+        ]);
+        const profilesByUser = {};
+        allProfiles.forEach(p => {
+          if (!profilesByUser[p.user_id]) profilesByUser[p.user_id] = [];
+          profilesByUser[p.user_id].push(p);
+        });
+        const users = (authData.users || []).map(u => {
+          const profiles = profilesByUser[u.id] || [];
+          const primary = profiles[0] || null;
+          return {
+            id: u.id, email: u.email, created_at: u.created_at, last_sign_in_at: u.last_sign_in_at || null,
+            profileCount: profiles.length,
+            primaryProfile: primary ? { name: primary.name, dob: primary.dob, place: primary.place } : null
+          };
+        }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
         return res.status(200).json(users);
       }
       case 'user_detail': {

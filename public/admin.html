@@ -357,10 +357,15 @@ async function renderUsersTab(){
   try{
     var users = await adminFetch('users');
     if(!users.length){ content.innerHTML = '<div class="empty">No signed-up users yet.</div>'; return; }
-    var html = '<div class="card table-wrap"><table><thead><tr><th>Email</th><th>Signed up</th><th>Last sign-in</th></tr></thead><tbody>';
+    var html = '<div class="card table-wrap"><table><thead><tr><th>Email</th><th>Profiles</th><th>Primary profile</th><th>Signed up</th><th>Last sign-in</th></tr></thead><tbody>';
     users.forEach(function(u){
+      var p = u.primaryProfile;
+      var preview = p ? ((p.name||'—')+' · '+(p.dob||'—')+' · '+(p.place||'—')) : '—';
       html += '<tr class="clickable-row" onclick="renderUserDetail(\''+u.id+'\',\''+(u.email||'').replace(/'/g,"\\'")+'\')">'
-        + '<td>'+(u.email||'—')+'</td><td>'+fmtDate(u.created_at)+'</td><td>'+fmtDate(u.last_sign_in_at)+'</td></tr>';
+        + '<td>'+(u.email||'—')+'</td>'
+        + '<td>'+(u.profileCount ? '<span class="badge">'+u.profileCount+'</span>' : '<span class="badge zero">0</span>')+'</td>'
+        + '<td>'+preview+'</td>'
+        + '<td>'+fmtDate(u.created_at)+'</td><td>'+fmtDate(u.last_sign_in_at)+'</td></tr>';
     });
     html += '</tbody></table></div>';
     content.innerHTML = html;
