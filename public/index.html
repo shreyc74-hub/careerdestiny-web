@@ -3529,6 +3529,18 @@ function logOut(){
   window._currentUser = null;
   window._chatSessionId = null; window._chatSessionSaved = false;
   refreshAuthUI();
+  // Logging out doesn't kick the user off the chat screen — sendChat()
+  // already falls back to the anonymous save path (saveLeadMessage() +
+  // the save nudge) once window._currentUser is cleared, so nothing
+  // actually breaks. This just lets them know the save behavior changed,
+  // instead of silently switching underneath them.
+  if(typeof _rsCurrentScreen !== 'undefined' && _rsCurrentScreen === 'chat' && typeof addRow === 'function'){
+    var lang = window._lang || 'en';
+    var note = lang==='hi'
+      ? "आप लॉग आउट हो गए हैं — जब तक आप फिर से लॉग इन नहीं करते, यहां से भेजे गए संदेश सहेजे नहीं जाएंगे।"
+      : "You've been logged out — messages from here won't be saved unless you sign back in.";
+    addRow('agent', renderChatReply(note), null, note);
+  }
   if(s && s.access_token){
     fetch(SB_AUTH+'/logout', { method:'POST', headers:{'apikey':SUPABASE_ANON_KEY,'Authorization':'Bearer '+s.access_token} }).catch(function(){});
   }
