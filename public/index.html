@@ -3644,9 +3644,15 @@ async function saveLead(details){
 // entirely — chat_sessions can't hold it (RLS ties every row to a real
 // auth.uid()), but the lead it came from can still show what was asked.
 // No-ops for logged-in users, who already get the full experience via
-// autoSaveChatIfLoggedIn()/chat_sessions.
+// autoSaveChatIfLoggedIn()/chat_sessions. Guards on window._currentUser
+// (not a fresh getCurrentUser() read) to match the caller's routing
+// decision (5042) exactly — otherwise the two can disagree when the
+// cached value is momentarily stale, and the message is dropped:
+// routing sends it here because window._currentUser looked logged-out,
+// then this guard rejects it because a fresh localStorage read shows a
+// real session, and autoSaveChatIfLoggedIn() is never called either.
 async function saveLeadMessage(role, text){
-  if(getCurrentUser() || !window._leadId) return;
+  if(window._currentUser || !window._leadId) return;
   try{
     var res = await fetch(SB_REST+'/lead_messages', {
       method:'POST',
