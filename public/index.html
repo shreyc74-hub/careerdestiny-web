@@ -3503,6 +3503,7 @@ async function ensureValidAccessToken(){
   }catch(e){
     setStoredSession(null);
     window._currentUser = null;
+    if(typeof refreshAuthUI === 'function') refreshAuthUI();
     return null;
   }
 }
