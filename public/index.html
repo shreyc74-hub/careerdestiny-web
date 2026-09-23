@@ -3652,7 +3652,14 @@ async function saveLead(details){
 // then this guard rejects it because a fresh localStorage read shows a
 // real session, and autoSaveChatIfLoggedIn() is never called either.
 async function saveLeadMessage(role, text){
-  if(window._currentUser || !window._leadId) return;
+  if(window._currentUser) return;
+  // saveLead() runs fire-and-forget from analyze() — the results/chat
+  // screen appears before its POST to /leads resolves, so a visitor who
+  // chats immediately can win the race and arrive here before
+  // window._leadId is set. Wait for that in-flight save (if any) instead
+  // of dropping the message outright.
+  if(!window._leadId && window._leadSavePromise){ await window._leadSavePromise; }
+  if(!window._leadId) return;
   try{
     var res = await fetch(SB_REST+'/lead_messages', {
       method:'POST',
@@ -4590,6 +4597,7 @@ async function analyze(){
   // detail) falls straight through to the normal flow below.
   window._activeProfileId = null;
   window._leadId = null; // a new analysis means a new lead, if one gets created below
+  window._leadSavePromise = null;
   if(getCurrentUser()){
     var matchedProfile = await findMatchingProfile({dob:dob, time:time, place:place});
     if(matchedProfile){
@@ -4758,7 +4766,7 @@ async function analyze(){
         cdTrack('analysis_call1_complete', {duration_ms: Date.now()-(_analysisStartTime||Date.now())});
         var verdictMatch = window._reply1.match(/VERDICT:\s*([A-Z]+)/i);
         collectData({name:name,dob:dob,time:time,place:place,email:email}, verdictMatch?verdictMatch[1]:'MIXED', window._reply1);
-        saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:verdictMatch?verdictMatch[1]:'MIXED', bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
+        window._leadSavePromise = saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:verdictMatch?verdictMatch[1]:'MIXED', bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
         updateReportPreview();
       }catch(e){ console.log('CALL1 error:',e.message); window._call1Ready=true; }
 
@@ -4850,7 +4858,7 @@ function loadFromCachedAnalysis(cached, name, email, dob, time, place){
   // Without this, only fresh (non-cached) analyses would ever count as a
   // revisit, so a logged-in user re-checking their own saved profile would
   // silently not be counted.
-  saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
+  window._leadSavePromise = saveLead({name:name, email:email, dob:dob, time:time, place:place, verdict:jsVerdict, bizScore:bizScore, jobScore:jobScore, profileId:window._activeProfileId||null});
 
   // SVGs for the emailed PDF aren't cached — re-geocode and fetch them in
   // the background so "Get my full report" still has real chart images.
