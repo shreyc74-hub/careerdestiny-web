@@ -3507,6 +3507,12 @@ async function ensureValidAccessToken(){
     return null;
   }
 }
+// Validate/refresh the stored session once on load, rather than waiting
+// for the first authenticated action (e.g. analyze()'s saveLead() call)
+// to happen to trigger it — otherwise the header shows whatever the raw,
+// unvalidated localStorage cache says (right only if the access token
+// happened to still be valid) until something unrelated fixes it later.
+document.addEventListener('DOMContentLoaded', function(){ ensureValidAccessToken(); });
 async function signUp(details){
   var data = await _sbAuthFetch('/signup', { email:details.email, password:details.password, data:{ name: details.name||'' } });
   if(data.access_token){
