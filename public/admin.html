@@ -23,7 +23,7 @@
   .main-title{font-size:16px;font-weight:600;margin:0 0 18px;}
   button{font:inherit;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;background:var(--ink);color:#fff;}
   button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);width:100%;}
-  input{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;}
+  input,select{font:inherit;padding:9px 12px;border:1px solid var(--line);border-radius:8px;}
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;}
   .login-box{max-width:360px;margin:80px auto;}
   .login-box h2{margin-top:0;font-size:16px;}
@@ -232,6 +232,20 @@ function showErr(e){
   document.getElementById('tab-content').innerHTML = '<div class="empty">Error: '+e.message+'</div>';
 }
 
+// Lead source values come from visitor-controlled URLs, so always escape.
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+}
+
+// One readable label per lead: tagged source, else referring site, else direct.
+function leadSource(l){
+  if(l.utm_source) return l.utm_source + (l.utm_medium ? ' / '+l.utm_medium : '');
+  if(l.gclid) return 'google ads';
+  if(l.fbclid) return 'facebook / instagram';
+  if(l.referrer){ try{ return new URL(l.referrer).host.replace(/^www\./,''); }catch(e){ return l.referrer; } }
+  return 'direct';
+}
+
 function fmtDate(s){
   if(!s) return '—';
   try{ return new Date(s).toLocaleString('en-IN', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }catch(e){ return s; }
@@ -260,7 +274,7 @@ function renderOverview(o){
 }
 
 // ── Leads (with search + filters, folds in anonymous chat messages) ──
-var _leadsCache = null, _leadMessageCounts = null, _leadsFilter = 'all', _leadsSearch = '';
+var _leadsCache = null, _leadMessageCounts = null, _leadsFilter = 'all', _leadsSearch = '', _leadsSource = '';
 
 async function renderLeadsTab(){
   var content = document.getElementById('tab-content');
@@ -277,14 +291,29 @@ async function renderLeadsTab(){
       + '<div class="filter-chip" data-f="24h">Last 24h</div>'
       + '<div class="filter-chip" data-f="7d">Last 7 days</div>'
       + '<div class="filter-chip" data-f="chatted">Has chat</div>'
+      + '<select id="leads-source"><option value="">All sources</option>'
+      +   sourceOptions(leads)
+      + '</select>'
       + '</div>'
       + '<div id="leads-table"></div>';
     document.getElementById('leads-search').oninput = function(){ _leadsSearch = this.value.toLowerCase(); renderLeadsTable(); };
+    var srcSel = document.getElementById('leads-source');
+    srcSel.value = _leadsSource;
+    srcSel.onchange = function(){ _leadsSource = this.value; renderLeadsTable(); };
     content.querySelectorAll('.filter-chip').forEach(function(chip){
       chip.onclick = function(){ applyLeadsFilter(chip.dataset.f); };
     });
     applyLeadsFilter('all');
   }catch(e){ showErr(e); }
+}
+
+// Source dropdown options with lead counts, most common first.
+function sourceOptions(leads){
+  var counts = {};
+  leads.forEach(function(l){ var s = leadSource(l); counts[s] = (counts[s]||0) + 1; });
+  return Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; }).map(function(s){
+    return '<option value="'+esc(s)+'">'+esc(s)+' ('+counts[s]+')</option>';
+  }).join('');
 }
 
 function applyLeadsFilter(f){
@@ -301,6 +330,7 @@ function renderLeadsTable(){
     if(_leadsFilter==='24h' && now - new Date(l.created_at).getTime() > 24*60*60*1000) return false;
     if(_leadsFilter==='7d' && now - new Date(l.created_at).getTime() > 7*24*60*60*1000) return false;
     if(_leadsFilter==='chatted' && !_leadMessageCounts[l.id]) return false;
+    if(_leadsSource && leadSource(l) !== _leadsSource) return false;
     if(_leadsSearch){
       var hay = ((l.name||'')+' '+(l.email||'')+' '+(l.place_of_birth||'')).toLowerCase();
       if(hay.indexOf(_leadsSearch) === -1) return false;
@@ -309,13 +339,14 @@ function renderLeadsTable(){
   });
   if(!rows.length){ wrap.innerHTML = '<div class="empty">No matching leads.</div>'; return; }
   var html = '<div class="card table-wrap"><table><thead><tr>'
-    + '<th>Name</th><th>Email</th><th>DOB</th><th>Time</th><th>Place</th><th>Verdict</th><th>Biz</th><th>Job</th><th>Messages</th><th>Created</th>'
+    + '<th>Name</th><th>Email</th><th>DOB</th><th>Time</th><th>Place</th><th>Verdict</th><th>Biz</th><th>Job</th><th>Source</th><th>Messages</th><th>Created</th>'
     + '</tr></thead><tbody>';
   rows.forEach(function(l){
     var mc = _leadMessageCounts[l.id] || 0;
     html += '<tr class="clickable-row" onclick="renderLeadDetail(\''+l.id+'\')">'
       + '<td>'+(l.name||'—')+'</td><td>'+(l.email||'—')+'</td><td>'+(l.dob||'')+'</td><td>'+(l.time_of_birth||'')+'</td>'
       + '<td>'+(l.place_of_birth||'')+'</td><td>'+(l.verdict||'')+'</td><td>'+(l.biz_score!=null?l.biz_score:'')+'</td><td>'+(l.job_score!=null?l.job_score:'')+'</td>'
+      + '<td>'+esc(leadSource(l))+'</td>'
       + '<td>'+(mc ? '<span class="badge">'+mc+'</span>' : '<span class="badge zero">0</span>')+'</td>'
       + '<td>'+fmtDate(l.created_at)+'</td></tr>';
   });
@@ -337,7 +368,14 @@ async function renderLeadDetail(leadId){
       +     'DOB: '+(lead.dob||'—')+' at '+(lead.time_of_birth||'—')+'<br/>'
       +     'Place: '+(lead.place_of_birth||'—')+'<br/>'
       +     'Verdict: '+(lead.verdict||'—')+' (Biz '+lead.biz_score+' / Job '+lead.job_score+')<br/>'
-      +     'Submitted: '+fmtDate(lead.created_at)
+      +     'Submitted: '+fmtDate(lead.created_at)+'<br/>'
+      +     'Source: '+esc(leadSource(lead))
+      +       (lead.utm_campaign ? ' · campaign: '+esc(lead.utm_campaign) : '')
+      +       (lead.utm_content ? ' · content: '+esc(lead.utm_content) : '')+'<br/>'
+      +     'Referrer: '+esc(lead.referrer||'—')+'<br/>'
+      +     'Landing page: '+esc(lead.landing_page||'—')+'<br/>'
+      +     'First seen: '+fmtDate(lead.first_seen_at)
+      +       (lead.last_touch && leadSource(lead.last_touch) !== leadSource(lead) ? '<br/>Latest visit from: '+esc(leadSource(lead.last_touch)) : '')
       +   '</div>'
       + '</div>';
     if(messages.length){
