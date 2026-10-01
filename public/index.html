@@ -616,6 +616,36 @@ function cdTrack(event, params){
     }
   } catch(e){ /* silent fail */ }
 }
+
+// ─── Lead source attribution ────────────────────────────────────────────────
+// Records where a visitor came from (UTM tags, external referrer, ad click
+// IDs, landing page) so it can be stored on their lead row — GA only has
+// this in aggregate. First touch is kept forever in localStorage, so a
+// visitor who clicks a tagged link today and returns directly next week is
+// still credited to the original link. Last touch is overwritten by any
+// later visit that carries its own source (tagged link or external site);
+// plain direct/internal visits never overwrite either.
+var CD_ATTR_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'];
+function captureAttribution(){
+  try{
+    var qs = new URLSearchParams(location.search);
+    var touch = {};
+    CD_ATTR_KEYS.forEach(function(k){ var v = qs.get(k); if(v) touch[k] = v.slice(0,200); });
+    var ref = '';
+    try{ if(document.referrer && new URL(document.referrer).host !== location.host) ref = document.referrer.slice(0,500); }catch(e){}
+    if(ref) touch.referrer = ref;
+    var hasSource = Object.keys(touch).length > 0;
+    touch.landing_page = (location.pathname + location.search).slice(0,500);
+    touch.at = new Date().toISOString();
+    if(!localStorage.getItem('cd_first_touch')) localStorage.setItem('cd_first_touch', JSON.stringify(touch));
+    if(hasSource || !localStorage.getItem('cd_last_touch')) localStorage.setItem('cd_last_touch', JSON.stringify(touch));
+  }catch(e){ /* storage blocked — attribution is best-effort */ }
+}
+captureAttribution();
+function getAttribution(){
+  function read(k){ try{ return JSON.parse(localStorage.getItem(k)||'null'); }catch(e){ return null; } }
+  return { first: read('cd_first_touch') || {}, last: read('cd_last_touch') || {} };
+}
 // ────────────────────────────────────────────────────────────────────────────
 var _RASHI_EN={'Mesha':'Aries','Vrishabha':'Taurus','Mithuna':'Gemini','Karka':'Cancer','Simha':'Leo','Kanya':'Virgo','Tula':'Libra','Vrischika':'Scorpio','Dhanu':'Sagittarius','Makar':'Capricorn','Kumbha':'Aquarius','Meena':'Pisces'};
 var _RASHI_HI={'Mesha':'मेष','Vrishabha':'वृषभ','Mithuna':'मिथुन','Karka':'कर्क','Simha':'सिंह','Kanya':'कन्या','Tula':'तुला','Vrischika':'वृश्चिक','Dhanu':'धनु','Makar':'मकर','Kumbha':'कुंभ','Meena':'मीन'};
@@ -3623,21 +3653,39 @@ async function saveLead(details){
     var token = await ensureValidAccessToken();
     var headers = {'apikey':SUPABASE_ANON_KEY, 'Content-Type':'application/json'};
     if(token) headers['Authorization'] = 'Bearer '+token;
-    var res = await fetch(SB_REST+'/leads', {
-      method:'POST',
-      headers:headers,
-      body: JSON.stringify({
-        id: leadId,
-        profile_id: details.profileId||null,
-        name: details.name||null, email: details.email||null,
-        dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
-        verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
-      })
-    });
+    var row = {
+      id: leadId,
+      profile_id: details.profileId||null,
+      name: details.name||null, email: details.email||null,
+      dob: details.dob||null, time_of_birth: details.time||null, place_of_birth: details.place||null,
+      verdict: details.verdict||null, biz_score: details.bizScore, job_score: details.jobScore
+    };
+    var attr = getAttribution(), ft = attr.first;
+    var attrCols = {
+      utm_source: ft.utm_source||null, utm_medium: ft.utm_medium||null, utm_campaign: ft.utm_campaign||null,
+      utm_content: ft.utm_content||null, utm_term: ft.utm_term||null,
+      gclid: ft.gclid||null, fbclid: ft.fbclid||null,
+      referrer: ft.referrer||null, landing_page: ft.landing_page||null,
+      first_seen_at: ft.at||null,
+      last_touch: attr.last && attr.last.at ? attr.last : null
+    };
+    var postLead = function(body){
+      return fetch(SB_REST+'/leads', { method:'POST', headers:headers, body: JSON.stringify(body) });
+    };
+    var res = await postLead(Object.assign({}, row, attrCols));
     if(!res.ok){
       var errBody = await res.text();
-      console.error('saveLead rejected by server:', res.status, errBody);
-      return;
+      // Attribution columns not added to the table yet (PostgREST PGRST204,
+      // unknown column) — save the lead without them rather than lose it.
+      if(res.status === 400 && /PGRST204|column/i.test(errBody)){
+        console.warn('saveLead: attribution columns missing, saving without them');
+        res = await postLead(row);
+        if(!res.ok) errBody = await res.text();
+      }
+      if(!res.ok){
+        console.error('saveLead rejected by server:', res.status, errBody);
+        return;
+      }
     }
     // Stashed so an anonymous chat (which has no chat_sessions row to write
     // to — that table requires a real logged-in owner) can still be logged
@@ -4541,7 +4589,12 @@ function hidePlaceDropdown(inputEl){
 }
 function collectData(meta, verdict, analysis){
   try{
+    var ft = getAttribution().first;
     var params = new URLSearchParams({
+      utm_source: ft.utm_source||"",
+      utm_medium: ft.utm_medium||"",
+      utm_campaign: ft.utm_campaign||"",
+      referrer: ft.referrer||"",
       name: meta.name||"",
       dob: meta.dob||"",
       time: meta.time||"",
