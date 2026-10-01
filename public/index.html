@@ -620,11 +620,13 @@ function cdTrack(event, params){
 // ─── Lead source attribution ────────────────────────────────────────────────
 // Records where a visitor came from (UTM tags, external referrer, ad click
 // IDs, landing page) so it can be stored on their lead row — GA only has
-// this in aggregate. First touch is kept forever in localStorage, so a
-// visitor who clicks a tagged link today and returns directly next week is
-// still credited to the original link. Last touch is overwritten by any
-// later visit that carries its own source (tagged link or external site);
-// plain direct/internal visits never overwrite either.
+// this in aggregate. First touch is the first visit that actually came
+// from somewhere (tagged link, ad click or external site), kept forever in
+// localStorage — a visitor who clicks a tagged link today and returns
+// directly next week is still credited to the original link. A plain
+// direct visit is only a placeholder: it's recorded if nothing better has
+// been seen yet, and replaced by the first sourced visit that follows.
+// Last touch is overwritten by any later sourced visit.
 var CD_ATTR_KEYS = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','gclid','fbclid'];
 function captureAttribution(){
   try{
@@ -637,7 +639,10 @@ function captureAttribution(){
     var hasSource = Object.keys(touch).length > 0;
     touch.landing_page = (location.pathname + location.search).slice(0,500);
     touch.at = new Date().toISOString();
-    if(!localStorage.getItem('cd_first_touch')) localStorage.setItem('cd_first_touch', JSON.stringify(touch));
+    var first = null;
+    try{ first = JSON.parse(localStorage.getItem('cd_first_touch')||'null'); }catch(e){}
+    var firstIsDirect = !first || !CD_ATTR_KEYS.concat('referrer').some(function(k){ return first[k]; });
+    if(!first || (hasSource && firstIsDirect)) localStorage.setItem('cd_first_touch', JSON.stringify(touch));
     if(hasSource || !localStorage.getItem('cd_last_touch')) localStorage.setItem('cd_last_touch', JSON.stringify(touch));
   }catch(e){ /* storage blocked — attribution is best-effort */ }
 }
